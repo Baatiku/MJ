@@ -1,7 +1,7 @@
 import { whatsappIcon } from './whatsapp-icon.js';
 import { categories, products } from '../catalog/products.js';
 import { escapeHtml as html } from '../lib/html.js';
-import { contactLink, displayWhatsAppNumber } from '../lib/shop.js';
+import { contactLink, displayWhatsAppNumber, freeStoreLink } from '../lib/shop.js';
 import { productCard } from './product-card.js';
 
 export function storefront(origin, catalog = products) {
@@ -17,20 +17,40 @@ export function storefront(origin, catalog = products) {
     `<img src="${html(variants[0].image)}" alt="" width="512" height="512" fetchpriority="high">`
   ).join('');
   const data = JSON.stringify(catalog).replaceAll('<', '\\u003c');
+  const title = 'Maknoon Jamil | Modestwear Catalog';
+  const description = 'Shop abayas, maxi dresses, khimars, niqab looks, hijabs and matching sets. Browse colours and order on WhatsApp.';
+  const homepage = origin ? new URL('/', origin).href : null;
+  const cover = homepage ? new URL('/images/catalog-share-v1.jpg', homepage).href : null;
+  const social = homepage ? `
+  <link rel="canonical" href="${html(homepage)}">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Maknoon Jamil">
+  <meta property="og:url" content="${html(homepage)}">
+  <meta property="og:title" content="${html(title)}">
+  <meta property="og:description" content="${html(description)}">
+  <meta property="og:image" content="${html(cover)}">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Maknoon Jamil catalog cover showing modestwear from across the collection.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="${html(title)}">
+  <meta name="twitter:description" content="${html(description)}">
+  <meta name="twitter:image" content="${html(cover)}">` : '';
   return `<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Explore Maknoon Jamil’s abayas, khimars and niqab looks. Choose a colour and order through WhatsApp.">
+  <meta name="description" content="${html(description)}">${social}
   <meta name="theme-color" content="#faf6ef">
-  <title>Maknoon Jamil — Modestwear Boutique</title>
+  <title>${html(title)}</title>
   <link rel="stylesheet" href="/styles/storefront.css">
   <script src="/storefront.js" type="module"></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
-  <div class="announcement">Nigerian modestwear boutique <span aria-hidden="true">✦</span> Orders via WhatsApp</div>
+  <a class="announcement" href="${html(freeStoreLink)}" target="_blank" rel="noopener noreferrer">${whatsappIcon} Get a free online store for your business</a>
   <header class="shell masthead">
     <nav aria-label="Storefront"><a href="#styles">Styles</a><a href="#collection">Collection</a></nav>
     <a class="wordmark" href="/">Maknoon Jamil<small>MODESTWEAR</small></a>

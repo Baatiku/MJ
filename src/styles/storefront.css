@@ -14,8 +14,10 @@ img { display: block; width: 100%; height: auto; }
 .sr-only, .skip-link:not(:focus) { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .skip-link:focus { position: fixed; top: 10px; left: 10px; z-index: 4; background: white; padding: 8px 16px; }
 
-.announcement { padding: 8px 12px; text-align: center; background: var(--ink); color: var(--paper); font-size: 10px; letter-spacing: .13em; text-transform: uppercase; }
-.announcement span, .kicker span { margin-inline: .55em; }
+.announcement { display: flex; align-items: center; justify-content: center; gap: 7px; padding: 8px 6px; background: var(--ink); color: var(--paper); font-size: clamp(10px, 3vw, 13px); font-weight: 650; white-space: nowrap; }
+.announcement:hover { text-decoration: underline; text-underline-offset: 3px; }
+.announcement .whatsapp-icon { color: #25d366; }
+.kicker span { margin-inline: .55em; }
 .masthead { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; min-height: 86px; }
 .masthead nav { display: flex; gap: clamp(10px, 2vw, 28px); font-size: 13px; }
 .masthead > .contact { justify-self: end; }

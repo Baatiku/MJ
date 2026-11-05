@@ -17,8 +17,8 @@ export function formatNaira(amount) {
   }).format(amount);
 }
 
-export function whatsappLink(message) {
-  return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+export function whatsappLink(message, number = whatsappNumber) {
+  return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
 }
 
 export function variantPath(product, variant) {
@@ -43,3 +43,5 @@ export function orderLink(product, variant, origin) {
 }
 
 export const contactLink = whatsappLink('Hello Maknoon Jamil! I’d like to ask about your modestwear collection.');
+
+export const freeStoreLink = whatsappLink('Hello! I’d like to set up a free online store for my business, like Maknoon Jamil. How do I get started?', '2348161564273');
