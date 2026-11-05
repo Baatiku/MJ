@@ -15,7 +15,9 @@ export function variantPath(product, variant) {
 }
 
 export function previewImage(variant) {
-  return variant.image.replace('/images/', '/previews/').replace(/\.webp$/, '.jpg');
+  return variant.image.startsWith('/images/') && variant.image.endsWith('.webp')
+    ? variant.image.replace('/images/', '/previews/').replace(/\.webp$/, '.jpg')
+    : variant.image;
 }
 
 export function orderLink(product, variant, origin) {

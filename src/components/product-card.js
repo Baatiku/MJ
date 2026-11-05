@@ -5,7 +5,7 @@ export function productCard(product, origin) {
   const first = product.variants[0];
   return `<article class="product" data-product="${product.id}" data-category="${product.category}" id="${product.id}">
     <a class="product-media" href="${variantPath(product, first)}">
-      <img src="${first.image}" alt="${html(product.name)} in ${html(first.name)}" width="512" height="512" loading="lazy" decoding="async">
+      <img src="${html(first.image)}" alt="${html(product.name)} in ${html(first.name)}" width="512" height="512" loading="lazy" decoding="async">
     </a>
     <div class="product-body">
       <div class="product-title"><h3>${html(product.name)}</h3><span>${product.price === null ? 'Ask for price' : formatNaira(product.price)}</span></div>
@@ -19,9 +19,9 @@ export function productCard(product, origin) {
           </label>`).join('')}
         </div>
       </fieldset>
-      <a class="order" href="${html(orderLink(product, first, origin))}" target="_blank" rel="noopener noreferrer">
+      ${product.available === false ? '<p class="stock-note">Currently unavailable</p>' : `<a class="order" href="${html(orderLink(product, first, origin))}" target="_blank" rel="noopener noreferrer">
         ${product.price === null ? 'Ask on WhatsApp' : 'Buy on WhatsApp'} <span aria-hidden="true">↗</span>
-      </a>
+      </a>`}
     </div>
   </article>`;
 }

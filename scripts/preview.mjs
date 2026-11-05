@@ -9,7 +9,7 @@ const port = Number(process.env.PORT || 4173);
 createServer(async (request, response) => {
   const path = new URL(request.url, 'http://localhost').pathname;
   try {
-    const file = new URL('.' + (path.endsWith('/') ? path + 'index.html' : path), root);
+    const file = new URL('.' + (path === '/admin' ? '/admin/index.html' : path.endsWith('/') ? path + 'index.html' : path), root);
     if (!file.href.startsWith(root.href)) throw new Error('Invalid path');
     const content = await readFile(file);
     response.writeHead(200, { 'Content-Type': types[extname(file.pathname)] || 'application/octet-stream' });

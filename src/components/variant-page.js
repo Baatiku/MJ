@@ -14,7 +14,7 @@ export function variantPage(product, variant, origin) {
   <meta property="og:title" content="${html(title)}">
   <meta property="og:description" content="${html(description)}">
   <meta property="og:image" content="${html(new URL(previewImage(variant), origin).href)}">
-  <meta property="og:image:type" content="image/jpeg">
+
   <meta property="og:image:alt" content="${html(title)}">` : '';
 
   return `<!doctype html>
@@ -30,7 +30,7 @@ export function variantPage(product, variant, origin) {
   <main class="shell variant-page">
     <a class="variant-back" href="/#${product.id}">← Back to the collection</a>
     <div class="variant-layout">
-      <img src="${variant.image}" alt="${html(title)}">
+      <img src="${html(variant.image)}" alt="${html(title)}">
       <div>
         <p class="kicker">Maknoon Jamil</p>
         <h1>${html(product.name)}</h1>
@@ -39,7 +39,7 @@ export function variantPage(product, variant, origin) {
         <nav class="variant-colours" aria-label="Available colours">
           ${product.variants.map((option) => `<a href="${variantPath(product, option)}"${option === variant ? ' aria-current="page"' : ''}>${html(option.name)}</a>`).join('')}
         </nav>
-        <a class="order" href="${html(orderLink(product, variant, origin))}" target="_blank" rel="noopener noreferrer">Order on WhatsApp <span aria-hidden="true">↗</span></a>
+        ${product.available === false ? '<p class="stock-note">Currently unavailable</p>' : `<a class="order" href="${html(orderLink(product, variant, origin))}" target="_blank" rel="noopener noreferrer">Order on WhatsApp <span aria-hidden="true">↗</span></a>`}
       </div>
     </div>
   </main>

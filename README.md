@@ -40,3 +40,15 @@ Cloudflare builds and publishes `dist/`. Subsequent pushes to the connected prod
 The catalog uses studio renderings. The only confirmed price is ₦25,000 for the Flow Abaya. Confirm availability, price, and details over WhatsApp.
 
 Every colour has a static product page with a JPEG link preview. The WhatsApp order message includes that page’s URL. Cloudflare Pages supplies the public deployment URL automatically. Set the optional `SITE_URL` build variable to the public custom domain if you want preview metadata to use it. WhatsApp controls whether its app displays a thumbnail.
+
+## Enable the owner dashboard
+
+1. In Cloudflare, create a D1 database for the shop.
+2. Open the database console and run the statements from `migrations/0001_catalog.sql`.
+3. In the Pages project's **Settings → Bindings**, bind that database as `CATALOG_DB`. Use a separate database for preview deployments if you enable admin there.
+4. In **Settings → Variables and Secrets**, add `ADMIN_PASSWORD` as an encrypted secret. Use a private password independent of the public WhatsApp number.
+5. Redeploy and open `/admin/`. The static catalog works before the database is connected, but owner sign-in requires both bindings.
+
+The editor updates names, descriptions, categories, prices, availability, visibility, and per-colour names, swatches and photo URLs. Use a catalog image path or public HTTPS URL for a matching photo. Swatch changes do not recolour photos. Hidden products disappear from the storefront and their product URLs return 404. Product image assets are public, including images previously shared in chat. An unavailable item stays listed with ordering disabled.
+
+Catalog changes are stored in D1 and loaded on each storefront request. They take effect without a redeploy. The built-in catalog and images remain the default when no owner edits exist.

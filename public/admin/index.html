@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Catalog admin | Maknoon Jamil</title>
+  <link rel="stylesheet" href="/styles/storefront.css">
+  <link rel="stylesheet" href="/admin/admin.css">
+  <script type="module" src="/admin/admin.js"></script>
+</head>
+<body>
+  <main class="shell admin">
+    <header class="admin-header">
+      <div><p class="kicker">Maknoon Jamil</p><h1>Catalog admin</h1></div>
+      <a href="/">View shop ↗</a>
+    </header>
+    <p id="notice" role="status"></p>
+    <form id="login" class="panel" hidden>
+      <h2>Owner sign-in</h2>
+      <label>Password <input type="password" name="password" autocomplete="current-password" required></label>
+      <button class="primary" type="submit">Sign in</button>
+    </form>
+    <section id="dashboard" class="admin-layout" hidden>
+      <aside class="panel">
+        <div class="admin-header"><h2>Products</h2><button type="button" id="logout">Sign out</button></div>
+        <label>Find a product <input id="search" type="search"></label>
+        <div id="list"></div>
+      </aside>
+      <form id="editor" class="panel" hidden>
+        <h2 id="product-title">Edit product</h2>
+        <div class="admin-fields">
+          <label>Name <input name="name" required maxlength="100"></label>
+          <label>Price in ₦ <input name="price" type="number" min="0" max="100000000" placeholder="Ask for price"></label>
+          <label>Category <select name="category"></select></label>
+          <label class="wide">Description <textarea name="description" required maxlength="450"></textarea></label>
+          <label class="check"><input type="checkbox" name="available"> Available to order</label>
+          <label class="check"><input type="checkbox" name="hidden"> Hide from the storefront</label>
+        </div>
+        <h3>Colours and photos</h3>
+        <p>Set each colour’s swatch and matching photo. Changing a swatch updates the colour selector. Changing the photo updates the image shoppers see.</p>
+        <div id="variants"></div>
+        <div class="admin-actions"><button type="button" id="add-colour">Add colour</button><button class="primary" type="submit">Save product</button></div>
+      </form>
+    </section>
+  </main>
+  <template id="variant">
+    <div class="variant-editor">
+      <img alt="" width="85" height="85" loading="lazy">
+      <div class="admin-fields">
+        <label>Colour name <input name="colour" required maxlength="60"></label>
+        <label>Swatch <input name="swatch" type="color"></label>
+        <label class="wide">Photo URL <input name="image" required maxlength="500"></label>
+      </div>
+      <button type="button" class="remove">Remove</button>
+    </div>
+  </template>
+</body>
+</html>

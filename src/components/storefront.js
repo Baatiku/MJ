@@ -3,13 +3,19 @@ import { escapeHtml as html } from '../lib/html.js';
 import { contactLink } from '../lib/shop.js';
 import { productCard } from './product-card.js';
 
-const categoryLinks = categories.map(({ id, name, image }) => `
-  <a class="category" href="?category=${id}#collection" data-filter-link="${id}">
-    <img src="${image}" alt="" width="512" height="512" loading="lazy">
-    <span>${html(name)} <b aria-hidden="true">↗</b></span>
-  </a>`).join('');
-
-export function storefront(origin) {
+export function storefront(origin, catalog = products) {
+  const categoryLinks = categories.flatMap(({ id, name }) => {
+    const lead = catalog.find((product) => product.category === id);
+    if (!lead) return [];
+    return `<a class="category" href="?category=${id}#collection">
+      <img src="${html(lead.variants[0].image)}" alt="" width="512" height="512" loading="lazy">
+      <span>${html(name)} <b aria-hidden="true">↗</b></span>
+    </a>`;
+  }).join('');
+  const hero = catalog.slice(0, 3).map(({ variants }) =>
+    `<img src="${html(variants[0].image)}" alt="" width="512" height="512" fetchpriority="high">`
+  ).join('');
+  const data = JSON.stringify(catalog).replaceAll('<', '\\u003c');
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -37,11 +43,7 @@ export function storefront(origin) {
         <p>Fluid silhouettes and rich colours, from wide-sleeve abayas to softly layered khimars.</p>
         <a class="primary" href="#collection">Explore the collection <span aria-hidden="true">↓</span></a>
       </div>
-      <div class="hero-gallery" aria-hidden="true">
-        <img src="/images/flow-abaya-navy.webp" alt="" width="512" height="512" fetchpriority="high">
-        <img src="/images/rose-khimar-rose.webp" alt="" width="512" height="512" fetchpriority="high">
-        <img src="/images/blue-veil-blue.webp" alt="" width="512" height="512" fetchpriority="high">
-      </div>
+      ${hero ? `<div class="hero-gallery" aria-hidden="true">${hero}</div>` : ''}
     </section>
     <section class="style-section" id="styles" aria-labelledby="styles-title">
       <p class="kicker">Find your silhouette</p><h2 id="styles-title">Shop by style</h2>
@@ -52,18 +54,20 @@ export function storefront(origin) {
         <div><p class="kicker">The collection</p><h2 id="collection-title">Find your colour</h2></div>
         <div class="filters" aria-label="Filter collection" hidden>
           <button type="button" data-filter="all" aria-pressed="true">All styles</button>
-          ${categories.map(({ id, name }) => `<button type="button" data-filter="${id}" aria-pressed="false">${html(name)}</button>`).join('')}
+          ${categories.filter(({ id }) => catalog.some(({ category }) => category === id)).map(({ id, name }) => `<button type="button" data-filter="${id}" aria-pressed="false">${html(name)}</button>`).join('')}
         </div>
       </div>
       <p class="collection-note">Choose a colour to see its photo, then message us on WhatsApp to confirm availability.</p>
       <p class="sr-only" data-result-count aria-live="polite"></p>
-      <div class="product-grid">${products.map((product) => productCard(product, origin)).join('')}</div>
+      ${catalog.length ? '' : '<p>No styles are listed right now.</p>'}
+      <div class="product-grid">${catalog.map((product) => productCard(product, origin)).join('')}</div>
     </section>
   </main>
   <footer class="footer">
-    <div class="shell footer-inner"><div><span class="wordmark">Maknoon Jamil</span><p>Modestwear boutique</p></div>
+    <div class="shell footer-inner"><div><span class="wordmark">Maknoon Jamil</span><p>Modestwear boutique · <a href="/admin/">Owner sign-in</a></p></div>
     <a class="contact" href="${html(contactLink)}" target="_blank" rel="noopener noreferrer">+234 802 251 9062 <span aria-hidden="true">↗</span></a></div>
   </footer>
+  <script type="application/json" id="catalog-data">${data}</script>
 </body>
 </html>`;
 }

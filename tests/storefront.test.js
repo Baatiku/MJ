@@ -8,7 +8,7 @@ import { variantPage } from '../src/components/variant-page.js';
 const origin = 'https://shop.example';
 
 test('each style has distinct colour choices and uniquely addressed images', () => {
-  assert.ok(products.length >= 10);
+  assert.equal(products.length, 25);
   assert.equal(new Set(products.map(({ id }) => id)).size, products.length);
   const images = new Set();
   for (const product of products) {

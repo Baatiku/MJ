@@ -1,5 +1,6 @@
-import { products } from './catalog/products.js';
 import { orderLink, variantPath } from './lib/shop.js';
+
+const products = JSON.parse(document.querySelector('#catalog-data').textContent);
 
 for (const product of products) {
   const card = document.getElementById(product.id);
@@ -14,7 +15,7 @@ for (const product of products) {
     image.alt = `${product.name} in ${variant.name}`;
     selected.textContent = variant.name;
     photo.href = variantPath(product, variant);
-    order.href = orderLink(product, variant, location.origin);
+    if (order) order.href = orderLink(product, variant, location.origin);
   }
   options.addEventListener('change', updateSelection);
   options.hidden = false;

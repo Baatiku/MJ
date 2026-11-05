@@ -1,0 +1,35 @@
+.admin { padding-block: 25px 65px; }
+.admin h1 { font-size: clamp(40px, 8vw, 80px); }
+.admin h2 { font-size: 29px; margin: 0 0 12px; }
+.admin h3 { font-size: 24px; margin: 22px 0 8px; }
+.admin-header, .admin-actions { display: flex; gap: 12px; align-items: center; justify-content: space-between; }
+.admin-header a { text-decoration: underline; white-space: nowrap; }
+.admin-layout { display: grid; grid-template-columns: minmax(200px, 1fr) minmax(0, 3fr); align-items: start; gap: 15px; }
+.panel { background: var(--card); border: 1px solid var(--line); padding: clamp(12px, 3vw, 25px); }
+#login { max-width: 420px; }
+#notice { min-height: 1.8em; color: var(--accent); }
+.admin label { display: grid; gap: 4px; font-weight: 650; font-size: 13px; min-width: 0; }
+.admin input, .admin select, .admin textarea, .admin button { border: 1px solid var(--line); padding: 8px; font: inherit; }
+.admin input, .admin select, .admin textarea { width: 100%; background: var(--paper); }
+.admin input[type="color"] { height: 40px; }
+.admin .check { display: flex; align-items: center; gap: 8px; }
+.admin input[type="checkbox"] { width: auto; }
+.admin textarea { min-height: 70px; resize: vertical; }
+.admin button:not(.primary) { background: var(--paper); color: var(--ink); }
+.admin .primary { margin-top: 0; }
+#login button { margin-top: 12px; }
+#list { display: grid; gap: 4px; margin-top: 12px; max-height: 60vh; overflow: auto; }
+#list button { text-align: left; }
+#list button[aria-current="true"] { border-color: var(--ink); background: var(--sand); }
+#list small { display: block; color: var(--muted); }
+.admin-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.admin-fields .wide { grid-column: 1 / -1; }
+.variant-editor { display: grid; grid-template-columns: 85px minmax(0, 1fr) auto; align-items: center; gap: 8px; padding-block: 10px; border-bottom: 1px solid var(--line); }
+.variant-editor img { aspect-ratio: 1; object-fit: contain; background: var(--sand); }
+.admin-actions { margin-top: 15px; }
+@media (max-width: 700px) {
+  .admin-layout { grid-template-columns: minmax(0, 1fr); }
+  #list { max-height: 28vh; }
+  .variant-editor { grid-template-columns: 56px minmax(0, 1fr); }
+  .variant-editor .remove { grid-column: 2; justify-self: start; }
+}

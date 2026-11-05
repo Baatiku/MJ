@@ -101,3 +101,5 @@ h2 { font-size: clamp(40px, 6vw, 72px); line-height: 1; margin-top: 7px; letter-
   .variant-layout { grid-template-columns: 1fr; }
   .variant-layout > img { max-height: 60vh; }
 }
+
+.stock-note { color: var(--accent); padding-block: 8px; font-weight: 650; }

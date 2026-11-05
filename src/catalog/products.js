@@ -8,10 +8,22 @@ const product = (id, name, category, description, colours, price = null) => ({
   }))
 });
 
+const newStyle = (id, name, category, description) => ({
+  id, name, category, description, price: null,
+  variants: [
+    ['navy', 'Midnight Navy', '#202e47'],
+    ['olive', 'Olive', '#54583d'],
+    ['taupe', 'Warm Taupe', '#9a8170']
+  ].map(([colour, name, swatch]) => ({ id: colour, name, swatch, image: `/images/${id}-${colour}.jpg` }))
+});
+
 export const categories = [
   { id: 'abaya', name: 'Abayas', image: '/images/flow-abaya-navy.webp' },
   { id: 'khimar', name: 'Khimars', image: '/images/rose-khimar-rose.webp' },
-  { id: 'niqab', name: 'Niqab looks', image: '/images/blue-veil-blue.webp' }
+  { id: 'niqab', name: 'Niqab looks', image: '/images/blue-veil-blue.webp' },
+  { id: 'dress', name: 'Maxi dresses', image: '/images/belted-shirt-maxi-navy.jpg' },
+  { id: 'layer', name: 'Layers & sets', image: '/images/open-kimono-abaya-olive.jpg' },
+  { id: 'headwear', name: 'Hijabs & undercaps', image: '/images/chiffon-wrap-taupe.jpg' }
 ];
 
 export const products = [
@@ -44,5 +56,20 @@ export const products = [
   ]),
   product('jilbab-veil', 'The Layered Jilbab Look', 'niqab', 'A layered jilbab silhouette styled with a matching niqab.', [
     ['black', 'Black', '#282424'], ['taupe', 'Warm Taupe', '#9a8170'], ['burgundy', 'Dark Burgundy', '#5d303a']
-  ])
+  ]),
+  newStyle('belted-shirt-maxi', 'Belted Shirt Maxi', 'dress', 'A collared, button-front silhouette with a waist tie.'),
+  newStyle('pleated-high-neck-maxi', 'High-Neck Pleated Maxi', 'dress', 'A high neckline and flowing pleats.'),
+  newStyle('linen-a-line-maxi', 'A-Line Maxi', 'dress', 'A relaxed A-line cut with a softly textured finish.'),
+  newStyle('tiered-gathered-maxi', 'Tiered Gathered Maxi', 'dress', 'Gathered tiers give this full-length dress movement.'),
+  newStyle('longline-knit-maxi', 'Longline Knit Maxi', 'dress', 'A long, simple silhouette with a knit finish.'),
+  newStyle('open-kimono-abaya', 'Open Kimono Abaya', 'layer', 'An open-front layer with wide kimono sleeves.'),
+  newStyle('wide-leg-tunic-set', 'Wide-Leg Tunic Set', 'layer', 'A long tunic styled with wide-leg trousers.'),
+  newStyle('cape-sleeve-abaya', 'Cape-Sleeve Abaya', 'layer', 'A flowing cape sleeve for a more formal silhouette.'),
+  newStyle('hooded-jilbab', 'Hooded Jilbab', 'layer', 'A full-length jilbab with an integrated hood.'),
+  newStyle('waistcoat-maxi-set', 'Longline Waistcoat Set', 'layer', 'A long waistcoat styled with a matching maxi skirt.'),
+  newStyle('chiffon-wrap', 'Chiffon Wrap Hijab', 'headwear', 'A rectangular wrap with soft, overlapping folds.'),
+  newStyle('satin-square', 'Satin Square Hijab', 'headwear', 'A square scarf folded into a neat triangular drape.'),
+  newStyle('ribbed-instant', 'Ribbed Instant Hijab', 'headwear', 'A close-fitting pull-on shape with fine ribbing.'),
+  newStyle('tie-back-undercap', 'Tie-Back Undercap', 'headwear', 'A full-coverage undercap with an adjustable tie.'),
+  newStyle('pull-on-prayer-hijab', 'Pull-On Prayer Hijab', 'headwear', 'A pull-on prayer covering with a shoulder-length drape.')
 ];
