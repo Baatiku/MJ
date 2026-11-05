@@ -1,7 +1,8 @@
 import { whatsappIcon } from './whatsapp-icon.js';
 import { categories, products } from '../catalog/products.js';
 import { escapeHtml as html } from '../lib/html.js';
-import { contactLink, displayWhatsAppNumber, freeStoreLink } from '../lib/shop.js';
+import { contactLink, displayWhatsAppNumber } from '../lib/shop.js';
+import { siteHeader } from './site-header.js';
 import { productCard } from './product-card.js';
 
 export function storefront(origin, catalog = products) {
@@ -49,13 +50,7 @@ export function storefront(origin, catalog = products) {
   <script src="/storefront.js" type="module"></script>
 </head>
 <body>
-  <a class="skip-link" href="#main">Skip to content</a>
-  <a class="announcement" href="${html(freeStoreLink)}" target="_blank" rel="noopener noreferrer">${whatsappIcon} Get a free online store for your business</a>
-  <header class="shell masthead">
-    <nav aria-label="Storefront"><a href="#styles">Styles</a><a href="#collection">Collection</a></nav>
-    <a class="wordmark" href="/">Maknoon Jamil<small>MODESTWEAR</small></a>
-    <a class="contact whatsapp-contact" href="${html(contactLink)}" target="_blank" rel="noopener noreferrer">WhatsApp ${whatsappIcon}</a>
-  </header>
+  ${siteHeader('')}
   <main class="shell" id="main">
     <section class="hero" aria-labelledby="hero-title">
       <div class="hero-copy">

@@ -1,3 +1,4 @@
+import { siteHeader } from './site-header.js';
 import { whatsappIcon } from './whatsapp-icon.js';
 import { escapeHtml as html } from '../lib/html.js';
 import { formatNaira, orderLabel, orderLink, previewImage, variantPath } from '../lib/shop.js';
@@ -28,7 +29,8 @@ export function variantPage(product, variant, origin) {
   <link rel="stylesheet" href="/styles/storefront.css">
 </head>
 <body>
-  <main class="shell variant-page">
+  ${siteHeader()}
+  <main class="shell variant-page" id="main">
     <a class="variant-back" href="/#${product.id}">← Back to the collection</a>
     <div class="variant-layout">
       <img src="${html(variant.image)}" alt="${html(title)}">

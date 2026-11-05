@@ -29,6 +29,10 @@ test('each style has distinct colour choices and uniquely addressed images', () 
       assert.ok(page.includes(`property="og:url" content="${variantUrl}"`));
       assert.ok(page.includes(`property="og:image" content="${origin + previewImage(variant)}"`));
       assert.ok(page.includes(`src="${variant.image}"`));
+      assert.match(page, /class="announcement"/);
+      assert.match(page, /class="shell masthead"/);
+      assert.match(page, /href="\/#styles"/);
+      assert.match(page, /href="\/#collection"/);
     }
   }
 });
