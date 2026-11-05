@@ -1,0 +1,48 @@
+const product = (id, name, category, description, colours, price = null, concept = true) => ({
+  id, name, category, description, price, concept,
+  variants: colours.map(([idSuffix, name, swatch]) => ({
+    id: idSuffix,
+    name,
+    swatch,
+    image: `/images/${id}-${idSuffix}.webp`
+  }))
+});
+
+export const categories = [
+  { id: 'abaya', name: 'Abayas', image: '/images/flow-abaya-navy.webp' },
+  { id: 'khimar', name: 'Khimars', image: '/images/rose-khimar-rose.webp' },
+  { id: 'niqab', name: 'Niqab looks', image: '/images/blue-veil-blue.webp' }
+];
+
+export const products = [
+  product('flow-abaya', 'The Flow Abaya', 'abaya', 'An easy full-length drape with generous sleeves.', [
+    ['navy', 'Navy Blue', '#26354e'], ['black', 'Black', '#252323'], ['brown', 'Warm Brown', '#77533a']
+  ], 25000, false),
+  product('rose-khimar', 'The Petal Khimar', 'khimar', 'Soft, overlapping layers frame the shoulders.', [
+    ['rose', 'Dusty Rose', '#ad7288'], ['slate', 'Slate Blue', '#536a80'], ['black', 'Black', '#262525']
+  ], null, false),
+  product('blue-veil', 'The Long Veil Look', 'niqab', 'A long khimar styled with a coordinated niqab.', [
+    ['blue', 'Deep Blue', '#245875'], ['black', 'Black', '#282625'], ['espresso', 'Espresso', '#483026']
+  ], null, false),
+  product('everyday-abaya', 'The Everyday Abaya', 'abaya', 'A straight silhouette with clean, simple sleeves.', [
+    ['olive', 'Olive', '#585840'], ['burgundy', 'Burgundy', '#663640'], ['charcoal', 'Charcoal', '#424144']
+  ]),
+  product('pleated-abaya', 'The Pleated Cuff Abaya', 'abaya', 'Gathered cuffs add shape to a softly flowing cut.', [
+    ['sand', 'Sand', '#ab8563'], ['mocha', 'Mocha', '#735541'], ['black', 'Black', '#252423']
+  ]),
+  product('butterfly-abaya', 'The Butterfly Abaya', 'abaya', 'Wide wings fall into a dramatic floor-length drape.', [
+    ['black', 'Black', '#262426'], ['aubergine', 'Aubergine', '#58374f'], ['midnight', 'Midnight Navy', '#273148']
+  ]),
+  product('cascade-khimar', 'The Cascade Khimar', 'khimar', 'Three pointed layers give the silhouette its movement.', [
+    ['plum', 'Plum', '#66384f'], ['taupe', 'Taupe', '#8c7669'], ['olive', 'Deep Olive', '#50523a']
+  ]),
+  product('rounded-khimar', 'The Rounded Khimar', 'khimar', 'Two softly curved layers create a gentle, rounded hem.', [
+    ['oat', 'Oat', '#c2ac8d'], ['espresso', 'Espresso', '#4b3028'], ['mauve', 'Warm Mauve', '#9c707c']
+  ]),
+  product('short-veil', 'The Short Veil Look', 'niqab', 'A shorter drape styled with a coordinated niqab.', [
+    ['slate', 'Smoky Slate', '#4b5c6c'], ['plum', 'Dusty Plum', '#795565'], ['forest', 'Forest Green', '#385344']
+  ]),
+  product('jilbab-veil', 'The Layered Jilbab Look', 'niqab', 'A layered jilbab silhouette styled with a matching niqab.', [
+    ['black', 'Black', '#282424'], ['taupe', 'Warm Taupe', '#9a8170'], ['burgundy', 'Dark Burgundy', '#5d303a']
+  ])
+];
