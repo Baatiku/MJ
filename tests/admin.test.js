@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { DatabaseSync } from 'node:sqlite';
 import { test } from 'node:test';
+import { products as defaults } from '../src/catalog/products.js';
 import { onRequest } from '../functions/api/admin.js';
 import { onRequestGet as shop } from '../functions/index.js';
 import { onRequestGet as detail } from '../functions/products/[[path]].js';
@@ -21,6 +22,8 @@ test('owner can edit a colour and unlist its product with a persistent session',
     },
     batch: async (statements) => Promise.all(statements.map((statement) => statement.run()))
   };
+  const legacy = { ...defaults[0], hidden: false, available: true, variants: defaults[0].variants.slice(0, 3) };
+  sql.prepare('INSERT INTO catalog_edits VALUES (?, ?, 1)').run(legacy.id, JSON.stringify(legacy));
   const origin = 'https://shop.example';
   const env = { CATALOG_DB: db, ADMIN_PASSWORD: 'test-only-secret' };
   const call = (method, body, cookie, requestOrigin = origin) => onRequest({
@@ -36,6 +39,8 @@ test('owner can edit a colour and unlist its product with a persistent session',
   const cookie = signedIn.headers.get('set-cookie').split(';')[0];
   const { products } = await (await call('GET', null, cookie)).json();
   const product = products[0];
+  assert.equal(product.variants.length, 4);
+  assert.equal(product.variants[3].name, 'Deep Plum');
   product.variants[0].name = 'Ink Navy';
   product.variants[0].image = 'https://cdn.example/ink-navy.jpg';
   assert.equal((await call('PUT', product, cookie, 'https://outside.example')).status, 403);

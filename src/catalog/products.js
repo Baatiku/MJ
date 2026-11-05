@@ -1,3 +1,5 @@
+import { fourthColour } from './fourth-colours.js';
+
 const product = (id, name, category, description, colours, price = null) => ({
   id, name, category, description, price,
   variants: colours.map(([idSuffix, name, swatch]) => ({
@@ -26,7 +28,7 @@ export const categories = [
   { id: 'headwear', name: 'Hijabs & undercaps', image: '/images/chiffon-wrap-taupe.jpg' }
 ];
 
-export const products = [
+const styles = [
   product('flow-abaya', 'The Flow Abaya', 'abaya', 'An easy full-length drape with generous sleeves.', [
     ['navy', 'Navy Blue', '#26354e'], ['black', 'Black', '#252323'], ['brown', 'Warm Brown', '#77533a']
   ], 25000),
@@ -73,3 +75,7 @@ export const products = [
   newStyle('tie-back-undercap', 'Tie-Back Undercap', 'headwear', 'A full-coverage undercap with an adjustable tie.'),
   newStyle('pull-on-prayer-hijab', 'Pull-On Prayer Hijab', 'headwear', 'A pull-on prayer covering with a shoulder-length drape.')
 ];
+
+export const products = styles.map((style) => ({
+  ...style, variants: [...style.variants, fourthColour(style.id)]
+}));

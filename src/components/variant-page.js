@@ -1,3 +1,4 @@
+import { whatsappIcon } from './whatsapp-icon.js';
 import { escapeHtml as html } from '../lib/html.js';
 import { formatNaira, orderLink, previewImage, variantPath } from '../lib/shop.js';
 
@@ -39,7 +40,7 @@ export function variantPage(product, variant, origin) {
         <nav class="variant-colours" aria-label="Available colours">
           ${product.variants.map((option) => `<a href="${variantPath(product, option)}"${option === variant ? ' aria-current="page"' : ''}>${html(option.name)}</a>`).join('')}
         </nav>
-        ${product.available === false ? '<p class="stock-note">Currently unavailable</p>' : `<a class="order" href="${html(orderLink(product, variant, origin))}" target="_blank" rel="noopener noreferrer">Order on WhatsApp <span aria-hidden="true">↗</span></a>`}
+        ${product.available === false ? '<p class="stock-note">Currently unavailable</p>' : `<a class="order" href="${html(orderLink(product, variant, origin))}" target="_blank" rel="noopener noreferrer">Order on WhatsApp ${whatsappIcon}</a>`}
       </div>
     </div>
   </main>

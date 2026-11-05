@@ -13,7 +13,7 @@ test('each style has distinct colour choices and uniquely addressed images', () 
   const images = new Set();
   for (const product of products) {
     assert.ok(categories.some(({ id }) => id === product.category));
-    assert.ok(product.variants.length >= 3);
+    assert.equal(product.variants.length, 4);
     assert.equal(new Set(product.variants.map(({ id }) => id)).size, product.variants.length);
     for (const variant of product.variants) {
       assert.ok(!images.has(variant.image));

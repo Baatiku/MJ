@@ -1,9 +1,19 @@
 import { categories, products } from './products.js';
+import { fourthColour } from './fourth-colours.js';
+
+const colourEdition = 1;
 
 export async function readCatalog(db) {
   const { results } = await db.prepare('SELECT id, document, revision FROM catalog_edits').all();
   const edits = new Map(results.map(({ id, document, revision }) => [id, { ...JSON.parse(document), revision }]));
-  return products.map((product) => edits.get(product.id) ?? { ...product, revision: 0, hidden: false, available: true });
+  return products.map((product) => {
+    const edited = edits.get(product.id);
+    if (!edited) return { ...product, revision: 0, hidden: false, available: true };
+    if (edited.colourEdition === colourEdition || edited.variants.length >= 16) return edited;
+    const extra = fourthColour(product.id);
+    if (edited.variants.some(({ id, name }) => id === extra.id || name.toLowerCase() === extra.name.toLowerCase())) return edited;
+    return { ...edited, variants: [...edited.variants, extra] };
+  });
 }
 
 const slug = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -40,5 +50,5 @@ export function validateProduct(input) {
     return { id: variant.id, name: variant.name.trim(), swatch: variant.swatch, image: variant.image };
   });
   const { id, category, price, available, hidden } = input;
-  return { id, category, price, available, hidden, name: input.name.trim(), description: input.description.trim(), variants };
+  return { id, category, price, available, hidden, colourEdition, name: input.name.trim(), description: input.description.trim(), variants };
 }

@@ -1,3 +1,4 @@
+import { whatsappIcon } from './whatsapp-icon.js';
 import { categories, products } from '../catalog/products.js';
 import { escapeHtml as html } from '../lib/html.js';
 import { contactLink, displayWhatsAppNumber } from '../lib/shop.js';
@@ -33,7 +34,7 @@ export function storefront(origin, catalog = products) {
   <header class="shell masthead">
     <nav aria-label="Storefront"><a href="#styles">Styles</a><a href="#collection">Collection</a></nav>
     <a class="wordmark" href="/">Maknoon Jamil<small>MODESTWEAR</small></a>
-    <a class="contact" href="${html(contactLink)}" target="_blank" rel="noopener noreferrer">WhatsApp <span aria-hidden="true">↗</span></a>
+    <a class="contact whatsapp-contact" href="${html(contactLink)}" target="_blank" rel="noopener noreferrer">WhatsApp ${whatsappIcon}</a>
   </header>
   <main class="shell" id="main">
     <section class="hero" aria-labelledby="hero-title">
@@ -65,7 +66,7 @@ export function storefront(origin, catalog = products) {
   </main>
   <footer class="footer">
     <div class="shell footer-inner"><div><span class="wordmark">Maknoon Jamil</span><p>Modestwear boutique · <a href="/admin/">Owner sign-in</a></p></div>
-    <a class="contact" href="${html(contactLink)}" target="_blank" rel="noopener noreferrer">${html(displayWhatsAppNumber())} <span aria-hidden="true">↗</span></a></div>
+    <a class="contact whatsapp-contact" href="${html(contactLink)}" target="_blank" rel="noopener noreferrer">${html(displayWhatsAppNumber())} ${whatsappIcon}</a></div>
   </footer>
   <script type="application/json" id="catalog-data">${data}</script>
 </body>
