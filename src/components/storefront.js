@@ -1,6 +1,6 @@
 import { categories, products } from '../catalog/products.js';
 import { escapeHtml as html } from '../lib/html.js';
-import { contactLink } from '../lib/shop.js';
+import { contactLink, displayWhatsAppNumber } from '../lib/shop.js';
 import { productCard } from './product-card.js';
 
 export function storefront(origin, catalog = products) {
@@ -65,7 +65,7 @@ export function storefront(origin, catalog = products) {
   </main>
   <footer class="footer">
     <div class="shell footer-inner"><div><span class="wordmark">Maknoon Jamil</span><p>Modestwear boutique · <a href="/admin/">Owner sign-in</a></p></div>
-    <a class="contact" href="${html(contactLink)}" target="_blank" rel="noopener noreferrer">+234 802 251 9062 <span aria-hidden="true">↗</span></a></div>
+    <a class="contact" href="${html(contactLink)}" target="_blank" rel="noopener noreferrer">${html(displayWhatsAppNumber())} <span aria-hidden="true">↗</span></a></div>
   </footer>
   <script type="application/json" id="catalog-data">${data}</script>
 </body>

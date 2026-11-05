@@ -1,4 +1,15 @@
-export const whatsappNumber = '2348022519062';
+import { whatsappNumber as configuredNumber } from './shop-number.js';
+
+export const whatsappNumber = configuredNumber;
+
+if (!/^[1-9]\d{7,14}$/.test(whatsappNumber)) {
+  throw new Error('Configure the WhatsApp number in international format in config/shop.json.');
+}
+
+export function displayWhatsAppNumber(number = whatsappNumber) {
+  const nigeria = number.match(/^234(\d{3})(\d{3})(\d{4})$/);
+  return nigeria ? `+234 ${nigeria.slice(1).join(' ')}` : `+${number}`;
+}
 
 export function formatNaira(amount) {
   return new Intl.NumberFormat('en-NG', {

@@ -52,3 +52,7 @@ Every colour has a static product page with a JPEG link preview. The WhatsApp or
 The editor updates names, descriptions, categories, prices, availability, visibility, and per-colour names, swatches and photo URLs. Use a catalog image path or public HTTPS URL for a matching photo. Swatch changes do not recolour photos. Hidden products disappear from the storefront and their product URLs return 404. Product image assets are public, including images previously shared in chat. An unavailable item stays listed with ordering disabled.
 
 Catalog changes are stored in D1 and loaded on each storefront request. They take effect without a redeploy. The built-in catalog and images remain the default when no owner edits exist.
+
+## Change the public WhatsApp number
+
+Edit `config/shop.json` from the **Shop settings** section of `/admin/`. Use international digits only. Commit to the deployed branch to update the number for all visitors, including product orders and the footer.

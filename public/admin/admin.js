@@ -1,4 +1,5 @@
 import { categories } from '/catalog/products.js';
+import { displayWhatsAppNumber } from '/lib/shop.js';
 
 const find = (selector) => document.querySelector(selector);
 const login = find('#login');
@@ -6,6 +7,7 @@ const dashboard = find('#dashboard');
 const editor = find('#editor');
 const variants = find('#variants');
 const notice = find('#notice');
+find('#shop-number').textContent = displayWhatsAppNumber();
 let catalog = [];
 let current;
 

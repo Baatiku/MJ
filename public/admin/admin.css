@@ -33,3 +33,8 @@
   .variant-editor { grid-template-columns: 56px minmax(0, 1fr); }
   .variant-editor .remove { grid-column: 2; justify-self: start; }
 }
+
+#shop-settings { margin-bottom: 15px; }
+#shop-settings summary { cursor: pointer; font-weight: 650; }
+#shop-settings p { margin-top: 8px; }
+#shop-settings .primary { margin-top: 12px; }

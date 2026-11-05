@@ -16,6 +16,12 @@
       <a href="/">View shop ↗</a>
     </header>
     <p id="notice" role="status"></p>
+    <details class="panel" id="shop-settings">
+      <summary>Shop settings</summary>
+      <p>WhatsApp number: <output id="shop-number">Loading…</output></p>
+      <p>Change the number in international format, using digits only. Committing the change to GitHub updates the footer and every WhatsApp button on the next deployment.</p>
+      <a class="primary" href="https://github.com/Baatiku/MJ/edit/main/config/shop.json" target="_blank" rel="noopener noreferrer">Edit WhatsApp number in GitHub ↗</a>
+    </details>
     <form id="login" class="panel" hidden>
       <h2>Owner sign-in</h2>
       <label>Password <input type="password" name="password" autocomplete="current-password" required></label>
