@@ -4,8 +4,8 @@ import { storefront } from '../src/components/storefront.js';
 import { variantPage } from '../src/components/variant-page.js';
 import { previewImage, variantPath, whatsappNumber } from '../src/lib/shop.js';
 
-const configuredUrl = process.env.SITE_URL || process.env.CF_PAGES_URL;
-const origin = configuredUrl ? new URL(configuredUrl).origin : undefined;
+const publicSiteUrl = 'https://mj.masanawa.com';
+const origin = new URL(process.env.SITE_URL || publicSiteUrl).origin;
 
 const root = new URL('../', import.meta.url);
 const output = new URL('dist/', root);
