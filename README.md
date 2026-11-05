@@ -37,4 +37,6 @@ Cloudflare builds and publishes `dist/`. Subsequent pushes to the connected prod
 - `public/images/` contains separate generated WebP catalog photographs.
 - `scripts/build.mjs` validates image paths and generates the static deployment.
 
-The seven new silhouettes are labelled style concepts until availability is confirmed. The existing photo references informed three original designs. The only confirmed price is ₦25,000 for the Flow Abaya. The catalog images are generated visual references. Confirm availability, exact shade, and details over WhatsApp.
+The catalog uses studio renderings. The only confirmed price is ₦25,000 for the Flow Abaya. Confirm availability, price, and details over WhatsApp.
+
+Every colour has a static product page with a JPEG link preview. The WhatsApp order message includes that page’s URL. Cloudflare Pages supplies the public deployment URL automatically. Set the optional `SITE_URL` build variable to the public custom domain if you want preview metadata to use it. WhatsApp controls whether its app displays a thumbnail.

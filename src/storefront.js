@@ -1,10 +1,11 @@
 import { products } from './catalog/products.js';
-import { orderLink } from './lib/shop.js';
+import { orderLink, variantPath } from './lib/shop.js';
 
 for (const product of products) {
   const card = document.getElementById(product.id);
   const options = card.querySelector('fieldset');
-  const image = card.querySelector('img');
+  const photo = card.querySelector('.product-media');
+  const image = photo.querySelector('img');
   const selected = card.querySelector('[data-selected]');
   const order = card.querySelector('.order');
   function updateSelection() {
@@ -12,7 +13,8 @@ for (const product of products) {
     image.src = variant.image;
     image.alt = `${product.name} in ${variant.name}`;
     selected.textContent = variant.name;
-    order.href = orderLink(product, variant);
+    photo.href = variantPath(product, variant);
+    order.href = orderLink(product, variant, location.origin);
   }
   options.addEventListener('change', updateSelection);
   options.hidden = false;

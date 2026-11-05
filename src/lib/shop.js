@@ -10,15 +10,23 @@ export function whatsappLink(message) {
   return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
 }
 
-export function orderLink(product, variant) {
+export function variantPath(product, variant) {
+  return `/products/${product.id}/${variant.id}/`;
+}
+
+export function previewImage(variant) {
+  return variant.image.replace('/images/', '/previews/').replace(/\.webp$/, '.jpg');
+}
+
+export function orderLink(product, variant, origin) {
   const selection = `${product.name} in ${variant.name}`;
-  if (product.concept) {
-    return whatsappLink(`Hello Maknoon Jamil! Is the ${selection} style available to order? Please share the price and details.`);
-  }
-  if (product.price === null) {
-    return whatsappLink(`Hello Maknoon Jamil! I’m interested in ${selection}. Please confirm availability, price and what is included.`);
-  }
-  return whatsappLink(`Hello Maknoon Jamil! I’d like to order ${selection} (${formatNaira(product.price)}). Is it available?`);
+  const price = product.price === null ? '' : ` (${formatNaira(product.price)})`;
+  const question = product.price === null
+    ? 'Please confirm the price and availability.'
+    : 'Is it available?';
+  const message = `Hello Maknoon Jamil! I’d like to order ${selection}${price}. ${question}`;
+  const link = origin ? `\n\n${new URL(variantPath(product, variant), origin).href}` : '';
+  return whatsappLink(message + link);
 }
 
 export const contactLink = whatsappLink('Hello Maknoon Jamil! I’d like to ask about your modestwear collection.');

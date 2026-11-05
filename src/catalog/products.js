@@ -1,5 +1,5 @@
-const product = (id, name, category, description, colours, price = null, concept = true) => ({
-  id, name, category, description, price, concept,
+const product = (id, name, category, description, colours, price = null) => ({
+  id, name, category, description, price,
   variants: colours.map(([idSuffix, name, swatch]) => ({
     id: idSuffix,
     name,
@@ -17,13 +17,13 @@ export const categories = [
 export const products = [
   product('flow-abaya', 'The Flow Abaya', 'abaya', 'An easy full-length drape with generous sleeves.', [
     ['navy', 'Navy Blue', '#26354e'], ['black', 'Black', '#252323'], ['brown', 'Warm Brown', '#77533a']
-  ], 25000, false),
+  ], 25000),
   product('rose-khimar', 'The Petal Khimar', 'khimar', 'Soft, overlapping layers frame the shoulders.', [
     ['rose', 'Dusty Rose', '#ad7288'], ['slate', 'Slate Blue', '#536a80'], ['black', 'Black', '#262525']
-  ], null, false),
+  ]),
   product('blue-veil', 'The Long Veil Look', 'niqab', 'A long khimar styled with a coordinated niqab.', [
     ['blue', 'Deep Blue', '#245875'], ['black', 'Black', '#282625'], ['espresso', 'Espresso', '#483026']
-  ], null, false),
+  ]),
   product('everyday-abaya', 'The Everyday Abaya', 'abaya', 'A straight silhouette with clean, simple sleeves.', [
     ['olive', 'Olive', '#585840'], ['burgundy', 'Burgundy', '#663640'], ['charcoal', 'Charcoal', '#424144']
   ]),

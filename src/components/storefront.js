@@ -9,7 +9,7 @@ const categoryLinks = categories.map(({ id, name, image }) => `
     <span>${html(name)} <b aria-hidden="true">↗</b></span>
   </a>`).join('');
 
-export function storefront() {
+export function storefront(origin) {
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -55,9 +55,9 @@ export function storefront() {
           ${categories.map(({ id, name }) => `<button type="button" data-filter="${id}" aria-pressed="false">${html(name)}</button>`).join('')}
         </div>
       </div>
-      <p class="collection-note">Studio imagery shows each colour. For styles marked <strong>Style concept</strong>, ask us about availability and pricing.</p>
+      <p class="collection-note">Choose a colour to see its photo, then message us on WhatsApp to confirm availability.</p>
       <p class="sr-only" data-result-count aria-live="polite"></p>
-      <div class="product-grid">${products.map(productCard).join('')}</div>
+      <div class="product-grid">${products.map((product) => productCard(product, origin)).join('')}</div>
     </section>
   </main>
   <footer class="footer">

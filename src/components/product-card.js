@@ -1,13 +1,12 @@
 import { escapeHtml as html } from '../lib/html.js';
-import { formatNaira, orderLink } from '../lib/shop.js';
+import { formatNaira, orderLink, variantPath } from '../lib/shop.js';
 
-export function productCard(product) {
+export function productCard(product, origin) {
   const first = product.variants[0];
   return `<article class="product" data-product="${product.id}" data-category="${product.category}" id="${product.id}">
-    <div class="product-media">
+    <a class="product-media" href="${variantPath(product, first)}">
       <img src="${first.image}" alt="${html(product.name)} in ${html(first.name)}" width="512" height="512" loading="lazy" decoding="async">
-      <span class="badge">${product.concept ? 'Style concept' : 'The original edit'}</span>
-    </div>
+    </a>
     <div class="product-body">
       <div class="product-title"><h3>${html(product.name)}</h3><span>${product.price === null ? 'Ask for price' : formatNaira(product.price)}</span></div>
       <p class="description">${html(product.description)}</p>
@@ -20,7 +19,7 @@ export function productCard(product) {
           </label>`).join('')}
         </div>
       </fieldset>
-      <a class="order" href="${html(orderLink(product, first))}" target="_blank" rel="noopener noreferrer">
+      <a class="order" href="${html(orderLink(product, first, origin))}" target="_blank" rel="noopener noreferrer">
         ${product.price === null ? 'Ask on WhatsApp' : 'Buy on WhatsApp'} <span aria-hidden="true">↗</span>
       </a>
     </div>
