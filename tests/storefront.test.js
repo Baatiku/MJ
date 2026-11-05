@@ -45,7 +45,7 @@ test('static HTML contains every product and checkout works before JS loads', ()
 test('homepage provides a catalog share card and a separate store setup chat', () => {
   const markup = storefront(origin);
   assert.match(markup, /property="og:url" content="https:\/\/shop.example\/"/);
-  assert.match(markup, /property="og:image" content="https:\/\/shop.example\/images\/catalog-share-v1.jpg"/);
+  assert.match(markup, /property="og:image" content="https:\/\/shop.example\/images\/catalog-share-v2.jpg"/);
   assert.match(markup, /name="twitter:card" content="summary_large_image"/);
   const banner = new URL(markup.match(/class="announcement" href="([^"]+)"/)[1]);
   assert.equal(banner.pathname, '/2348161564273');

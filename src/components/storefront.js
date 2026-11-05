@@ -18,9 +18,9 @@ export function storefront(origin, catalog = products) {
   ).join('');
   const data = JSON.stringify(catalog).replaceAll('<', '\\u003c');
   const title = 'Maknoon Jamil | Modestwear Catalog';
-  const description = 'Shop abayas, maxi dresses, khimars, niqab looks, hijabs and matching sets. Browse colours and order on WhatsApp.';
+  const description = 'Shop abayas, khimars, hijabs, niqabs and modest dresses. Order on WhatsApp.';
   const homepage = origin ? new URL('/', origin).href : null;
-  const cover = homepage ? new URL('/images/catalog-share-v1.jpg', homepage).href : null;
+  const cover = homepage ? new URL('/images/catalog-share-v2.jpg', homepage).href : null;
   const social = homepage ? `
   <link rel="canonical" href="${html(homepage)}">
   <meta property="og:type" content="website">

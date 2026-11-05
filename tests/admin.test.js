@@ -76,3 +76,14 @@ test('owner can edit a colour, set or clear its product price, and unlist it', a
   assert.equal((await call('GET', null, cookie)).status, 401);
   sql.close();
 });
+
+test('homepage share metadata uses the requested public host without an admin database', async () => {
+  const request = new Request('https://store.example/?share=2', {
+    headers: { 'User-Agent': 'WhatsApp/2.24.0 A' }
+  });
+  const response = await shop({ env: {}, request });
+  assert.equal(response.status, 200);
+  const head = (await response.text()).split('</head>')[0];
+  assert.match(head, /property="og:url" content="https:\/\/store.example\/"/);
+  assert.match(head, /property="og:image" content="https:\/\/store.example\/images\/catalog-share-v2.jpg"/);
+});
