@@ -1,6 +1,6 @@
 import { whatsappIcon } from './whatsapp-icon.js';
 import { escapeHtml as html } from '../lib/html.js';
-import { formatNaira, orderLink, variantPath } from '../lib/shop.js';
+import { formatNaira, orderLabel, orderLink, variantPath } from '../lib/shop.js';
 
 export function productCard(product, origin) {
   const first = product.variants[0];
@@ -9,7 +9,7 @@ export function productCard(product, origin) {
       <img src="${html(first.image)}" alt="${html(product.name)} in ${html(first.name)}" width="512" height="512" loading="lazy" decoding="async">
     </a>
     <div class="product-body">
-      <div class="product-title"><h3>${html(product.name)}</h3><span>${product.price === null ? 'Ask for price' : formatNaira(product.price)}</span></div>
+      <div class="product-title"><h3>${html(product.name)}</h3>${product.price === null ? '' : `<span>${formatNaira(product.price)}</span>`}</div>
       <p class="description">${html(product.description)}</p>
       <fieldset class="colours" hidden>
         <legend>Colour <span data-selected aria-live="polite">${html(first.name)}</span></legend>
@@ -21,7 +21,7 @@ export function productCard(product, origin) {
         </div>
       </fieldset>
       ${product.available === false ? '<p class="stock-note">Currently unavailable</p>' : `<a class="order" href="${html(orderLink(product, first, origin))}" target="_blank" rel="noopener noreferrer">
-        ${product.price === null ? 'Ask on WhatsApp' : 'Buy on WhatsApp'} ${whatsappIcon}
+        ${orderLabel(product)} ${whatsappIcon}
       </a>`}
     </div>
   </article>`;

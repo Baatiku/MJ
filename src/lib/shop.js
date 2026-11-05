@@ -31,6 +31,10 @@ export function previewImage(variant) {
     : variant.image;
 }
 
+export function orderLabel(product) {
+  return product.price === null ? 'Ask on WhatsApp' : 'Buy on WhatsApp';
+}
+
 export function orderLink(product, variant, origin) {
   const selection = `${product.name} in ${variant.name}`;
   const price = product.price === null ? '' : ` (${formatNaira(product.price)})`;

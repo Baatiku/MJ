@@ -37,7 +37,7 @@
         <h2 id="product-title">Edit product</h2>
         <div class="admin-fields">
           <label>Name <input name="name" required maxlength="100"></label>
-          <label>Price in ₦ <input name="price" type="number" min="0" max="100000000" placeholder="Ask for price"></label>
+          <label>Price in ₦ <input name="price" type="number" min="0" max="100000000" step="1" placeholder="Ask on WhatsApp" aria-describedby="price-help"><small id="price-help">Leave blank to show Ask on WhatsApp.</small></label>
           <label>Category <select name="category"></select></label>
           <label class="wide">Description <textarea name="description" required maxlength="450"></textarea></label>
           <label class="check"><input type="checkbox" name="available"> Available to order</label>
