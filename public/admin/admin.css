@@ -85,3 +85,7 @@
 #appearance { display: grid; gap: .75rem; max-width: 48rem; }
 #appearance[hidden] { display: none; }
 .admin input[type=file] { max-width: 100%; }
+
+#register { max-width: 34rem; }
+#register label { margin-block: .75rem; }
+#register p:last-child, #sign-in p:last-child { margin-bottom: 0; }

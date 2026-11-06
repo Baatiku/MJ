@@ -78,6 +78,24 @@ test('D1 owner invites are single-use and storefront writes are isolated', async
   assert.equal((await edit('second-shop', null, a)).status, 404);
   assert.equal((await call('/api/workspaces?platform=1', null, a)).status, 401);
   assert.equal((await (await call('/api/workspaces?platform=1', null, admin)).json()).shops.length, 2);
+  const signup = { action: 'register', name: 'New Client', slug: 'new-client', username: 'Client-Owner', password };
+  assert.equal((await api({ ...signup, slug: 'new-shop' })).status, 409);
+  assert.equal((await api({ ...signup, slug: 'maknoon-jamil' })).status, 400);
+  const registered = await api(signup);
+  assert.equal(registered.status, 201);
+  const client = session(registered);
+  assert.equal((await registered.json()).shop.published, false);
+  assert.equal((await api({ ...signup, slug: 'duplicate-client' })).status, 409);
+  assert.equal((await call('/shops/new-client/')).status, 404);
+  assert.equal((await edit('new-client', null, client)).status, 200);
+  assert.equal((await edit('new-client', null, a)).status, 404);
+  assert.equal((await api({ action: 'login', identity: 'client-owner', password })).status, 200);
+  assert.equal((await edit('new-client', {
+    action: 'settings', name: 'New Client', published: true, banner: 'New arrivals'
+  }, client)).status, 200);
+  const clientPage = await (await call('/shops/new-client/')).text();
+  assert.match(clientPage, /class="announcement" href="\/manage\/\?setup=1"/);
+  assert.match(clientPage, /New arrivals/);
   const upload = await edit('second-shop', { action: 'upload-photo', data: btoa('\xff\xd8\xff\xd9') }, b);
   assert.equal(upload.status, 201);
   const { url: photo } = await upload.json();

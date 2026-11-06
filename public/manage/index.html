@@ -33,9 +33,20 @@
   </form>
   <form id="sign-in" class="panel" hidden>
     <h2>Owner sign-in</h2>
-    <label>Email <input name="email" type="email" autocomplete="username" required></label>
+    <label>Username or email <input name="identity" autocomplete="username" maxlength="254" required></label>
     <label>Password <input name="password" type="password" autocomplete="current-password" minlength="14" maxlength="128" required></label>
     <button type="submit">Sign in</button>
+    <p><a href="/manage/?setup=1">Create a free storefront</a></p>
+  </form>
+  <form id="register" class="panel" hidden>
+    <h2>Open your free storefront</h2>
+    <p>Create your account and a private draft shop. You can add products before publishing.</p>
+    <label>Shop name <input name="name" maxlength="100" required></label>
+    <label>Shop link name <input name="slug" minlength="3" maxlength="48" pattern="[a-z0-9]+(-[a-z0-9]+)*" placeholder="my-shop" required></label>
+    <label>Username <input name="username" autocomplete="username" autocapitalize="none" minlength="3" maxlength="32" pattern="[A-Za-z0-9]+(-[A-Za-z0-9]+)*" required></label>
+    <label>Password <input name="password" type="password" autocomplete="new-password" minlength="14" maxlength="128" required></label>
+    <button type="submit" class="primary">Create my shop</button>
+    <p><a href="/manage/">Already have an account? Sign in</a></p>
   </form>
   <form id="accept" class="panel" hidden>
     <h2>Accept your shop invitation</h2>

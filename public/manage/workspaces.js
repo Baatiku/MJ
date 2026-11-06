@@ -8,6 +8,9 @@ if (platform) {
   find('original-shop').hidden = false;
 }
 const signIn = find('sign-in');
+const register = find('register');
+const setup = !platform && new URLSearchParams(location.search).get('setup') === '1';
+
 const accept = find('accept');
 const inviteOwner = find('invite-owner');
 const invite = new URLSearchParams(location.hash.slice(1)).get('invite');
@@ -89,7 +92,7 @@ async function load() {
   try {
     const { shops, canInvite } = await request();
     inviteOwner.hidden = !canInvite;
-    signIn.hidden = accept.hidden = true;
+    signIn.hidden = accept.hidden = register.hidden = true;
     workspace.hidden = hasInvite;
     accept.hidden = !hasInvite;
     find('platform-sign-in').hidden = true;
@@ -97,12 +100,17 @@ async function load() {
     find('import-original').hidden = !platform || shops.some(({ slug }) => slug === 'maknoon-jamil');
     find('original-shop').hidden = !platform || shops.some(({ slug }) => slug === 'maknoon-jamil');
     render(shops);
+    if (setup && !hasInvite) {
+      form.elements.name.focus();
+      form.scrollIntoView({ block: 'start' });
+    }
   } catch (error) {
     workspace.hidden = true;
     find('change-password').hidden = find('import-original').hidden = true;
     inviteOwner.hidden = !error.canInvite;
     accept.hidden = error.status !== 401 || !hasInvite;
-    signIn.hidden = platform || error.status !== 401 || hasInvite;
+    signIn.hidden = platform || error.status !== 401 || hasInvite || setup;
+    register.hidden = !setup || error.status !== 401 || hasInvite;
     find('platform-sign-in').hidden = !platform || error.status !== 401;
     if (error.status !== 401) notice.textContent = error.message;
   }
@@ -137,9 +145,22 @@ submit(inviteOwner, async () => {
   notice.textContent = 'Invite created. It expires in 24 hours.';
 });
 submit(signIn, async () => {
-  await request({ action: 'login', email: signIn.elements.email.value, password: signIn.elements.password.value });
+  await request({ action: 'login', identity: signIn.elements.identity.value, password: signIn.elements.password.value });
   signIn.reset();
   await load();
+});
+register.elements.name.oninput = () => {
+  if (register.elements.slug.dataset.edited) return;
+  register.elements.slug.value = register.elements.name.value.toLowerCase()
+    .normalize('NFKD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+/, '').slice(0, 48).replace(/-+$/, '');
+};
+register.elements.slug.oninput = () => { register.elements.slug.dataset.edited = 'true'; };
+submit(register, async () => {
+  const fields = Object.fromEntries(['name', 'slug', 'username', 'password'].map((key) => [key, register.elements[key].value]));
+  const { shop } = await request({ action: 'register', ...fields });
+  register.reset();
+  location.assign('/manage/' + shop.slug + '/');
 });
 submit(accept, async () => {
   await request({ action: 'accept', invite, password: accept.elements.password.value });

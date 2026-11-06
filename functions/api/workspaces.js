@@ -41,6 +41,16 @@ function emailAddress(value) {
   return email.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? email : null;
 }
 
+function usernameKey(value) {
+  const username = typeof value === 'string' ? value.trim().toLowerCase() : '';
+  return username.length >= 3 && username.length <= 32 && slugPattern.test(username)
+    ? 'username:' + username : null;
+}
+
+function validShopSlug(slug) {
+  return typeof slug === 'string' && slug.length >= 3 && slug.length <= 48 && slugPattern.test(slug) && slug !== originalSlug;
+}
+
 function cleanProfile(input) {
   const name = typeof input?.name === 'string' ? input.name.trim() : '';
   const description = typeof input?.description === 'string' ? input.description.trim() : '';
@@ -71,13 +81,20 @@ export async function workspaceOwner(request, db, now = Math.floor(Date.now() / 
   return row?.owner_id ?? null;
 }
 
-async function signIn(db, ownerId, now) {
+async function newSession(db, ownerId, now) {
   const token = randomToken();
+  const statement = db.prepare('INSERT INTO workspace_sessions VALUES (?, ?, ?)')
+    .bind(await digest(token), ownerId, now + sessionSeconds);
+  return { statement, header: { 'Set-Cookie': cookie(token, sessionSeconds) } };
+}
+
+async function signIn(db, ownerId, now) {
+  const { statement, header } = await newSession(db, ownerId, now);
   await db.batch([
     db.prepare('DELETE FROM workspace_sessions WHERE expires <= ?').bind(now),
-    db.prepare('INSERT INTO workspace_sessions VALUES (?, ?, ?)').bind(await digest(token), ownerId, now + sessionSeconds)
+    statement
   ]);
-  return json({ ok: true }, 200, { 'Set-Cookie': cookie(token, sessionSeconds) });
+  return json({ ok: true }, 200, header);
 }
 
 export async function onRequest({ request, env }) {
@@ -88,7 +105,8 @@ export async function onRequest({ request, env }) {
   }
   const db = env.CATALOG_DB;
   const pepper = env.SHOP_PASSWORD_PEPPER;
-  if (!db || typeof pepper !== 'string' || pepper.length < 32) return json({ error: 'Shared owner sign-in has not been configured.' }, 503);
+  if (!db) return json({ error: 'Shop database is unavailable.' }, 503);
+  if (typeof pepper !== 'string' || pepper.length < 32) return json({ error: 'Shared owner sign-in has not been configured.' }, 503);
   const now = Math.floor(Date.now() / 1000);
   try {
     const input = request.method === 'POST' ? await request.json().catch(() => null) : null;
@@ -133,12 +151,46 @@ export async function onRequest({ request, env }) {
       ]);
       return json({ ok: true, admin: '/manage/' + originalSlug + '/' }, 201);
     }
-    if (action === 'accept' || action === 'login') {
+    if (action === 'accept' || action === 'login' || action === 'register') {
       const password = input.password;
       if (typeof password !== 'string' || password.length < 14 || password.length > 128) {
         return json({ error: 'Use a password between 14 and 128 characters.' }, 400);
       }
       if (!await allowAttempt(db, request, action, now)) return json({ error: 'Too many attempts. Try again in 15 minutes.' }, 429);
+      if (action === 'register') {
+        if (tokenHash && await workspaceOwner(request, db, now)) {
+          return json({ error: 'You are already signed in. Create another shop from your dashboard.' }, 409);
+        }
+        const username = usernameKey(input.username);
+        const profile = cleanProfile(input);
+        if (!username) return json({ error: 'Use 3–32 letters, digits or hyphens for your username.' }, 400);
+        if (!profile || !validShopSlug(input.slug)) {
+          return json({ error: 'Enter a shop name and an available URL name with 3–48 lowercase letters, digits or hyphens.' }, 400);
+        }
+        const ownerId = crypto.randomUUID();
+        const salt = randomToken();
+        const hash = await passwordHash(password, salt, pepper);
+        const { statement, header } = await newSession(db, ownerId, now);
+        try {
+          const [, inserted] = await db.batch([
+            db.prepare('INSERT INTO workspace_owners (id,email,password_salt,password_hash) VALUES (?, ?, ?, ?)')
+              .bind(ownerId, username, salt, hash),
+            db.prepare(`INSERT INTO storefront_workspaces (id,owner_id,slug,name,description,whatsapp)
+              VALUES (?,?,?,?,?,?) RETURNING ${select}`)
+              .bind(crypto.randomUUID(), ownerId, input.slug, profile.name, profile.description, profile.whatsapp),
+            statement
+          ]);
+          return json({ shop: present(inserted.results[0]) }, 201, header);
+        } catch (error) {
+          const [owner, shop] = await Promise.all([
+            db.prepare('SELECT id FROM workspace_owners WHERE email = ?').bind(username).first(),
+            db.prepare('SELECT id FROM storefront_workspaces WHERE slug = ?').bind(input.slug).first()
+          ]);
+          if (owner) return json({ error: 'That username is already in use. Sign in or choose another.' }, 409);
+          if (shop) return json({ error: 'That shop URL is already taken.' }, 409);
+          throw error;
+        }
+      }
       if (action === 'accept') {
         if (typeof input.invite !== 'string' || !tokenPattern.test(input.invite)) return json({ error: 'This invite is invalid or expired.' }, 400);
         const inviteHash = await digest(input.invite);
@@ -156,8 +208,9 @@ export async function onRequest({ request, env }) {
         if (!insert.results?.length) return json({ error: 'This invite is invalid, expired, already used, or the email has an account.' }, 400);
         return signIn(db, ownerId, now);
       }
-      const email = emailAddress(input.email);
-      const owner = email ? await db.prepare('SELECT id,password_salt,password_hash FROM workspace_owners WHERE email = ?').bind(email).first() : null;
+      const identity = input.identity ?? input.email;
+      const key = emailAddress(identity) || usernameKey(identity);
+      const owner = key ? await db.prepare('SELECT id,password_salt,password_hash FROM workspace_owners WHERE email = ?').bind(key).first() : null;
       const hash = await passwordHash(password, owner?.password_salt || 'missing-owner', pepper);
       if (!owner || !equalHash(hash, owner.password_hash)) return json({ error: 'Incorrect email or password.' }, 401);
       return signIn(db, owner.id, now);
@@ -200,7 +253,7 @@ export async function onRequest({ request, env }) {
     const { name, description, whatsapp } = profile;
     if (action === 'create') {
       const slug = input.slug;
-      if (typeof slug !== 'string' || slug.length < 3 || slug.length > 48 || (!slugPattern.test(slug) || slug === originalSlug)) {
+      if (!validShopSlug(slug)) {
         return json({ error: 'Choose an available shop URL with 3–48 lowercase letters, digits or hyphens.' }, 400);
       }
       const shop = await db.prepare(`INSERT INTO storefront_workspaces (id,owner_id,slug,name,description,whatsapp)

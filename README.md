@@ -76,7 +76,7 @@ Role presets save owner instructions. The upstream automatic router still contro
 
 ### Cloudflare Worker deployment
 
-The static storefront can run on Pages. If the production site uses **Workers Builds**, use the committed `wrangler.worker.jsonc` with build command `npm run build` and deploy command `node scripts/deploy-admin.mjs`. In **Build settings → Build variables**, set `MJ_WORKER_NAME` to the existing production Worker name and `MJ_CATALOG_DATABASE_ID` to the ID of the existing D1 catalog. The deploy script includes that exact database as `CATALOG_DB` on every release. The build variables apply to the whole platform. Its asset routing explicitly invokes the Worker for `/api/*`, so a missing binding returns an actionable JSON error rather than a static 404.
+The static storefront can run on Pages. If the production site uses **Workers Builds**, use the committed `wrangler.worker.jsonc` with build command `npm run build` and deploy command `node scripts/deploy-admin.mjs`. In **Build settings → Build variables**, set `MJ_WORKER_NAME` to the existing production Worker name and `MJ_CATALOG_DATABASE_ID` to the exact name or UUID of the existing D1 catalog. Name lookup uses Wrangler and needs D1 listing access on the build token. Use the UUID if name lookup fails. The deploy script includes that exact database as `CATALOG_DB` on every release. The build variables apply to the whole platform. Its asset routing explicitly invokes the Worker for `/api/*`, so a missing binding returns an actionable JSON error rather than a static 404.
 
 Bind the existing D1 catalog database as `CATALOG_DB` and keep the admin password and runtime token in Cloudflare secrets. Deploy the linked ChatWithStars PR before enabling delegation. The contact picker reads only the linked account's unmerged direct WhatsApp contacts. Manual entry still requires a matching contact. Verify a real text message, voice note, reconnect, inbound call and outbound call before enabling production automation.
 
@@ -87,11 +87,12 @@ Apply `0001_catalog.sql`, `0002_workspaces.sql` and `0003_shop_catalogs.sql` in 
 | URL | Who uses it |
 | --- | --- |
 | `/platform-admin/` | Operator creates 24-hour owner invites, lists shops, migrates the original catalog and assigns dedicated WhatsApp runtime tenants |
-| `/manage/` | Owners accept invites, sign in, create shops, choose a shop and change their password |
+| `/manage/?setup=1` | Visitors create an owner account and draft shop without an invite |
+| `/manage/` | Owners sign in, accept operator invites, choose a shop and change their password |
 | `/manage/<slug>/` | Owner edits products, colours, prices, shop settings and WhatsApp assistant settings |
 | `/shops/<slug>/` | Public storefront once published |
 
-Client onboarding uses the existing Worker and shared D1. It requires no per-client GitHub access or Cloudflare secret. New storefronts start private with an empty catalog and use the same renderer, layout and colour selector as Maknoon Jamil. Upload matching photos from the device or use HTTPS image links. To share a storefront, publish it first. A dedicated cover, or the first visible product photo as fallback, becomes the social preview. Native Status sharing depends on whether the browser and WhatsApp expose the relevant share target.
+Every storefront links to self-service signup. New owners sign in with a username and password. Operator-invited owners can still sign in by email. Client onboarding uses the existing Worker and shared D1. It requires no per-client GitHub access or Cloudflare secret. New storefronts start private with an empty catalog and use the same renderer, layout and colour selector as Maknoon Jamil. Upload matching photos from the device or use HTTPS image links. To share a storefront, publish it first. A dedicated cover, or the first visible product photo as fallback, becomes the social preview. Native Status sharing depends on whether the browser and WhatsApp expose the relevant share target.
 
 To move the original shop to owner access, create an invite for its owner, have them accept it, then use **Move Maknoon Jamil** in platform admin. The move copies the current catalog, visibility, availability, prices, colour images and order number into the owner workspace. The root domain and existing `/products/...` and catalog URLs then read that workspace. The owner signs in at `/manage/` and edits it at `/manage/maknoon-jamil/`. The pre-move data remains in the legacy table. Avoid editing the old dashboard during the move.
 

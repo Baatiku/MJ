@@ -47,5 +47,3 @@ export function orderLink(product, variant, origin, number, home = '/', name = '
 }
 
 export const contactLink = (number, name = 'Maknoon Jamil') => whatsappLink(`Hello ${name}! I’d like to ask about your collection.`, number);
-
-export const freeStoreLink = whatsappLink('Hello! I’d like to set up a free online store for my business, like Maknoon Jamil. How do I get started?', '2348161564273');

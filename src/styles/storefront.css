@@ -16,7 +16,7 @@ img { display: block; width: 100%; height: auto; }
 
 .announcement { display: flex; align-items: center; justify-content: center; gap: 7px; padding: 8px 6px; background: var(--ink); color: var(--paper); font-size: clamp(10px, 3vw, 13px); font-weight: 650; white-space: nowrap; }
 .announcement:hover { text-decoration: underline; text-underline-offset: 3px; }
-.announcement .whatsapp-icon { color: #25d366; }
+.shop-announcement { margin: 0; padding: 7px 12px; background: var(--sand); text-align: center; font-size: .85rem; }
 .kicker span { margin-inline: .55em; }
 .masthead { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; min-height: 86px; }
 .masthead nav { display: flex; gap: clamp(10px, 2vw, 28px); font-size: 13px; }
