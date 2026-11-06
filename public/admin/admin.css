@@ -78,3 +78,10 @@
   .admin .admin-fields { grid-template-columns: minmax(0, 1fr); }
   .admin input:not([type="checkbox"]), .admin textarea, .admin select { font-size: 16px; }
 }
+
+#shops ul { list-style: none; padding: 0; }
+#shops li { display: grid; gap: .55rem; padding: .8rem 0; border-bottom: 1px solid var(--line, #ded2c5); overflow-wrap: anywhere; }
+#shops li > a:first-child { font-weight: 650; }
+#appearance { display: grid; gap: .75rem; max-width: 48rem; }
+#appearance[hidden] { display: none; }
+.admin input[type=file] { max-width: 100%; }

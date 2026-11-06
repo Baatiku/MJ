@@ -1,4 +1,12 @@
 const find = (id) => document.getElementById(id);
+const platform = /^\/platform-admin\/?$/.test(location.pathname);
+if (platform) {
+  document.title = 'Platform admin';
+  find('manage-heading').textContent = 'Platform admin';
+  find('shops-heading').textContent = 'Client storefronts';
+  find('shop').hidden = true;
+  find('original-shop').hidden = false;
+}
 const signIn = find('sign-in');
 const accept = find('accept');
 const inviteOwner = find('invite-owner');
@@ -11,7 +19,7 @@ let current;
 let hasInvite = Boolean(invite);
 
 async function request(body) {
-  const response = await fetch('/api/workspaces', body ? {
+  const response = await fetch('/api/workspaces' + (platform && !body ? '?platform=1' : ''), body ? {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
   } : undefined);
   const result = await response.json().catch(() => ({}));
@@ -39,22 +47,42 @@ function render(shops) {
   add.onclick = () => edit(null);
   const items = shops.map((shop) => {
     const item = document.createElement('li');
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.textContent = shop.name + (shop.published ? ' · Published' : ' · Draft');
-    button.onclick = () => edit(shop);
-    item.append(button);
-    if (shop.published) {
-      const link = document.createElement('a');
-      link.href = '/shops/' + encodeURIComponent(shop.slug) + '/';
-      link.textContent = ' View shop';
-      item.append(link);
+    const link = document.createElement('a');
+    link.href = '/manage/' + encodeURIComponent(shop.slug) + '/';
+    link.textContent = shop.name + (shop.published ? ' · Published' : ' · Draft');
+    const preview = document.createElement('a');
+    preview.href = '/shops/' + encodeURIComponent(shop.slug) + '/' + (shop.published ? '' : '?preview=1');
+    preview.textContent = shop.published ? 'View storefront' : 'Preview draft';
+    item.append(link, preview);
+    if (platform && shop.slug !== 'maknoon-jamil') {
+      const binding = document.createElement('form');
+      const field = document.createElement('label');
+      field.textContent = 'WhatsApp runtime tenant ID';
+      const tenant = document.createElement('input');
+      tenant.required = true;
+      tenant.maxLength = 36;
+      field.append(tenant);
+      const save = document.createElement('button');
+      save.type = 'submit';
+      save.textContent = 'Assign WhatsApp tenant';
+      binding.append(field, save);
+      submit(binding, async () => {
+        const response = await fetch('/api/whatsapp?shop=' + encodeURIComponent(shop.slug), {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'assign-runtime', tenant: tenant.value })
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || 'Unable to assign WhatsApp.');
+        binding.reset();
+        notice.textContent = 'WhatsApp assigned to ' + shop.name + '.';
+      });
+      item.append(binding);
     }
     return item;
   });
   const list = document.createElement('ul');
   list.append(...items);
-  find('shops').replaceChildren(add, list);
+  find('shops').replaceChildren(...(platform ? [] : [add]), list);
 }
 
 async function load() {
@@ -64,12 +92,18 @@ async function load() {
     signIn.hidden = accept.hidden = true;
     workspace.hidden = hasInvite;
     accept.hidden = !hasInvite;
+    find('platform-sign-in').hidden = true;
+    find('change-password').hidden = platform;
+    find('import-original').hidden = !platform || shops.some(({ slug }) => slug === 'maknoon-jamil');
+    find('original-shop').hidden = !platform || shops.some(({ slug }) => slug === 'maknoon-jamil');
     render(shops);
   } catch (error) {
     workspace.hidden = true;
+    find('change-password').hidden = find('import-original').hidden = true;
     inviteOwner.hidden = !error.canInvite;
     accept.hidden = error.status !== 401 || !hasInvite;
-    signIn.hidden = error.status !== 401 || hasInvite;
+    signIn.hidden = platform || error.status !== 401 || hasInvite;
+    find('platform-sign-in').hidden = !platform || error.status !== 401;
     if (error.status !== 401) notice.textContent = error.message;
   }
 }
@@ -85,6 +119,16 @@ function submit(target, action) {
   };
 }
 
+submit(find('platform-sign-in'), async () => {
+  const form = find('platform-sign-in');
+  const response = await fetch('/api/admin', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: form.elements.password.value })
+  });
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.error || 'Unable to sign in.');
+  form.reset();
+  await load();
+});
 submit(inviteOwner, async () => {
   const { link } = await request({ action: 'invite', email: inviteOwner.elements.email.value });
   inviteOwner.elements.link.value = link;
@@ -104,7 +148,16 @@ submit(accept, async () => {
   await load();
 });
 find('sign-out').onclick = async () => {
-  try { await request({ action: 'logout' }); edit(null); await load(); }
+  try {
+    if (platform) {
+      const response = await fetch('/api/admin', { method: 'DELETE' });
+      if (!response.ok) throw new Error('Sign-out failed. Try again.');
+    } else {
+      await request({ action: 'logout' });
+      edit(null);
+    }
+    await load();
+  }
   catch (error) { notice.textContent = error.message; }
 };
 submit(form, async () => {
@@ -112,8 +165,17 @@ submit(form, async () => {
   const { shop } = await request(current
     ? { action: 'update', ...profile, id: current.id, published: form.elements.published.checked }
     : { action: 'create', ...profile, slug: form.elements.slug.value });
-  edit(shop);
-  await load();
-  notice.textContent = shop.published ? 'Storefront published.' : 'Draft saved.';
+  location.assign('/manage/' + shop.slug + '/');
+});
+submit(find('import-original'), async () => {
+  if (!window.confirm('Move the live Maknoon Jamil catalog to this owner?')) return;
+  const { admin } = await request({ action: 'import-original', email: find('import-original').elements.email.value });
+  location.assign(admin);
+});
+submit(find('change-password'), async () => {
+  const form = find('change-password');
+  await request({ action: 'change-password', currentPassword: form.elements.currentPassword.value, password: form.elements.password.value });
+  form.reset();
+  notice.textContent = 'Password changed.';
 });
 load();

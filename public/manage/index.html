@@ -11,8 +11,20 @@
 </head>
 <body>
 <main class="shell admin">
-  <header class="admin-header"><h1>Manage your shops</h1></header>
+  <header class="admin-header"><h1 id="manage-heading">Manage your shops</h1></header>
   <p id="notice" role="status"></p>
+  <form id="platform-sign-in" class="panel" hidden>
+    <h2>Platform operator sign-in</h2>
+    <label>Password <input type="password" name="password" autocomplete="current-password" required></label>
+    <button type="submit">Sign in</button>
+  </form>
+  <form id="import-original" class="panel" hidden>
+    <h2>Move Maknoon Jamil to its owner dashboard</h2>
+    <label>Registered owner email <input type="email" name="email" required></label>
+    <p>The existing catalog, number and public links move to the owner’s dashboard. Ask the owner to accept their invite first.</p>
+    <button type="submit">Move Maknoon Jamil</button>
+  </form>
+  <p id="original-shop" hidden><a href="/admin/">Manage Maknoon Jamil’s original storefront</a></p>
   <form id="invite-owner" class="panel" hidden>
     <h2>Invite a shop owner</h2>
     <label>Owner email <input name="email" type="email" required></label>
@@ -31,7 +43,7 @@
     <button type="submit">Create owner account</button>
   </form>
   <section id="workspace" hidden>
-    <div class="admin-header"><h2>Your storefronts</h2><button id="sign-out" type="button">Sign out</button></div>
+    <div class="admin-header"><h2 id="shops-heading">Your storefronts</h2><button id="sign-out" type="button">Sign out</button></div>
     <div class="admin-layout">
       <div id="shops" class="panel"></div>
       <form id="shop" class="panel">
@@ -45,6 +57,12 @@
       </form>
     </div>
   </section>
+  <form id="change-password" class="panel" hidden>
+    <h2>Change owner password</h2>
+    <label>Current password <input type="password" name="currentPassword" autocomplete="current-password" required maxlength="128"></label>
+    <label>New password <input type="password" name="password" autocomplete="new-password" minlength="14" maxlength="128" required></label>
+    <button type="submit">Save new password</button>
+  </form>
 </main>
 </body>
 </html>

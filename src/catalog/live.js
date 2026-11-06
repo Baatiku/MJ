@@ -18,9 +18,9 @@ export async function readCatalog(db) {
 
 const slug = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const asset = /^\/(?:images|previews)\/[a-z0-9-]+\.(?:jpg|jpeg|png|webp)$/;
-function imageUrl(value) {
+function imageUrl(value, workspace) {
   if (typeof value !== 'string' || value.length > 500) return false;
-  if (asset.test(value)) return true;
+  if (asset.test(value) || (workspace && /^\/shop-media\/[a-f0-9-]{36}$/.test(value))) return true;
   try {
     const url = new URL(value);
     return url.protocol === 'https:' && !url.username && !url.password;
@@ -29,11 +29,11 @@ function imageUrl(value) {
   }
 }
 
-export function validateProduct(input) {
+export function validateProduct(input, { workspace = false } = {}) {
   const clean = (value, max) => typeof value === 'string' && value.trim().length > 0 && value.trim().length <= max;
-  if (!input || !products.some(({ id }) => id === input.id) ||
+  if (!input || !(workspace ? typeof input.id === 'string' && input.id.length <= 64 && slug.test(input.id) : products.some(({ id }) => id === input.id)) ||
       !clean(input.name, 100) || !clean(input.description, 450) ||
-      !categories.some(({ id }) => id === input.category) ||
+      !(workspace ? clean(input.category, 50) && slug.test(input.category) : categories.some(({ id }) => id === input.category)) ||
       typeof input.hidden !== 'boolean' || typeof input.available !== 'boolean' ||
       !Number.isSafeInteger(input.revision) || input.revision < 0 ||
       !(input.price === null || Number.isSafeInteger(input.price) && input.price >= 0 && input.price <= 100000000) ||
@@ -43,7 +43,7 @@ export function validateProduct(input) {
   const ids = new Set();
   const variants = input.variants.map((variant) => {
     if (!variant || !clean(variant.id, 50) || !slug.test(variant.id) || ids.has(variant.id) ||
-        !clean(variant.name, 60) || !/^#[a-fA-F0-9]{6}$/.test(variant.swatch) || !imageUrl(variant.image)) {
+        !clean(variant.name, 60) || !/^#[a-fA-F0-9]{6}$/.test(variant.swatch) || !imageUrl(variant.image, workspace)) {
       throw new Error('Each colour needs a unique ID, a name, a swatch and a valid HTTPS or catalog photo URL.');
     }
     ids.add(variant.id);

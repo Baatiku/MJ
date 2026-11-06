@@ -21,8 +21,8 @@ export function whatsappLink(message, number = whatsappNumber) {
   return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
 }
 
-export function variantPath(product, variant) {
-  return `/products/${product.id}/${variant.id}/`;
+export function variantPath(product, variant, home = '/') {
+  return `${home}products/${product.id}/${variant.id}/`;
 }
 
 export function previewImage(variant) {
@@ -35,17 +35,17 @@ export function orderLabel(product) {
   return product.price === null ? 'Ask on WhatsApp' : 'Buy on WhatsApp';
 }
 
-export function orderLink(product, variant, origin, number) {
+export function orderLink(product, variant, origin, number, home = '/', name = 'Maknoon Jamil') {
   const selection = `${product.name} in ${variant.name}`;
   const price = product.price === null ? '' : ` (${formatNaira(product.price)})`;
   const question = product.price === null
     ? 'Please confirm the price and availability.'
     : 'Is it available?';
-  const message = `Hello Maknoon Jamil! I’d like to order ${selection}${price}. ${question}`;
-  const link = origin ? `\n\n${new URL(variantPath(product, variant), origin).href}` : '';
+  const message = `Hello ${name}! I’d like to order ${selection}${price}. ${question}`;
+  const link = origin ? `\n\n${new URL(variantPath(product, variant, home), origin).href}` : '';
   return whatsappLink(message + link, number);
 }
 
-export const contactLink = (number) => whatsappLink('Hello Maknoon Jamil! I’d like to ask about your modestwear collection.', number);
+export const contactLink = (number, name = 'Maknoon Jamil') => whatsappLink(`Hello ${name}! I’d like to ask about your collection.`, number);
 
 export const freeStoreLink = whatsappLink('Hello! I’d like to set up a free online store for my business, like Maknoon Jamil. How do I get started?', '2348161564273');

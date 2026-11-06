@@ -1,5 +1,5 @@
 {
   "version": 1,
-  "include": ["/", "/index.html", "/catalog", "/catalog/", "/products/*", "/api/admin", "/api/whatsapp", "/api/workspaces", "/shops/*"],
+  "include": ["/", "/index.html", "/catalog", "/catalog/", "/products/*", "/api/admin", "/api/whatsapp", "/api/workspaces", "/shops/*", "/manage/*", "/platform-admin", "/platform-admin/", "/shop-media/*", "/api/shop-catalog"],
   "exclude": []
 }

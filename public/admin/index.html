@@ -13,7 +13,7 @@
   <main class="shell admin">
     <header class="admin-header">
       <div><p class="kicker">Maknoon Jamil</p><h1>Shop admin</h1></div>
-      <div class="admin-header-links"><a href="/">View storefront ↗</a><button type="button" id="logout" hidden>Sign out</button></div>
+      <div class="admin-header-links"><a id="view-shop" href="/">View storefront ↗</a><button type="button" id="logout" hidden>Sign out</button></div>
     </header>
     <nav class="admin-sections" aria-label="Shop admin sections" hidden>
       <a href="#dashboard">Products</a><a href="#shop-settings">Shop settings</a>
@@ -29,7 +29,22 @@
         <p>This changes where customers go when they tap WhatsApp on your storefront. The AI assistant stays on its separately linked account.</p>
         <button class="primary" type="submit">Save order number</button>
       </form>
-      <p><a href="/manage/">Manage shops and owner invites ↗</a></p>
+      <form id="appearance" hidden>
+        <label>Shop name <input name="name" maxlength="100" required></label>
+        <label>Description <textarea name="description" maxlength="300"></textarea></label>
+        <label>Customer order WhatsApp number <input name="whatsapp" type="tel" maxlength="40"></label>
+        <label>Headline <input name="headline" maxlength="100"></label>
+        <label>Banner text <input name="banner" maxlength="120"></label>
+        <label>Accent colour <input name="accent" type="color" value="#875749"></label>
+        <label>Logo URL <input name="logo" maxlength="500"></label>
+        <label>Upload logo <input type="file" data-photo="logo" accept="image/*"></label>
+        <label>Cover photo URL <input name="cover" maxlength="500"></label>
+        <label>Upload cover photo <input type="file" data-photo="cover" accept="image/*"></label>
+        <label>Category display names <textarea name="categoryLabels" placeholder="long-dresses = Long Dresses"></textarea><small>Use one category URL name and display name per line, separated by =.</small></label>
+        <label class="check"><input type="checkbox" name="published"> Publish storefront</label>
+        <button class="primary" type="submit">Save shop settings</button>
+      </form>
+      <p><a id="manage-shops" href="/platform-admin/">Platform admin ↗</a></p>
     </section>
     <form id="login" class="panel" hidden>
       <h2>Owner sign-in</h2>
@@ -38,7 +53,7 @@
     </form>
     <section id="dashboard" class="admin-layout" data-admin-panel hidden>
       <aside class="panel">
-        <h2>Products</h2>
+        <h2>Products</h2><button id="new-product" type="button" hidden>Add product</button>
         <label>Find a product <input id="search" type="search"></label>
         <div id="list"></div>
       </aside>
@@ -47,7 +62,9 @@
         <div class="admin-fields">
           <label>Name <input name="name" required maxlength="100"></label>
           <label>Price in ₦ <input name="price" type="number" min="0" max="100000000" step="1" placeholder="Ask on WhatsApp" aria-describedby="price-help"><small id="price-help">Leave blank to show Ask on WhatsApp.</small></label>
-          <label>Category <select name="category"></select></label>
+          <label id="legacy-category">Category <select name="category"></select></label>
+          <label class="workspace-field" hidden>Category name <input name="customCategory" maxlength="50"></label>
+          <label class="workspace-field" hidden>Display order <input name="position" type="number" min="0" max="100000" step="1"></label>
           <label class="wide">Description <textarea name="description" required maxlength="450"></textarea></label>
           <label class="check"><input type="checkbox" name="available"> Available to order</label>
           <label class="check"><input type="checkbox" name="hidden"> Hide from the storefront</label>
@@ -55,7 +72,7 @@
         <h3>Colours and photos</h3>
         <p>Set each colour’s swatch and matching photo. Changing a swatch updates the colour selector. Changing the photo updates the image shoppers see.</p>
         <div id="variants"></div>
-        <div class="admin-actions"><button type="button" id="add-colour">Add colour</button><button class="primary" type="submit">Save product</button></div>
+        <div class="admin-actions"><button type="button" id="add-colour">Add colour</button><button type="button" id="delete-product" hidden>Delete product</button><button class="primary" type="submit">Save product</button></div>
       </form>
     </section>
     <section class="panel assistant-panel" id="whatsapp-assistant" data-admin-panel hidden>
@@ -137,6 +154,7 @@
         <label>Colour name <input name="colour" required maxlength="60"></label>
         <label>Swatch <input name="swatch" type="color"></label>
         <label class="wide">Photo URL <input name="image" required maxlength="500"></label>
+        <label class="wide" data-upload hidden>Upload photo <input type="file" accept="image/*"></label>
       </div>
       <button type="button" class="remove">Remove</button>
     </div>

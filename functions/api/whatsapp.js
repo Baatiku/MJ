@@ -1,4 +1,8 @@
+import { originalShop } from '../_original-shop.js';
+import { originalSlug } from '../_original-id.js';
 import { adminSessionHash } from './admin.js';
+import { workspaceOwner } from './workspaces.js';
+import { findShop } from './shop-catalog.js';
 
 const headers = { 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' };
 const json = (data, status = 200) => Response.json(data, { status, headers });
@@ -85,18 +89,41 @@ export async function onRequest({ request, env }) {
   if (request.method === 'POST' && request.headers.get('Origin') !== new URL(request.url).origin) {
     return json({ error: 'Invalid request origin.' }, 403);
   }
-  if (!env.CATALOG_DB || !env.ADMIN_PASSWORD) return json({ error: 'Owner sign-in must be configured first.' }, 503);
+  if (!env.CATALOG_DB) return json({ error: 'Owner sign-in must be configured first.' }, 503);
   let delegated = false;
   try {
-    if (!await adminSessionHash(request, env)) return json({ error: 'Sign in to continue.' }, 401);
+    const db = env.CATALOG_DB;
+    const params = new URL(request.url).searchParams;
+    const shopSlug = params.get('shop');
+    const operator = await adminSessionHash(request, env);
+    const owner = shopSlug ? await workspaceOwner(request, db) : null;
+    if (!operator && !owner) return json({ error: 'Sign in to continue.' }, 401);
+    const input = request.method === 'POST' ? await request.json().catch(() => null) : null;
     const { WA_RUNTIME_ORIGIN, WA_RUNTIME_TOKEN, WA_TENANT_ID } = env;
+    let tenant = WA_TENANT_ID;
+    if (shopSlug) {
+      const shop = await findShop(db, shopSlug, owner, Boolean(operator));
+      if (!shop) return json({ error: 'Shop not found.' }, 404);
+      const original = shopSlug === originalSlug && await originalShop(db);
+      if (input?.action === 'assign-runtime') {
+        if (original) return json({ error: 'Maknoon Jamil uses its existing WhatsApp service.' }, 409);
+        if (!operator) return json({ error: 'Platform admin sign-in is required.' }, 403);
+        const tenantId = typeof input.tenant === 'string' ? input.tenant.trim().toLowerCase() : '';
+        if (!tenantPattern.test(tenantId) || tenantId === WA_TENANT_ID?.toLowerCase()) {
+          return json({ error: 'Enter a dedicated WhatsApp tenant ID for this shop.' }, 400);
+        }
+        const saved = await db.prepare('INSERT INTO workspace_whatsapp_bindings VALUES (?, ?) ON CONFLICT DO NOTHING RETURNING tenant_id')
+          .bind(shop.id, tenantId).first();
+        return saved ? json({ ok: true }) : json({ error: 'This shop or tenant already has a WhatsApp binding.' }, 409);
+      }
+      if (!original) tenant = (await db.prepare('SELECT tenant_id FROM workspace_whatsapp_bindings WHERE shop_id = ?').bind(shop.id).first())?.tenant_id;
+      if (!tenant) return json({ error: 'The platform admin needs to connect a WhatsApp service for this shop.' }, 503);
+    }
     const origin = WA_RUNTIME_ORIGIN ? new URL(WA_RUNTIME_ORIGIN) : null;
     if (!origin || origin.protocol !== 'https:' || origin.username || origin.password ||
-        !WA_RUNTIME_TOKEN || !tenantPattern.test(WA_TENANT_ID ?? '')) {
+        !WA_RUNTIME_TOKEN || !tenantPattern.test(tenant ?? '')) {
       return json({ error: 'WhatsApp service setup is pending.' }, 503);
     }
-    const input = request.method === 'POST' ? await request.json().catch(() => null) : null;
-    const params = new URL(request.url).searchParams;
     const listContacts = request.method === 'GET' && params.get('view') === 'contacts';
     const offset = Number(params.get('offset') || 0);
     if (listContacts && (!Number.isInteger(offset) || offset < 0 || offset > 100000)) return json({ error: 'Invalid contact page.' }, 400);
@@ -108,7 +135,7 @@ export async function onRequest({ request, env }) {
     if (delegated && env.WA_EXACT_DELEGATION !== '1') {
       return json({ error: 'Delegation requires a worker with exact WhatsApp recipient validation.' }, 503);
     }
-    const response = await callRuntime(origin, WA_TENANT_ID, WA_RUNTIME_TOKEN, action);
+    const response = await callRuntime(origin, tenant, WA_RUNTIME_TOKEN, action);
     if (!response.ok) {
       if (delegated) return json({ error: 'Delivery could not be confirmed. Check the WhatsApp conversation before trying again.' }, 502);
       return json({ error: 'The WhatsApp worker could not complete this action. Check the connection and try again.' }, 502);

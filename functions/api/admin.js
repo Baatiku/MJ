@@ -1,3 +1,4 @@
+import { originalMarker } from '../_original-id.js';
 import { normalizeOrderNumber, readOrderNumber, saveOrderNumber } from '../../src/catalog/shop-settings.js';
 import { readCatalog, validateProduct } from '../../src/catalog/live.js';
 
@@ -64,6 +65,10 @@ export async function onRequest({ request, env }) {
     const hash = await adminSessionHash(request, env, now);
     if (!hash) {
       return json({ error: 'Sign in to continue.' }, 401);
+    }
+    if (['GET', 'PUT'].includes(request.method) &&
+        await db.prepare('SELECT id FROM catalog_edits WHERE id = ?').bind(originalMarker).first()) {
+      return json({ migrated: '/manage/maknoon-jamil/' }, request.method === 'GET' ? 200 : 409);
     }
     if (request.method === 'GET') {
       const [products, orderNumber] = await Promise.all([readCatalog(db), readOrderNumber(db)]);

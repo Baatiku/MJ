@@ -31,7 +31,7 @@ function refresh() {
   const files = ready.map(({ file }) => file);
   share.disabled = pending || !files.length || !navigator.canShare?.({ files });
   clear.disabled = !entries.length;
-  result.textContent = pending ? 'Preparing photos…' : entries.length ? `${entries.length} selected` : '';
+  result.textContent = !photos.length ? 'Add a visible product with a photo to start sharing.' : pending ? 'Preparing photos…' : entries.length ? `${entries.length} selected` : '';
   downloads.hidden = !entries.length;
   downloadList.replaceChildren(...entries.map(({ photo, file, failed }) => {
     const item = document.createElement('li');
@@ -114,7 +114,7 @@ export const statusPhotos = {
       label: product.name + ' · ' + variant.name,
       image: previewImage(variant)
     })));
-    panel.hidden = photos.length === 0;
+    panel.hidden = false;
     const current = new Map(photos.map((photo) => [photo.id, photo]));
     for (const [id, entry] of selected) {
       if (current.get(id)?.image !== entry.photo.image) selected.delete(id);

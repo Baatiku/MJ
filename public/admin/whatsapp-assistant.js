@@ -13,7 +13,11 @@ let contactOffset = 0;
 let contactQuery = '';
 
 async function api(body, query = '') {
-  const response = await fetch('/api/whatsapp' + query, body ? {
+  const params = new URLSearchParams(query);
+  const shop = /^\/manage\/([a-z0-9-]+)\/?$/.exec(location.pathname)?.[1];
+  if (shop) params.set('shop', shop);
+  const suffix = params.size ? '?' + params : '';
+  const response = await fetch('/api/whatsapp' + suffix, body ? {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
   } : undefined);
   const data = await response.json().catch(() => ({}));
@@ -33,7 +37,7 @@ function render(data) {
   find('wa-toggle').textContent = data.enabled ? 'Pause replies' : 'Enable replies';
   find('wa-toggle').disabled = !data.connected;
   find('wa-disconnect').disabled = !data.connected && !data.qrDataUrl;
-  delegate.querySelector('button').disabled = !data.connected;
+  delegate.querySelector('button[type=submit]').disabled = !data.connected;
   if (data.connected) {
     find('wa-code').textContent = '';
     clearTimeout(pairingTimer);
@@ -63,7 +67,7 @@ async function act(button, body, done) {
   } catch (error) {
     if (current === generation) notice.textContent = error.message;
   } finally {
-    if (current === generation) button.disabled = button === delegate.querySelector('button') && !session.connected;
+    if (current === generation) button.disabled = button === delegate.querySelector('button[type=submit]') && !session.connected;
   }
 }
 
@@ -148,7 +152,7 @@ delegate.onsubmit = (event) => {
   const phone = delegate.elements.phone.value.trim();
   const label = manual ? phone : contactSelect.selectedOptions[0]?.textContent;
   if (!session.connected || !label || !confirm(`Have the assistant write and send this reply to ${label}?`)) return;
-  act(delegate.querySelector('button'), {
+  act(delegate.querySelector('button[type=submit]'), {
     action: 'delegate', ...(manual ? { phone } : { jid: contactSelect.value }), modality: delegate.elements.modality.value, brief: delegate.elements.brief.value, confirm: true
   }, ({ modality }) => {
     notice.textContent = modality === 'voice' ? 'Voice note sent.' : 'Message sent.';

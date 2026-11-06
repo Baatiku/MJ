@@ -70,7 +70,7 @@ Configure these server-side variables on the deployment serving `/api/whatsapp`:
 | `WA_TENANT_ID` | UUID of the store's runtime tenant |
 | `WA_EXACT_DELEGATION` | Set to `1` only after deploying the exact-recipient runtime patch |
 
-The existing `CATALOG_DB` and `ADMIN_PASSWORD` admin session are required. The browser never receives the runtime token. The bridge accepts no caller-supplied tenant ID. Delegation currently requires the recipient's exact phone-based WhatsApp JID to exist in the runtime contacts. If delivery is uncertain, check the conversation before repeating the send.
+The existing `CATALOG_DB` and `ADMIN_PASSWORD` admin session are required. The browser never receives the runtime token. Only the platform operator can bind a dedicated runtime tenant to a shop. Delegation currently requires the recipient's exact phone-based WhatsApp JID to exist in the runtime contacts. If delivery is uncertain, check the conversation before repeating the send.
 
 Role presets save owner instructions. The upstream automatic router still controls actual specialist selection. This pilot bridge does not provision or expose calls, groups, Channels, a tenant-scoped token broker, or catalog-aware agent tools.
 
@@ -82,8 +82,21 @@ Bind the existing D1 catalog database as `CATALOG_DB` and keep the admin passwor
 
 ## Shared shop workspaces on Cloudflare D1
 
-Apply both SQL migrations in `migrations/` to the shared `CATALOG_DB`. On the executable Worker or Pages deployment configure one strong random runtime secret named `SHOP_PASSWORD_PEPPER` (at least 32 characters). Keep it stable because existing owner passwords depend on it. The existing `ADMIN_PASSWORD` is the platform operator credential and is configured once.
+Apply `0001_catalog.sql`, `0002_workspaces.sql` and `0003_shop_catalogs.sql` in order. For an existing deployment with the first two migrations, run only `0003_shop_catalogs.sql` on the existing `CATALOG_DB`. Keep the deployment's existing `SHOP_PASSWORD_PEPPER` and `ADMIN_PASSWORD`. The pepper is shared by all owner accounts and must stay stable.
 
-The operator signs in at `/admin/`, then opens `/manage/` to create a 24-hour single-use invite for a client email. Send that link privately. The client chooses their own password, then can create and publish shops at `/shops/<slug>/`. Shops are scoped to the signed-in owner. Client onboarding needs no email provider and no per-shop Cloudflare secrets or bindings.
+| URL | Who uses it |
+| --- | --- |
+| `/platform-admin/` | Operator creates 24-hour owner invites, lists shops, migrates the original catalog and assigns dedicated WhatsApp runtime tenants |
+| `/manage/` | Owners accept invites, sign in, create shops, choose a shop and change their password |
+| `/manage/<slug>/` | Owner edits products, colours, prices, shop settings and WhatsApp assistant settings |
+| `/shops/<slug>/` | Public storefront once published |
 
-The workspace manages storefront profiles and public click-to-chat numbers. The existing Maknoon Jamil catalog and live WhatsApp runtime still use their separate paths. Supabase is not required by the shared storefront or owner login.
+Client onboarding uses the existing Worker and shared D1. It requires no per-client GitHub access or Cloudflare secret. New storefronts start private with an empty catalog and use the same renderer, layout and colour selector as Maknoon Jamil. Upload matching photos from the device or use HTTPS image links. To share a storefront, publish it first. A dedicated cover, or the first visible product photo as fallback, becomes the social preview. Native Status sharing depends on whether the browser and WhatsApp expose the relevant share target.
+
+To move the original shop to owner access, create an invite for its owner, have them accept it, then use **Move Maknoon Jamil** in platform admin. The move copies the current catalog, visibility, availability, prices, colour images and order number into the owner workspace. The root domain and existing `/products/...` and catalog URLs then read that workspace. The owner signs in at `/manage/` and edits it at `/manage/maknoon-jamil/`. The pre-move data remains in the legacy table. Avoid editing the old dashboard during the move.
+
+### WhatsApp assistant for a client shop
+
+Create a dedicated tenant in the configured ChatWithStars runtime, then assign its UUID to exactly one shop in platform admin. Maknoon Jamil keeps the existing `WA_TENANT_ID`. Each linked owner can use QR or pairing code, set role guidance, and browse contacts for delegation. The proxy derives the tenant from the owner's authorized shop and keeps the shared runtime credentials on the server.
+
+The runtime must be deployed and have a real account paired to confirm QR login, reconnect, replies and text or voice delivery. Calls, groups and Channels are outside the current bridge. The presets send role guidance while the upstream router still selects the actual specialist.

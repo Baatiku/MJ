@@ -15,8 +15,8 @@ for (const product of products) {
     image.src = variant.image;
     image.alt = `${product.name} in ${variant.name}`;
     selected.textContent = variant.name;
-    photo.href = variantPath(product, variant);
-    if (order) order.href = orderLink(product, variant, location.origin, catalogData.dataset.orderNumber);
+    photo.href = variantPath(product, variant, catalogData.dataset.shopHome) + (catalogData.dataset.preview === '1' ? '?preview=1' : '');
+    if (order) order.href = orderLink(product, variant, location.origin, catalogData.dataset.orderNumber, catalogData.dataset.shopHome, catalogData.dataset.shopName);
   }
   options.addEventListener('change', updateSelection);
   options.hidden = false;

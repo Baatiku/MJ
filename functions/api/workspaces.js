@@ -1,3 +1,7 @@
+import { categories } from '../../src/catalog/products.js';
+import { readCatalog } from '../../src/catalog/live.js';
+import { readOrderNumber } from '../../src/catalog/shop-settings.js';
+import { originalMarker, originalSlug } from '../_original-id.js';
 import { adminSessionHash } from './admin.js';
 
 const sessionCookie = '__Host-shop-session';
@@ -58,6 +62,15 @@ async function allowAttempt(db, request, action, now) {
   return result.attempts <= 8;
 }
 
+export async function workspaceOwner(request, db, now = Math.floor(Date.now() / 1000)) {
+  if (!db) return null;
+  const token = request.headers.get('Cookie')?.match(/(?:^|; )__Host-shop-session=([a-f0-9]{64})(?:;|$)/)?.[1];
+  if (!token) return null;
+  const row = await db.prepare('SELECT owner_id FROM workspace_sessions WHERE token_hash = ? AND expires > ?')
+    .bind(await digest(token), now).first();
+  return row?.owner_id ?? null;
+}
+
 async function signIn(db, ownerId, now) {
   const token = randomToken();
   await db.batch([
@@ -97,6 +110,29 @@ export async function onRequest({ request, env }) {
       link.hash = 'invite=' + invite;
       return json({ link: link.href }, 201);
     }
+    if (action === 'import-original') {
+      if (!await adminSessionHash(request, env, now)) return json({ error: 'Platform admin sign-in is required.' }, 403);
+      const email = emailAddress(input.email);
+      const owner = email && await db.prepare('SELECT id FROM workspace_owners WHERE email = ?').bind(email).first();
+      if (!owner) return json({ error: 'The owner must accept their invitation first.' }, 400);
+      const existing = await db.prepare('SELECT id FROM storefront_workspaces WHERE slug = ?').bind(originalSlug).first();
+      if (existing) return json({ error: 'Maknoon Jamil already has an owner workspace.' }, 409);
+      const [products, whatsapp] = await Promise.all([readCatalog(db), readOrderNumber(db)]);
+      const shopId = crypto.randomUUID();
+      await db.batch([
+        db.prepare('INSERT INTO storefront_workspaces VALUES (?, ?, ?, ?, ?, ?, 1)')
+          .bind(shopId, owner.id, originalSlug, 'Maknoon Jamil', 'Fluid silhouettes and rich colours, from wide-sleeve abayas to softly layered khimars.', whatsapp),
+        db.prepare('INSERT INTO workspace_shop_appearance VALUES (?, ?)').bind(shopId, JSON.stringify({
+          headline: 'Grace in every fold.', cover: '/previews/maknoon-jamil-square.jpg',
+          banner: 'Get a free online store for your business',
+          categoryLabels: Object.fromEntries(categories.map(({ id, name }) => [id, name]))
+        })),
+        ...products.map(({ revision, ...product }, index) => db.prepare('INSERT INTO workspace_shop_products VALUES (?, ?, ?, 1, ?)')
+          .bind(shopId, product.id, JSON.stringify(product), index * 10)),
+        db.prepare("INSERT INTO catalog_edits VALUES (?, '{}', 1)").bind(originalMarker)
+      ]);
+      return json({ ok: true, admin: '/manage/' + originalSlug + '/' }, 201);
+    }
     if (action === 'accept' || action === 'login') {
       const password = input.password;
       if (typeof password !== 'string' || password.length < 14 || password.length > 128) {
@@ -129,18 +165,43 @@ export async function onRequest({ request, env }) {
     const session = tokenHash ? await db.prepare('SELECT owner_id FROM workspace_sessions WHERE token_hash = ? AND expires > ?').bind(tokenHash, now).first() : null;
     if (request.method === 'GET') {
       const canInvite = Boolean(await adminSessionHash(request, env, now));
+      if (new URL(request.url).searchParams.get('platform') === '1') {
+        if (!canInvite) return json({ error: 'Platform admin sign-in is required.' }, 401);
+        const { results } = await db.prepare(`SELECT ${select} FROM storefront_workspaces ORDER BY slug`).all();
+        return json({ shops: results.map(present), canInvite });
+      }
       if (!session) return json({ error: 'Sign in to continue.', canInvite }, 401);
       const { results } = await db.prepare(`SELECT ${select} FROM storefront_workspaces WHERE owner_id = ? ORDER BY slug`).bind(session.owner_id).all();
       return json({ shops: results.map(present), canInvite });
     }
     if (!session) return json({ error: 'Sign in to continue.' }, 401);
+    if (action === 'change-password') {
+      if (typeof input.password !== 'string' || input.password.length < 14 || input.password.length > 128 ||
+          typeof input.currentPassword !== 'string' || input.currentPassword.length > 128) {
+        return json({ error: 'Use a new password between 14 and 128 characters.' }, 400);
+      }
+      if (!await allowAttempt(db, request, action, now)) return json({ error: 'Too many attempts. Try again in 15 minutes.' }, 429);
+      const owner = await db.prepare('SELECT password_salt,password_hash FROM workspace_owners WHERE id = ?').bind(session.owner_id).first();
+      if (!owner || !equalHash(await passwordHash(input.currentPassword, owner.password_salt, pepper), owner.password_hash)) {
+        return json({ error: 'Incorrect current password.' }, 400);
+      }
+      const salt = randomToken();
+      const hash = await passwordHash(input.password, salt, pepper);
+      const [changed] = await db.batch([
+        db.prepare('UPDATE workspace_owners SET password_salt = ?, password_hash = ? WHERE id = ? AND password_hash = ? RETURNING id')
+          .bind(salt, hash, session.owner_id, owner.password_hash),
+        db.prepare('DELETE FROM workspace_sessions WHERE owner_id = ? AND EXISTS (SELECT 1 FROM workspace_owners WHERE id = ? AND password_hash = ?)')
+          .bind(session.owner_id, session.owner_id, hash)
+      ]);
+      return changed.results.length ? signIn(db, session.owner_id, now) : json({ error: 'Password already changed. Sign in again.' }, 409);
+    }
     const profile = cleanProfile(input);
     if (!profile) return json({ error: 'Check the shop name, description and WhatsApp number.' }, 400);
     const { name, description, whatsapp } = profile;
     if (action === 'create') {
       const slug = input.slug;
-      if (typeof slug !== 'string' || slug.length < 3 || slug.length > 48 || !slugPattern.test(slug)) {
-        return json({ error: 'Use 3–48 lowercase letters, digits or hyphens for the shop URL.' }, 400);
+      if (typeof slug !== 'string' || slug.length < 3 || slug.length > 48 || (!slugPattern.test(slug) || slug === originalSlug)) {
+        return json({ error: 'Choose an available shop URL with 3–48 lowercase letters, digits or hyphens.' }, 400);
       }
       const shop = await db.prepare(`INSERT INTO storefront_workspaces (id,owner_id,slug,name,description,whatsapp)
         VALUES (?,?,?,?,?,?) ON CONFLICT(slug) DO NOTHING RETURNING ${select}`)
