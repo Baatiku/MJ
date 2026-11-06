@@ -79,3 +79,11 @@ Role presets save owner instructions. The upstream automatic router still contro
 The static storefront can run on Pages. If the production site uses **Workers Builds**, use the committed `wrangler.worker.jsonc` with build command `npm run build` and deploy command `npx wrangler deploy --config wrangler.worker.jsonc`. Set the Wrangler Worker name to the existing production Worker name before applying the configuration to an existing deployment. Its asset routing explicitly invokes the Worker for `/api/*`, so a missing binding returns an actionable JSON error rather than a static 404.
 
 Bind the existing D1 catalog database as `CATALOG_DB` and keep the admin password and runtime token in Cloudflare secrets. Deploy the linked ChatWithStars PR before enabling delegation. The contact picker reads only the linked account's unmerged direct WhatsApp contacts. Manual entry still requires a matching contact. Verify a real text message, voice note, reconnect, inbound call and outbound call before enabling production automation.
+
+## Shared shop workspaces
+
+Deploy the existing executable Worker or Pages Functions and configure `SHOP_SUPABASE_URL` and `SHOP_SUPABASE_PUBLIC_KEY` once on the shared deployment. Use the Supabase publishable or anon key. Apply `supabase/migrations/20261106000100_storefront_workspaces.sql` to its Postgres database. Enable email sign-in and configure the Supabase sign-in email template to include `{{ .Token }}`, plus a production email sender before onboarding clients.
+
+Owners open `/manage/`, verify their email, create a draft, then publish to `/shops/<slug>/`. They can edit the storefront name, description, public WhatsApp contact and publication status. Access tokens stay in a secure HTTP-only cookie. Row-level policies authorize writes with the verified owner's identity. Public reads are limited to published storefront profiles.
+
+This first slice manages storefront profiles and click-to-chat numbers. It does not migrate the existing Maknoon Jamil catalog or add multi-store catalog editing and WhatsApp device pairing. The original shop and admin routes remain available during that migration.
