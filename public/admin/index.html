@@ -88,7 +88,20 @@
         <details>
           <summary>Delegate a customer reply</summary>
           <form id="wa-delegate">
-            <label>Customer WhatsApp number <input name="phone" type="tel" placeholder="+234…" required></label>
+            <fieldset class="wa-recipients">
+              <legend>Recipient</legend>
+              <label>Choose how to find the customer
+                <select name="recipientMode"><option value="contact">Existing WhatsApp contact</option><option value="manual">Enter phone number</option></select>
+              </label>
+              <div id="wa-contact-picker">
+                <label>Search contacts <input id="wa-contact-query" type="search" maxlength="80" placeholder="Name or number"></label>
+                <button type="button" id="wa-contact-search">Search or refresh</button>
+                <label>Contact <select name="contact" required><option value="">Select a contact</option></select></label>
+                <button type="button" id="wa-contact-more" hidden>Load more contacts</button>
+                <p id="wa-contact-note" aria-live="polite"></p>
+              </div>
+              <label id="wa-manual-recipient" hidden>Customer WhatsApp number <input name="phone" type="tel" placeholder="+234…"></label>
+            </fieldset>
             <label>What should the assistant say? <textarea name="brief" maxlength="3500" required placeholder="For example, thank the customer and explain when their order will be ready."></textarea></label>
             <label>Reply format <select name="modality"><option value="text">Text</option><option value="voice">Voice note</option></select></label>
             <p>The assistant writes and sends the reply from the connected WhatsApp account after you confirm.</p>

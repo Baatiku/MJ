@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { createHmac } from 'node:crypto';
 import { test } from 'node:test';
+import worker from '../worker.js';
 import { onRequest } from '../functions/api/whatsapp.js';
 
 test('WhatsApp admin signs scoped requests and gates exact recipient delegation', async (t) => {
@@ -22,9 +23,20 @@ test('WhatsApp admin signs scoped requests and gates exact recipient delegation'
     const message = [options.headers['X-Platform-Timestamp'], options.method, tenant, path].join('\n');
     assert.equal(options.headers['X-Platform-Signature'], createHmac('sha256', token).update(message).digest('base64url'));
     if (path === 'command') {
-      assert.match(JSON.parse(options.body).command, /Recipient\/contact: 2348000000000@s\.whatsapp\.net/);
-      return Response.json({ ok: true, action: 'send_contact_message', modality: 'text' });
+      const { command } = JSON.parse(options.body);
+      assert.match(command, /Recipient\/contact: (2348000000000@s\.whatsapp\.net|123456789@lid)/);
+      return Response.json({ ok: true, action: 'send_contact_message', modality: command.includes('Modality: voice') ? 'voice' : 'text' });
     }
+    if (path === 'whatsapp-contacts') {
+      assert.equal(url.searchParams.get('q'), 'Amina');
+      assert.equal(url.searchParams.get('offset'), '30');
+      return Response.json({ contacts: [
+        { jid: '123456789@lid', name: 'Amina', secret: 'private' },
+        { jid: '123456789@g.us', name: 'Group' }
+      ], hasMore: true });
+    }
+    if (path === 'connect') return Response.json({ connected: false, qrDataUrl: 'data:image/png;base64,AAAA' });
+    if (path === 'pairing-code') return Response.json({ code: 'ABCD1234' });
     return Response.json({ connected: true, enabled: true, privateCredential: 'must not be exposed' });
   });
   const call = (body, auth = true, source = origin) => onRequest({
@@ -47,5 +59,27 @@ test('WhatsApp admin signs scoped requests and gates exact recipient delegation'
   env.WA_EXACT_DELEGATION = '1';
   assert.equal((await call({ ...delegate, confirm: false })).status, 400);
   assert.deepEqual(await (await call(delegate)).json(), { ok: true, modality: 'text' });
-  assert.equal(fetch.mock.callCount(), 2);
+  assert.deepEqual(await (await call({ action: 'connect' })).json(), {
+    connected: false, enabled: false, phone: null, status: 'unknown', qrDataUrl: 'data:image/png;base64,AAAA'
+  });
+  assert.deepEqual(await (await call({ action: 'pair', phone: delegate.phone })).json(), { code: 'ABCD1234' });
+  assert.deepEqual(await (await call({ action: 'toggle', enabled: false })).json(), { ok: true });
+  const contacts = await worker.fetch(new Request(origin + '/api/whatsapp?view=contacts&q=Amina&offset=30', {
+    headers: { Cookie: cookie }
+  }), env);
+  assert.deepEqual(await contacts.json(), { contacts: [{ jid: '123456789@lid', name: 'Amina' }], hasMore: true });
+  assert.deepEqual(await (await call({ ...delegate, phone: undefined, jid: '123456789@lid', modality: 'voice' })).json(), { ok: true, modality: 'voice' });
+  assert.equal((await call({ ...delegate, phone: undefined, jid: '123456789@g.us' })).status, 400);
+  assert.equal(fetch.mock.callCount(), 7);
+});
+
+
+test('Worker routes both admin APIs before static assets', async () => {
+  const env = { ASSETS: { fetch: async () => new Response('static') } };
+  for (const path of ['/api/admin', '/api/whatsapp']) {
+    const response = await worker.fetch(new Request('https://shop.example' + path), env);
+    assert.equal(response.status, 503);
+    assert.equal(response.headers.get('Content-Type'), 'application/json');
+  }
+  assert.equal(await (await worker.fetch(new Request('https://shop.example/admin/'), env)).text(), 'static');
 });

@@ -8,9 +8,12 @@ const delegate = find('wa-delegate');
 let session = {};
 let generation = 0;
 let pairingTimer;
+let contactRequest = 0;
+let contactOffset = 0;
+let contactQuery = '';
 
-async function api(body) {
-  const response = await fetch('/api/whatsapp', body ? {
+async function api(body, query = '') {
+  const response = await fetch('/api/whatsapp' + query, body ? {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
   } : undefined);
   const data = await response.json().catch(() => ({}));
@@ -90,15 +93,67 @@ find('wa-guidance').onsubmit = (event) => {
     notice.textContent = 'Assistant guidance saved.';
   });
 };
+const contactSelect = delegate.elements.contact;
+const contactSearch = find('wa-contact-search');
+const contactMore = find('wa-contact-more');
+const contactNote = find('wa-contact-note');
+
+function recipientMode() {
+  const manual = delegate.elements.recipientMode.value === 'manual';
+  find('wa-contact-picker').hidden = manual;
+  find('wa-manual-recipient').hidden = !manual;
+  contactSelect.required = !manual;
+  delegate.elements.phone.required = manual;
+}
+
+async function loadContacts(append = false) {
+  const request = ++contactRequest;
+  const current = generation;
+  if (!append) {
+    contactOffset = 0;
+    contactQuery = find('wa-contact-query').value.trim();
+    contactSelect.replaceChildren(new Option('Select a contact', ''));
+    contactMore.hidden = true;
+  }
+  contactSearch.disabled = contactMore.disabled = true;
+  contactNote.textContent = 'Loading contacts…';
+  try {
+    const params = new URLSearchParams({ view: 'contacts', q: contactQuery, offset: String(contactOffset) });
+    const data = await api(undefined, '?' + params);
+    if (request !== contactRequest || current !== generation) return;
+    for (const { jid, name } of data.contacts) {
+      const phone = jid.endsWith('@s.whatsapp.net') ? '+' + jid.split('@')[0] : '';
+      contactSelect.add(new Option([name, phone].filter(Boolean).join(' · ') || 'WhatsApp contact', jid));
+    }
+    contactOffset += 30;
+    contactMore.hidden = !data.hasMore;
+    contactNote.textContent = contactSelect.options.length > 1 ? '' : 'No contacts found.';
+  } catch (error) {
+    if (request === contactRequest && current === generation) contactNote.textContent = error.message;
+  } finally {
+    if (request === contactRequest && current === generation) contactSearch.disabled = contactMore.disabled = false;
+  }
+}
+
+contactSearch.onclick = () => loadContacts();
+contactMore.onclick = () => loadContacts(true);
+delegate.elements.recipientMode.onchange = recipientMode;
+delegate.closest('details').ontoggle = (event) => {
+  if (event.currentTarget.open && session.connected && contactOffset === 0) void loadContacts();
+};
+
 delegate.onsubmit = (event) => {
   event.preventDefault();
+  const manual = delegate.elements.recipientMode.value === 'manual';
   const phone = delegate.elements.phone.value.trim();
-  if (!session.connected || !confirm(`Have the assistant write and send this reply to ${phone}?`)) return;
+  const label = manual ? phone : contactSelect.selectedOptions[0]?.textContent;
+  if (!session.connected || !label || !confirm(`Have the assistant write and send this reply to ${label}?`)) return;
   act(delegate.querySelector('button'), {
-    action: 'delegate', phone, modality: delegate.elements.modality.value, brief: delegate.elements.brief.value, confirm: true
+    action: 'delegate', ...(manual ? { phone } : { jid: contactSelect.value }), modality: delegate.elements.modality.value, brief: delegate.elements.brief.value, confirm: true
   }, ({ modality }) => {
     notice.textContent = modality === 'voice' ? 'Voice note sent.' : 'Message sent.';
     delegate.reset();
+    recipientMode();
   });
 };
 
@@ -115,6 +170,13 @@ export const assistantPanel = {
     find('wa-code').textContent = '';
     notice.textContent = '';
     delegate.reset();
+    recipientMode();
+    contactRequest += 1;
+    contactOffset = 0;
+    contactSelect.replaceChildren(new Option('Select a contact', ''));
+    contactSearch.disabled = contactMore.disabled = false;
+    contactMore.hidden = true;
+    contactNote.textContent = '';
     find('wa-pair').reset();
     find('wa-guidance').reset();
   }

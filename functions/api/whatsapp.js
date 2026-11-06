@@ -3,6 +3,7 @@ import { adminSessionHash } from './admin.js';
 const headers = { 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' };
 const json = (data, status = 200) => Response.json(data, { status, headers });
 const phonePattern = /^\+[1-9]\d{7,14}$/;
+const contactPattern = /^(?:[1-9][0-9]{7,14}@s\.whatsapp\.net|[0-9]{5,20}@lid)$/;
 const tenantPattern = /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i;
 
 const roleBriefs = {
@@ -39,14 +40,16 @@ function operation(input) {
     ].filter(Boolean).join('\n\n');
     return { method: 'PATCH', path: 'settings', body: { owner_instructions } };
   }
-  if (input?.action === 'delegate' && input.confirm === true && phonePattern.test(input.phone ?? '') &&
+  const recipient = contactPattern.test(input?.jid ?? '') ? input.jid
+    : phonePattern.test(input?.phone ?? '') ? input.phone.slice(1) + '@s.whatsapp.net' : null;
+  if (input?.action === 'delegate' && input.confirm === true && recipient &&
       ['text', 'voice'].includes(input.modality) && typeof input.brief === 'string' && input.brief.trim() && input.brief.length <= 3500) {
     return {
       method: 'POST', path: 'command', body: {
         command: [
           'PLATFORM OWNER ACTION: send_contact_message',
           'Semantics: private_owner_instruction_not_recipient_speech',
-          'Recipient/contact: ' + input.phone.slice(1) + '@s.whatsapp.net',
+          'Recipient/contact: ' + recipient,
           'Modality: ' + input.modality,
           'Owner instruction for the message:',
           input.brief.trim()
@@ -57,13 +60,15 @@ function operation(input) {
   return null;
 }
 
-async function callRuntime(origin, tenant, token, { method, path, body }) {
+async function callRuntime(origin, tenant, token, { method, path, body, query }) {
   const timestamp = String(Date.now());
   const encoder = new TextEncoder();
   const key = await crypto.subtle.importKey('raw', encoder.encode(token), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
   const signature = await crypto.subtle.sign('HMAC', key, encoder.encode([timestamp, method, tenant, path].join('\n')));
   const encoded = btoa(String.fromCharCode(...new Uint8Array(signature))).replaceAll('+', '-').replaceAll('/', '_').replace(/=+$/, '');
-  return fetch(new URL('/api/tenants/' + tenant + '/' + path, origin), {
+  const url = new URL('/api/tenants/' + tenant + '/' + path, origin);
+  if (query) url.search = query;
+  return fetch(url, {
     method, redirect: 'error', signal: AbortSignal.timeout(path === 'command' ? 55000 : 12000),
     headers: {
       Authorization: 'Bearer ' + token,
@@ -91,7 +96,13 @@ export async function onRequest({ request, env }) {
       return json({ error: 'WhatsApp service setup is pending.' }, 503);
     }
     const input = request.method === 'POST' ? await request.json().catch(() => null) : null;
-    const action = request.method === 'GET' ? { method: 'GET', path: 'status' } : operation(input);
+    const params = new URL(request.url).searchParams;
+    const listContacts = request.method === 'GET' && params.get('view') === 'contacts';
+    const offset = Number(params.get('offset') || 0);
+    if (listContacts && (!Number.isInteger(offset) || offset < 0 || offset > 100000)) return json({ error: 'Invalid contact page.' }, 400);
+    const action = listContacts
+      ? { method: 'GET', path: 'whatsapp-contacts', query: new URLSearchParams({ q: (params.get('q') || '').slice(0, 80), offset: String(offset) }).toString() }
+      : request.method === 'GET' ? { method: 'GET', path: 'status' } : operation(input);
     if (!action) return json({ error: 'Check the WhatsApp request and try again.' }, 400);
     delegated = action.path === 'command';
     if (delegated && env.WA_EXACT_DELEGATION !== '1') {
@@ -103,6 +114,12 @@ export async function onRequest({ request, env }) {
       return json({ error: 'The WhatsApp worker could not complete this action. Check the connection and try again.' }, 502);
     }
     const data = await response.json();
+    if (listContacts) {
+      const contacts = Array.isArray(data.contacts) ? data.contacts.slice(0, 30)
+        .filter((contact) => contactPattern.test(contact?.jid ?? ''))
+        .map(({ jid, name }) => ({ jid, name: typeof name === 'string' ? name.slice(0, 120) : '' })) : [];
+      return json({ contacts, hasMore: data.hasMore === true });
+    }
     if (action.path === 'status' || action.path === 'connect') return json(status(data));
     if (action.path === 'pairing-code') return json({ code: data.code });
     if (delegated && (data.ok !== true || data.action !== 'send_contact_message')) {

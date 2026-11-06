@@ -73,3 +73,9 @@ Configure these server-side variables on the deployment serving `/api/whatsapp`:
 The existing `CATALOG_DB` and `ADMIN_PASSWORD` admin session are required. The browser never receives the runtime token. The bridge accepts no caller-supplied tenant ID. Delegation currently requires the recipient's exact phone-based WhatsApp JID to exist in the runtime contacts. If delivery is uncertain, check the conversation before repeating the send.
 
 Role presets save owner instructions. The upstream automatic router still controls actual specialist selection. This pilot bridge does not provision or expose calls, groups, Channels, a tenant-scoped token broker, or catalog-aware agent tools.
+
+### Cloudflare Worker deployment
+
+The static storefront can run on Pages. If the production site uses **Workers Builds**, use the committed `wrangler.worker.jsonc` with build command `npm run build` and deploy command `npx wrangler deploy --config wrangler.worker.jsonc`. Set the Wrangler Worker name to the existing production Worker name before applying the configuration to an existing deployment. Its asset routing explicitly invokes the Worker for `/api/*`, so a missing binding returns an actionable JSON error rather than a static 404.
+
+Bind the existing D1 catalog database as `CATALOG_DB` and keep the admin password and runtime token in Cloudflare secrets. Deploy the linked ChatWithStars PR before enabling delegation. The contact picker reads only the linked account's unmerged direct WhatsApp contacts. Manual entry still requires a matching contact. Verify a real text message, voice note, reconnect, inbound call and outbound call before enabling production automation.

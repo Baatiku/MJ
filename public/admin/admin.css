@@ -61,3 +61,7 @@
 .wa-actions { flex-wrap: wrap; justify-content: flex-start; }
 #wa-qr { display: block; width: min(240px, 100%); height: auto; margin-block: 12px; }
 #wa-code { font-weight: 700; letter-spacing: .15em; }
+
+.wa-recipients { margin: 0; border: 1px solid var(--line); padding: 10px; }
+#wa-contact-picker { display: grid; gap: 8px; margin-top: 8px; }
+#wa-manual-recipient { margin-top: 8px; }
