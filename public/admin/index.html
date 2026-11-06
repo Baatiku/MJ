@@ -49,6 +49,18 @@
         <div class="admin-actions"><button type="button" id="add-colour">Add colour</button><button class="primary" type="submit">Save product</button></div>
       </form>
     </section>
+    <details class="panel status-photos" hidden>
+        <summary>Share product photos to Status</summary>
+        <p>Select one or more photos, then tap Share photos and choose WhatsApp → My Status if offered.</p>
+        <label>Find photos <input id="status-search" type="search" placeholder="Product or colour"></label>
+        <div id="status-grid" class="status-grid"></div>
+        <div class="status-actions">
+          <button type="button" class="primary" id="status-share" disabled>Share photos</button>
+          <button type="button" id="status-clear" disabled>Clear selection</button>
+          <output id="status-result" aria-live="polite"></output>
+        </div>
+        <details id="status-downloads" hidden><summary>Save photos to post manually</summary><ul></ul></details>
+    </details>
   </main>
   <template id="variant">
     <div class="variant-editor">

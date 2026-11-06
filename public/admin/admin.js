@@ -1,5 +1,6 @@
 import { categories } from '/catalog/products.js';
 import { displayWhatsAppNumber } from '/lib/shop.js';
+import { statusPhotos } from './status-photos.js';
 
 const find = (selector) => document.querySelector(selector);
 const login = find('#login');
@@ -18,8 +19,8 @@ async function api(method = 'GET', body) {
     method,
     ...(body ? { body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' } } : {})
   });
-  const data = await response.json();
-  if (!response.ok) throw Object.assign(new Error(data.error), { status: response.status });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw Object.assign(new Error(data.error || 'Catalog editing is unavailable.'), { status: response.status });
   return data;
 }
 
@@ -77,11 +78,24 @@ async function load() {
     ({ products: catalog } = await api());
     login.hidden = true;
     dashboard.hidden = false;
+    statusPhotos.update(catalog);
     renderList();
   } catch (error) {
     login.hidden = error.status !== 401;
     dashboard.hidden = true;
+    statusPhotos.update([]);
     if (error.status !== 401) notice.textContent = error.message;
+    if (error.status === 404 || error.status === 503) {
+      try {
+        const response = await fetch('/');
+        if (!response.ok) return;
+        const shop = new DOMParser().parseFromString(await response.text(), 'text/html');
+        const publicCatalog = JSON.parse(shop.querySelector('#catalog-data').textContent);
+        statusPhotos.update(publicCatalog);
+      } catch {
+        // The editor's error stays visible if the public catalog is unavailable.
+      }
+    }
   }
 }
 
@@ -142,6 +156,7 @@ editor.onsubmit = (event) => {
     catalog = catalog.map((item) => item.id === saved.id ? saved : item);
     if (current.id === saved.id) openProduct(saved);
     else renderList();
+    statusPhotos.update(catalog);
     notice.textContent = 'Product saved.';
   });
 };

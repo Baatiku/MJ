@@ -38,3 +38,15 @@
 #shop-settings summary { cursor: pointer; font-weight: 650; }
 #shop-settings p { margin-top: 8px; }
 #shop-settings .primary { margin-top: 12px; }
+
+.status-photos { margin-top: 15px; }
+.status-photos summary { cursor: pointer; font-weight: 650; }
+.status-photos > p { margin: 8px 0; }
+.status-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(115px, 1fr)); gap: 8px; max-height: 50vh; overflow: auto; margin-block: 12px; }
+.status-grid label { position: relative; background: var(--paper); padding: 6px; cursor: pointer; }
+.status-grid input { position: absolute; inset: 8px auto auto 8px; width: 18px; height: 18px; accent-color: var(--green); }
+.status-grid img { aspect-ratio: 1; object-fit: contain; }
+.status-grid span { font-size: 11px; }
+.status-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+.status-actions button:disabled { opacity: .55; cursor: default; }
+#status-downloads a { text-decoration: underline; }
