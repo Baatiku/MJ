@@ -23,6 +23,15 @@ function sessionCookie(token, seconds) {
   return `${cookie}=${token}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=${seconds}`;
 }
 
+export async function adminSessionHash(request, env, now = Math.floor(Date.now() / 1000)) {
+  if (!env.CATALOG_DB || !env.ADMIN_PASSWORD) return null;
+  const token = request.headers.get('Cookie')?.match(/(?:^|; )__Host-mj-admin=([a-f0-9]{64})(?:;|$)/)?.[1];
+  if (!token) return null;
+  const hash = await digest(token + env.ADMIN_PASSWORD);
+  const session = await env.CATALOG_DB.prepare('SELECT 1 FROM admin_sessions WHERE token = ? AND expires > ?').bind(hash, now).first();
+  return session ? hash : null;
+}
+
 export async function onRequest({ request, env }) {
   const db = env.CATALOG_DB;
   if (!db || !env.ADMIN_PASSWORD) return json({ error: 'Admin setup is pending. Configure the database and password in Cloudflare.' }, 503);
@@ -51,9 +60,8 @@ export async function onRequest({ request, env }) {
       return json({ ok: true }, 200, { 'Set-Cookie': sessionCookie(token, sessionSeconds) });
     }
 
-    const token = request.headers.get('Cookie')?.match(/(?:^|; )__Host-mj-admin=([a-f0-9]{64})(?:;|$)/)?.[1];
-    const hash = token ? await digest(token + env.ADMIN_PASSWORD) : null;
-    if (!hash || !await db.prepare('SELECT 1 FROM admin_sessions WHERE token = ? AND expires > ?').bind(hash, now).first()) {
+    const hash = await adminSessionHash(request, env, now);
+    if (!hash) {
       return json({ error: 'Sign in to continue.' }, 401);
     }
     if (request.method === 'GET') return json({ products: await readCatalog(db) });

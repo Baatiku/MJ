@@ -50,3 +50,14 @@
 .status-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
 .status-actions button:disabled { opacity: .55; cursor: default; }
 #status-downloads a { text-decoration: underline; }
+
+.admin-sections { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+.admin-sections a { background: var(--card); border: 1px solid var(--line); padding: 7px 10px; }
+.assistant-panel { margin-top: 15px; }
+.assistant-panel details { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
+.assistant-panel summary { cursor: pointer; font-weight: 650; }
+.assistant-panel form { display: grid; gap: 9px; margin-top: 10px; max-width: 580px; }
+.assistant-panel form button { justify-self: start; }
+.wa-actions { flex-wrap: wrap; justify-content: flex-start; }
+#wa-qr { display: block; width: min(240px, 100%); height: auto; margin-block: 12px; }
+#wa-code { font-weight: 700; letter-spacing: .15em; }

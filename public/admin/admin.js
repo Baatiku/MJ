@@ -1,5 +1,6 @@
 import { categories } from '/catalog/products.js';
 import { displayWhatsAppNumber } from '/lib/shop.js';
+import { assistantPanel } from './whatsapp-assistant.js';
 import { statusPhotos } from './status-photos.js';
 
 const find = (selector) => document.querySelector(selector);
@@ -78,11 +79,13 @@ async function load() {
     ({ products: catalog } = await api());
     login.hidden = true;
     dashboard.hidden = false;
+    assistantPanel.show();
     statusPhotos.update(catalog);
     renderList();
   } catch (error) {
     login.hidden = error.status !== 401;
     dashboard.hidden = true;
+    assistantPanel.hide();
     statusPhotos.update([]);
     if (error.status !== 401) notice.textContent = error.message;
     if (error.status === 404 || error.status === 503) {

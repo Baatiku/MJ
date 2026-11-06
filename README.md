@@ -56,3 +56,20 @@ Catalog changes are stored in D1 and loaded on each storefront request. They tak
 ## Change the public WhatsApp number
 
 Edit `config/shop.json` from the **Shop settings** section of `/admin/`. Use international digits only. Commit to the deployed branch to update the number for all visitors, including product orders and the footer.
+
+## WhatsApp assistant pilot
+
+The owner dashboard uses the ChatWithStars runtime API for linking, pausing, guidance and delegated text or voice replies. The storefront continues serving its catalog independently. Provision a dedicated pilot tenant and runtime deployment from the ChatWithStars integration branch; keep automatic replies paused until a test account is verified. Do not reuse a broad token from an unrelated production runtime.
+
+Configure these server-side variables on the deployment serving `/api/whatsapp`:
+
+| Variable | Value |
+| --- | --- |
+| `WA_RUNTIME_ORIGIN` | HTTPS origin of the dedicated runtime |
+| `WA_RUNTIME_TOKEN` | Runtime control token, as an encrypted secret |
+| `WA_TENANT_ID` | UUID of the store's runtime tenant |
+| `WA_EXACT_DELEGATION` | Set to `1` only after deploying the exact-recipient runtime patch |
+
+The existing `CATALOG_DB` and `ADMIN_PASSWORD` admin session are required. The browser never receives the runtime token. The bridge accepts no caller-supplied tenant ID. Delegation currently requires the recipient's exact phone-based WhatsApp JID to exist in the runtime contacts. If delivery is uncertain, check the conversation before repeating the send.
+
+Role presets save owner instructions. The upstream automatic router still controls actual specialist selection. This pilot bridge does not provision or expose calls, groups, Channels, a tenant-scoped token broker, or catalog-aware agent tools.
