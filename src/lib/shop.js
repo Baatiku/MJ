@@ -35,7 +35,7 @@ export function orderLabel(product) {
   return product.price === null ? 'Ask on WhatsApp' : 'Buy on WhatsApp';
 }
 
-export function orderLink(product, variant, origin) {
+export function orderLink(product, variant, origin, number) {
   const selection = `${product.name} in ${variant.name}`;
   const price = product.price === null ? '' : ` (${formatNaira(product.price)})`;
   const question = product.price === null
@@ -43,9 +43,9 @@ export function orderLink(product, variant, origin) {
     : 'Is it available?';
   const message = `Hello Maknoon Jamil! I’d like to order ${selection}${price}. ${question}`;
   const link = origin ? `\n\n${new URL(variantPath(product, variant), origin).href}` : '';
-  return whatsappLink(message + link);
+  return whatsappLink(message + link, number);
 }
 
-export const contactLink = whatsappLink('Hello Maknoon Jamil! I’d like to ask about your modestwear collection.');
+export const contactLink = (number) => whatsappLink('Hello Maknoon Jamil! I’d like to ask about your modestwear collection.', number);
 
 export const freeStoreLink = whatsappLink('Hello! I’d like to set up a free online store for my business, like Maknoon Jamil. How do I get started?', '2348161564273');

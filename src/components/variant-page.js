@@ -3,7 +3,7 @@ import { whatsappIcon } from './whatsapp-icon.js';
 import { escapeHtml as html } from '../lib/html.js';
 import { formatNaira, orderLabel, orderLink, previewImage, variantPath } from '../lib/shop.js';
 
-export function variantPage(product, variant, origin) {
+export function variantPage(product, variant, origin, number) {
   const title = `${product.name} in ${variant.name}`;
   const price = product.price === null ? 'Ask for price' : formatNaira(product.price);
   const description = `${price}. Order through Maknoon Jamil on WhatsApp.`;
@@ -29,7 +29,7 @@ export function variantPage(product, variant, origin) {
   <link rel="stylesheet" href="/styles/storefront.css">
 </head>
 <body>
-  ${siteHeader()}
+  ${siteHeader('/', number)}
   <main class="shell variant-page" id="main">
     <a class="variant-back" href="/#${product.id}">← Back to the collection</a>
     <div class="variant-layout">
@@ -42,7 +42,7 @@ export function variantPage(product, variant, origin) {
         <nav class="variant-colours" aria-label="Available colours">
           ${product.variants.map((option) => `<a href="${variantPath(product, option)}"${option === variant ? ' aria-current="page"' : ''}>${html(option.name)}</a>`).join('')}
         </nav>
-        ${product.available === false ? '<p class="stock-note">Currently unavailable</p>' : `<a class="order" href="${html(orderLink(product, variant, origin))}" target="_blank" rel="noopener noreferrer">${orderLabel(product)} ${whatsappIcon}</a>`}
+        ${product.available === false ? '<p class="stock-note">Currently unavailable</p>' : `<a class="order" href="${html(orderLink(product, variant, origin, number))}" target="_blank" rel="noopener noreferrer">${orderLabel(product)} ${whatsappIcon}</a>`}
       </div>
     </div>
   </main>

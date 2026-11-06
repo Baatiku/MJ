@@ -13,26 +13,32 @@
   <main class="shell admin">
     <header class="admin-header">
       <div><p class="kicker">Maknoon Jamil</p><h1>Shop admin</h1></div>
-      <a href="/">View shop ↗</a>
+      <div class="admin-header-links"><a href="/">View storefront ↗</a><button type="button" id="logout" hidden>Sign out</button></div>
     </header>
-    <nav class="admin-sections" aria-label="Admin sections">
-      <a href="#dashboard">Products</a><a href="#whatsapp-assistant">WhatsApp assistant</a><a href="#status-photos">Status photos</a><a href="#shop-settings">Shop settings</a>
+    <nav class="admin-sections" aria-label="Shop admin sections" hidden>
+      <a href="#dashboard">Products</a><a href="#shop-settings">Shop settings</a>
+      <a href="#whatsapp-assistant">AI assistant</a><a href="#status-photos">Status photos</a>
     </nav>
     <p id="notice" role="status"></p>
-    <details class="panel" id="shop-settings">
-      <summary>Shop settings</summary>
-      <p>WhatsApp number: <output id="shop-number">Loading…</output></p>
-      <p>Change the number in international format, using digits only. Committing the change to GitHub updates the footer and every WhatsApp button on the next deployment.</p>
-      <a class="primary" href="https://github.com/Baatiku/MJ/edit/main/config/shop.json" target="_blank" rel="noopener noreferrer">Edit WhatsApp number in GitHub ↗</a>
-    </details>
+    <section class="panel" id="shop-settings" data-admin-panel hidden>
+      <h2>Shop settings</h2>
+      <form id="order-number-form">
+        <label>Customer order WhatsApp number
+          <input name="orderNumber" type="tel" autocomplete="tel" maxlength="40" required placeholder="+234 801 234 5678">
+        </label>
+        <p>This changes where customers go when they tap WhatsApp on your storefront. The AI assistant stays on its separately linked account.</p>
+        <button class="primary" type="submit">Save order number</button>
+      </form>
+      <p><a href="/manage/">Manage shops and owner invites ↗</a></p>
+    </section>
     <form id="login" class="panel" hidden>
       <h2>Owner sign-in</h2>
       <label>Password <input type="password" name="password" autocomplete="current-password" required></label>
       <button class="primary" type="submit">Sign in</button>
     </form>
-    <section id="dashboard" class="admin-layout" hidden>
+    <section id="dashboard" class="admin-layout" data-admin-panel hidden>
       <aside class="panel">
-        <div class="admin-header"><h2>Products</h2><button type="button" id="logout">Sign out</button></div>
+        <h2>Products</h2>
         <label>Find a product <input id="search" type="search"></label>
         <div id="list"></div>
       </aside>
@@ -52,7 +58,7 @@
         <div class="admin-actions"><button type="button" id="add-colour">Add colour</button><button class="primary" type="submit">Save product</button></div>
       </form>
     </section>
-    <section class="panel assistant-panel" id="whatsapp-assistant" hidden>
+    <section class="panel assistant-panel" id="whatsapp-assistant" data-admin-panel hidden>
       <h2>WhatsApp assistant</h2>
       <p id="wa-status" role="status">Checking the WhatsApp connection…</p>
       <div id="wa-controls" hidden>
@@ -111,7 +117,7 @@
       </div>
       <p id="wa-notice" role="status"></p>
     </section>
-    <details class="panel status-photos" id="status-photos" hidden>
+    <details class="panel status-photos" id="status-photos" data-admin-panel hidden>
         <summary>Share product photos to Status</summary>
         <p>Select one or more photos, then tap Share photos and choose WhatsApp → My Status if offered.</p>
         <label>Find photos <input id="status-search" type="search" placeholder="Product or colour"></label>

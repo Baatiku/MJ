@@ -1,11 +1,11 @@
 import { whatsappIcon } from './whatsapp-icon.js';
 import { categories, products } from '../catalog/products.js';
 import { escapeHtml as html } from '../lib/html.js';
-import { contactLink, displayWhatsAppNumber } from '../lib/shop.js';
+import { contactLink, displayWhatsAppNumber, whatsappNumber } from '../lib/shop.js';
 import { siteHeader } from './site-header.js';
 import { productCard } from './product-card.js';
 
-export function storefront(origin, catalog = products, sharePath = '/') {
+export function storefront(origin, catalog = products, sharePath = '/', number = whatsappNumber) {
   const categoryLinks = categories.flatMap(({ id, name }) => {
     const lead = catalog.find((product) => product.category === id);
     if (!lead) return [];
@@ -47,7 +47,7 @@ export function storefront(origin, catalog = products, sharePath = '/') {
   <script src="/storefront.js" type="module"></script>
 </head>
 <body>
-  ${siteHeader('')}
+  ${siteHeader('', number)}
   <main class="shell" id="main">
     <section class="hero" aria-labelledby="hero-title">
       <div class="hero-copy">
@@ -73,14 +73,14 @@ export function storefront(origin, catalog = products, sharePath = '/') {
       <p class="collection-note">Choose a colour to see its photo, then message us on WhatsApp to confirm availability.</p>
       <p class="sr-only" data-result-count aria-live="polite"></p>
       ${catalog.length ? '' : '<p>No styles are listed right now.</p>'}
-      <div class="product-grid">${catalog.map((product) => productCard(product, origin)).join('')}</div>
+      <div class="product-grid">${catalog.map((product) => productCard(product, origin, number)).join('')}</div>
     </section>
   </main>
   <footer class="footer">
     <div class="shell footer-inner"><div><span class="wordmark">Maknoon Jamil</span><p>Modestwear boutique · <a href="/admin/">Owner sign-in</a></p></div>
-    <a class="contact whatsapp-contact" href="${html(contactLink)}" target="_blank" rel="noopener noreferrer">${html(displayWhatsAppNumber())} ${whatsappIcon}</a></div>
+    <a class="contact whatsapp-contact" href="${html(contactLink(number))}" target="_blank" rel="noopener noreferrer">${html(displayWhatsAppNumber(number))} ${whatsappIcon}</a></div>
   </footer>
-  <script type="application/json" id="catalog-data">${data}</script>
+  <script type="application/json" id="catalog-data" data-order-number="${html(number)}">${data}</script>
 </body>
 </html>`;
 }

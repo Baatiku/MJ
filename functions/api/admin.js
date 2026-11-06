@@ -1,3 +1,4 @@
+import { normalizeOrderNumber, readOrderNumber, saveOrderNumber } from '../../src/catalog/shop-settings.js';
 import { readCatalog, validateProduct } from '../../src/catalog/live.js';
 
 const cookie = '__Host-mj-admin';
@@ -64,13 +65,22 @@ export async function onRequest({ request, env }) {
     if (!hash) {
       return json({ error: 'Sign in to continue.' }, 401);
     }
-    if (request.method === 'GET') return json({ products: await readCatalog(db) });
+    if (request.method === 'GET') {
+      const [products, orderNumber] = await Promise.all([readCatalog(db), readOrderNumber(db)]);
+      return json({ products, orderNumber });
+    }
     if (request.method === 'DELETE') {
       await db.prepare('DELETE FROM admin_sessions WHERE token = ?').bind(hash).run();
       return json({ ok: true }, 200, { 'Set-Cookie': sessionCookie('', 0) });
     }
     if (request.method === 'PUT') {
       const input = await request.json();
+      if (input?.action === 'set-order-number') {
+        const orderNumber = normalizeOrderNumber(input.orderNumber);
+        if (!orderNumber) return json({ error: 'Enter a WhatsApp number with its country code, for example +234 801 234 5678.' }, 400);
+        await saveOrderNumber(db, orderNumber);
+        return json({ orderNumber });
+      }
       let product;
       try { product = validateProduct(input); } catch (error) { return json({ error: error.message }, 400); }
       const revision = input.revision + 1;

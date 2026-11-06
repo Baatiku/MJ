@@ -65,3 +65,16 @@
 .wa-recipients { margin: 0; border: 1px solid var(--line); padding: 10px; }
 #wa-contact-picker { display: grid; gap: 8px; margin-top: 8px; }
 #wa-manual-recipient { margin-top: 8px; }
+
+.admin[data-signed-in] [data-admin-panel]:not([data-selected-panel]) { display: none; }
+.admin-header-links { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.admin-sections a[aria-current="page"] { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+#order-number-form { display: grid; gap: 10px; max-width: 480px; }
+#order-number-form button { justify-self: start; }
+@media (max-width: 700px) {
+  .admin-sections { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .admin-sections a { display: grid; place-items: center; min-height: 44px; text-align: center; }
+  .admin .admin-header { align-items: flex-start; flex-wrap: wrap; }
+  .admin .admin-fields { grid-template-columns: minmax(0, 1fr); }
+  .admin input:not([type="checkbox"]), .admin textarea, .admin select { font-size: 16px; }
+}

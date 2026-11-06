@@ -55,7 +55,7 @@ Catalog changes are stored in D1 and loaded on each storefront request. They tak
 
 ## Change the public WhatsApp number
 
-Edit `config/shop.json` from the **Shop settings** section of `/admin/`. Use international digits only. Commit to the deployed branch to update the number for all visitors, including product orders and the footer.
+In `/admin/`, open **Shop settings**, enter the customer order WhatsApp number with its country code, and save. The storefront uses the saved number for product orders and contact links. The assistant keeps its separately linked account.
 
 ## WhatsApp assistant pilot
 

@@ -9,7 +9,24 @@ const dashboard = find('#dashboard');
 const editor = find('#editor');
 const variants = find('#variants');
 const notice = find('#notice');
-find('#shop-number').textContent = displayWhatsAppNumber();
+const shell = find('.admin');
+const sectionNav = find('.admin-sections');
+const settings = find('#shop-settings');
+const numberForm = find('#order-number-form');
+const sectionLinks = [...sectionNav.querySelectorAll('a')];
+const sections = sectionLinks.map((link) => link.hash.slice(1));
+
+function selectSection() {
+  const requested = location.hash.slice(1);
+  const active = sections.includes(requested) ? requested : 'dashboard';
+  for (const id of sections) find('#' + id).toggleAttribute('data-selected-panel', id === active);
+  for (const link of sectionLinks) {
+    if (link.hash === '#' + active) link.setAttribute('aria-current', 'page');
+    else link.removeAttribute('aria-current');
+  }
+}
+
+window.addEventListener('hashchange', selectSection);
 let catalog = [];
 let current;
 
@@ -35,7 +52,10 @@ function renderList() {
     const status = document.createElement('small');
     status.textContent = product.hidden ? 'Hidden' : product.available ? 'Listed · Available' : 'Listed · Unavailable';
     button.append(status);
-    button.onclick = () => openProduct(product);
+    button.onclick = () => {
+      openProduct(product);
+      if (window.matchMedia('(max-width: 700px)').matches) editor.scrollIntoView({ block: 'start' });
+    };
     return button;
   });
   find('#list').replaceChildren(...buttons);
@@ -76,7 +96,12 @@ function openProduct(product) {
 
 async function load() {
   try {
-    ({ products: catalog } = await api());
+    const data = await api();
+    catalog = data.products;
+    numberForm.elements.orderNumber.value = displayWhatsAppNumber(data.orderNumber);
+    sectionNav.hidden = settings.hidden = find('#logout').hidden = false;
+    shell.setAttribute('data-signed-in', '');
+    selectSection();
     login.hidden = true;
     dashboard.hidden = false;
     assistantPanel.show();
@@ -85,6 +110,8 @@ async function load() {
   } catch (error) {
     login.hidden = error.status !== 401;
     dashboard.hidden = true;
+    sectionNav.hidden = settings.hidden = find('#logout').hidden = true;
+    shell.removeAttribute('data-signed-in');
     assistantPanel.hide();
     statusPhotos.update([]);
     if (error.status !== 401) notice.textContent = error.message;
@@ -109,6 +136,17 @@ async function submit(form, action) {
   try { await action(); } catch (error) { notice.textContent = error.message; }
   finally { button.disabled = false; }
 }
+
+numberForm.onsubmit = (event) => {
+  event.preventDefault();
+  submit(numberForm, async () => {
+    const { orderNumber } = await api('PUT', {
+      action: 'set-order-number', orderNumber: numberForm.elements.orderNumber.value
+    });
+    numberForm.elements.orderNumber.value = displayWhatsAppNumber(orderNumber);
+    notice.textContent = 'Order number saved. Your storefront now uses it.';
+  });
+};
 
 login.onsubmit = (event) => {
   event.preventDefault();

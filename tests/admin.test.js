@@ -37,6 +37,22 @@ test('owner can edit a colour, set or clear its product price, and unlist it', a
   const signedIn = await call('POST', { password: env.ADMIN_PASSWORD });
   assert.equal(signedIn.status, 200);
   const cookie = signedIn.headers.get('set-cookie').split(';')[0];
+  const newNumber = '2348012345678';
+  assert.equal((await call('PUT', { action: 'set-order-number', orderNumber: '08012345678' }, cookie)).status, 400);
+  assert.equal((await call('PUT', { action: 'set-order-number', orderNumber: '+' + newNumber })).status, 401);
+  const changed = await call('PUT', { action: 'set-order-number', orderNumber: '+234 801 234 5678' }, cookie);
+  assert.deepEqual(await changed.json(), { orderNumber: newNumber });
+  const updatedHome = await (await shop({ env, request: new Request(origin) })).text();
+  assert.match(updatedHome, /data-order-number="2348012345678"/);
+  assert.match(updatedHome, /\+234 801 234 5678/);
+  const links = [...updatedHome.matchAll(/href="https:\/\/wa.me\/(\d+)\?text=/g)].map((match) => match[1]);
+  assert.equal(links.filter((number) => number === '2348161564273').length, 1);
+  assert.ok(links.length > 20 && links.slice(1).every((number) => number === newNumber));
+  const variantMarkup = await (await detail({
+    env, request: new Request(origin + '/products/flow-abaya/navy/'), params: { path: ['flow-abaya', 'navy'] }
+  })).text();
+  assert.match(variantMarkup, /wa.me\/2348012345678/);
+  assert.doesNotMatch(variantMarkup, /wa.me\/2348022519062/);
   const { products } = await (await call('GET', null, cookie)).json();
   const product = products[0];
   assert.equal(product.variants.length, 4);

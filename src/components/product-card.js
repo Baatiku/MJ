@@ -2,7 +2,7 @@ import { whatsappIcon } from './whatsapp-icon.js';
 import { escapeHtml as html } from '../lib/html.js';
 import { formatNaira, orderLabel, orderLink, variantPath } from '../lib/shop.js';
 
-export function productCard(product, origin) {
+export function productCard(product, origin, number) {
   const first = product.variants[0];
   return `<article class="product" data-product="${product.id}" data-category="${product.category}" id="${product.id}">
     <a class="product-media" href="${variantPath(product, first)}">
@@ -20,7 +20,7 @@ export function productCard(product, origin) {
           </label>`).join('')}
         </div>
       </fieldset>
-      ${product.available === false ? '<p class="stock-note">Currently unavailable</p>' : `<a class="order" href="${html(orderLink(product, first, origin))}" target="_blank" rel="noopener noreferrer">
+      ${product.available === false ? '<p class="stock-note">Currently unavailable</p>' : `<a class="order" href="${html(orderLink(product, first, origin, number))}" target="_blank" rel="noopener noreferrer">
         ${orderLabel(product)} ${whatsappIcon}
       </a>`}
     </div>
