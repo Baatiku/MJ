@@ -13,16 +13,22 @@
 <main class="shell admin">
   <header class="admin-header"><h1>Manage your shops</h1></header>
   <p id="notice" role="status"></p>
-  <form id="sign-in" class="panel" hidden>
-    <h2>Sign in with email</h2>
-    <label>Email <input name="email" type="email" autocomplete="email" required></label>
-    <button type="submit">Send sign-in code</button>
+  <form id="invite-owner" class="panel" hidden>
+    <h2>Invite a shop owner</h2>
+    <label>Owner email <input name="email" type="email" required></label>
+    <button type="submit">Create invite link</button>
+    <label id="invite-result" hidden>Copy and send this private link <input name="link" type="url" readonly></label>
   </form>
-  <form id="verify" class="panel" hidden>
-    <h2>Enter your code</h2>
-    <label>Email code <input name="code" inputmode="numeric" autocomplete="one-time-code" required></label>
+  <form id="sign-in" class="panel" hidden>
+    <h2>Owner sign-in</h2>
+    <label>Email <input name="email" type="email" autocomplete="username" required></label>
+    <label>Password <input name="password" type="password" autocomplete="current-password" minlength="14" maxlength="128" required></label>
     <button type="submit">Sign in</button>
-    <button type="button" id="change-email">Use another email</button>
+  </form>
+  <form id="accept" class="panel" hidden>
+    <h2>Accept your shop invitation</h2>
+    <label>Choose a password <input name="password" type="password" autocomplete="new-password" minlength="14" maxlength="128" required></label>
+    <button type="submit">Create owner account</button>
   </form>
   <section id="workspace" hidden>
     <div class="admin-header"><h2>Your storefronts</h2><button id="sign-out" type="button">Sign out</button></div>

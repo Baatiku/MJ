@@ -1,32 +1,40 @@
+import { adminSessionHash } from './admin.js';
+
 const sessionCookie = '__Host-shop-session';
 const select = 'id,slug,name,description,whatsapp,published';
 const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const tokenPattern = /^[a-f0-9]{64}$/;
 const phonePattern = /^[1-9][0-9]{7,14}$/;
+const sessionSeconds = 8 * 60 * 60;
+const encoder = new TextEncoder();
 const noStore = { 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' };
 const json = (value, status = 200, headers = {}) => Response.json(value, { status, headers: { ...noStore, ...headers } });
+const hex = (bytes) => Array.from(new Uint8Array(bytes), (byte) => byte.toString(16).padStart(2, '0')).join('');
+const randomToken = () => hex(crypto.getRandomValues(new Uint8Array(32)));
+const digest = async (text) => hex(await crypto.subtle.digest('SHA-256', encoder.encode(text)));
 
-function config(env) {
-  const { SHOP_SUPABASE_URL: raw, SHOP_SUPABASE_PUBLIC_KEY: key } = env;
-  if (!raw || !key) return null;
-  const url = new URL(raw);
-  return url.protocol === 'https:' && !url.username && !url.password ? { origin: url.origin, key } : null;
+async function passwordHash(password, salt, pepper) {
+  const pepperKey = await crypto.subtle.importKey('raw', encoder.encode(pepper), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  const material = await crypto.subtle.sign('HMAC', pepperKey, encoder.encode(password));
+  const key = await crypto.subtle.importKey('raw', material, 'PBKDF2', false, ['deriveBits']);
+  return hex(await crypto.subtle.deriveBits({
+    name: 'PBKDF2', hash: 'SHA-256', salt: encoder.encode(salt), iterations: 100000
+  }, key, 256));
 }
 
-function upstream(settings, path, { token, method = 'GET', body, prefer } = {}) {
-  return fetch(new URL(path, settings.origin), {
-    method, redirect: 'error', signal: AbortSignal.timeout(12000),
-    headers: {
-      apikey: settings.key,
-      ...(token ? { Authorization: 'Bearer ' + token } : {}),
-      'Content-Type': 'application/json',
-      ...(prefer ? { Prefer: prefer } : {})
-    },
-    ...(body ? { body: JSON.stringify(body) } : {})
-  });
+function equalHash(a, b) {
+  let difference = a.length ^ b.length;
+  for (let index = 0; index < a.length; index += 1) difference |= a.charCodeAt(index) ^ (b.charCodeAt(index) || 0);
+  return difference === 0;
 }
 
 function cookie(value, age) {
   return `${sessionCookie}=${value}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=${age}`;
+}
+
+function emailAddress(value) {
+  const email = typeof value === 'string' ? value.trim().toLowerCase() : '';
+  return email.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? email : null;
 }
 
 function cleanProfile(input) {
@@ -37,65 +45,113 @@ function cleanProfile(input) {
   return { name, description, whatsapp };
 }
 
+const present = (row) => row && { ...row, published: row.published === 1 };
+
+async function allowAttempt(db, request, action, now) {
+  const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
+  const key = await digest('workspace:' + action + ':' + ip);
+  const result = await db.prepare(`INSERT INTO login_attempts VALUES (?, 1, ?)
+    ON CONFLICT(bucket) DO UPDATE SET
+      attempts = CASE WHEN expires <= ? THEN 1 ELSE attempts + 1 END,
+      expires = CASE WHEN expires <= ? THEN excluded.expires ELSE expires END
+    RETURNING attempts`).bind(key, now + 900, now, now).first();
+  return result.attempts <= 8;
+}
+
+async function signIn(db, ownerId, now) {
+  const token = randomToken();
+  await db.batch([
+    db.prepare('DELETE FROM workspace_sessions WHERE expires <= ?').bind(now),
+    db.prepare('INSERT INTO workspace_sessions VALUES (?, ?, ?)').bind(await digest(token), ownerId, now + sessionSeconds)
+  ]);
+  return json({ ok: true }, 200, { 'Set-Cookie': cookie(token, sessionSeconds) });
+}
+
 export async function onRequest({ request, env }) {
   if (!['GET', 'POST'].includes(request.method)) return json({ error: 'Method not allowed.' }, 405);
-  if (request.method === 'POST' && request.headers.get('Origin') !== new URL(request.url).origin) {
+  const origin = new URL(request.url).origin;
+  if (request.method === 'POST' && request.headers.get('Origin') !== origin) {
     return json({ error: 'Invalid request origin.' }, 403);
   }
+  const db = env.CATALOG_DB;
+  const pepper = env.SHOP_PASSWORD_PEPPER;
+  if (!db || typeof pepper !== 'string' || pepper.length < 32) return json({ error: 'Shared owner sign-in has not been configured.' }, 503);
+  const now = Math.floor(Date.now() / 1000);
   try {
-    const settings = config(env);
-    if (!settings) return json({ error: 'Shared owner sign-in has not been configured.' }, 503);
     const input = request.method === 'POST' ? await request.json().catch(() => null) : null;
     const action = input?.action;
-    if (action === 'logout') return json({ ok: true }, 200, { 'Set-Cookie': cookie('', 0) });
-    if (action === 'otp' || action === 'verify') {
-      const email = typeof input.email === 'string' ? input.email.trim().toLowerCase() : '';
-      if (email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return json({ error: 'Enter a valid email address.' }, 400);
-      if (action === 'otp') {
-        const response = await upstream(settings, '/auth/v1/otp', { method: 'POST', body: { email, create_user: true } });
-        return response.ok ? json({ ok: true }) : json({ error: 'Could not send a code. Wait before trying again.' }, response.status === 429 ? 429 : 502);
+    const token = request.headers.get('Cookie')?.match(/(?:^|; )__Host-shop-session=([a-f0-9]{64})(?:;|$)/)?.[1];
+    const tokenHash = token ? await digest(token) : null;
+    if (action === 'logout') {
+      if (tokenHash) await db.prepare('DELETE FROM workspace_sessions WHERE token_hash = ?').bind(tokenHash).run();
+      return json({ ok: true }, 200, { 'Set-Cookie': cookie('', 0) });
+    }
+    if (action === 'invite') {
+      if (!await adminSessionHash(request, env, now)) return json({ error: 'Platform admin sign-in is required.' }, 403);
+      const email = emailAddress(input.email);
+      if (!email) return json({ error: 'Enter a valid email address.' }, 400);
+      const invite = randomToken();
+      await db.prepare('INSERT INTO workspace_invites (token_hash,email,expires) VALUES (?,?,?)')
+        .bind(await digest(invite), email, now + 86400).run();
+      const link = new URL('/manage/', origin);
+      link.hash = 'invite=' + invite;
+      return json({ link: link.href }, 201);
+    }
+    if (action === 'accept' || action === 'login') {
+      const password = input.password;
+      if (typeof password !== 'string' || password.length < 14 || password.length > 128) {
+        return json({ error: 'Use a password between 14 and 128 characters.' }, 400);
       }
-      if (typeof input.code !== 'string' || !/^\d{6,10}$/.test(input.code)) return json({ error: 'Enter the code from your email.' }, 400);
-      const response = await upstream(settings, '/auth/v1/verify', { method: 'POST', body: { email, token: input.code, type: 'email' } });
-      if (!response.ok) return json({ error: 'The code is invalid or expired.' }, 401);
-      const data = await response.json();
-      if (typeof data.access_token !== 'string' || !/^[A-Za-z0-9._-]+$/.test(data.access_token)) return json({ error: 'Sign-in could not be completed.' }, 502);
-      const lifetime = Math.max(1, Math.min(3600, Number(data.expires_in) || 3600));
-      return json({ ok: true }, 200, { 'Set-Cookie': cookie(data.access_token, lifetime) });
+      if (!await allowAttempt(db, request, action, now)) return json({ error: 'Too many attempts. Try again in 15 minutes.' }, 429);
+      if (action === 'accept') {
+        if (typeof input.invite !== 'string' || !tokenPattern.test(input.invite)) return json({ error: 'This invite is invalid or expired.' }, 400);
+        const inviteHash = await digest(input.invite);
+        const ownerId = crypto.randomUUID();
+        const salt = randomToken();
+        const hash = await passwordHash(password, salt, pepper);
+        const [insert] = await db.batch([
+          db.prepare(`INSERT INTO workspace_owners (id,email,password_salt,password_hash)
+            SELECT ?,email,?,? FROM workspace_invites WHERE token_hash = ? AND expires > ? AND claimed_by IS NULL
+            ON CONFLICT(email) DO NOTHING RETURNING id`).bind(ownerId, salt, hash, inviteHash, now),
+          db.prepare(`UPDATE workspace_invites SET claimed_by = ?
+            WHERE token_hash = ? AND claimed_by IS NULL AND EXISTS (SELECT 1 FROM workspace_owners WHERE id = ?)`)
+            .bind(ownerId, inviteHash, ownerId)
+        ]);
+        if (!insert.results?.length) return json({ error: 'This invite is invalid, expired, already used, or the email has an account.' }, 400);
+        return signIn(db, ownerId, now);
+      }
+      const email = emailAddress(input.email);
+      const owner = email ? await db.prepare('SELECT id,password_salt,password_hash FROM workspace_owners WHERE email = ?').bind(email).first() : null;
+      const hash = await passwordHash(password, owner?.password_salt || 'missing-owner', pepper);
+      if (!owner || !equalHash(hash, owner.password_hash)) return json({ error: 'Incorrect email or password.' }, 401);
+      return signIn(db, owner.id, now);
     }
-    const token = request.headers.get('Cookie')?.match(/(?:^|; )__Host-shop-session=([A-Za-z0-9._-]+)(?:;|$)/)?.[1];
-    if (!token) return json({ error: 'Sign in to continue.' }, 401);
-    const auth = await upstream(settings, '/auth/v1/user', { token });
-    if (!auth.ok) return json({ error: 'Sign in to continue.' }, 401);
-    const user = await auth.json();
+    const session = tokenHash ? await db.prepare('SELECT owner_id FROM workspace_sessions WHERE token_hash = ? AND expires > ?').bind(tokenHash, now).first() : null;
     if (request.method === 'GET') {
-      const result = await upstream(settings, '/rest/v1/rpc/my_storefront_workspaces', { token, method: 'POST', body: {} });
-      return result.ok ? json({ shops: await result.json() }) : json({ error: 'Could not load your shops.' }, 502);
+      const canInvite = Boolean(await adminSessionHash(request, env, now));
+      if (!session) return json({ error: 'Sign in to continue.', canInvite }, 401);
+      const { results } = await db.prepare(`SELECT ${select} FROM storefront_workspaces WHERE owner_id = ? ORDER BY slug`).bind(session.owner_id).all();
+      return json({ shops: results.map(present), canInvite });
     }
+    if (!session) return json({ error: 'Sign in to continue.' }, 401);
     const profile = cleanProfile(input);
     if (!profile) return json({ error: 'Check the shop name, description and WhatsApp number.' }, 400);
+    const { name, description, whatsapp } = profile;
     if (action === 'create') {
       const slug = input.slug;
       if (typeof slug !== 'string' || slug.length < 3 || slug.length > 48 || !slugPattern.test(slug)) {
         return json({ error: 'Use 3–48 lowercase letters, digits or hyphens for the shop URL.' }, 400);
       }
-      const result = await upstream(settings, '/rest/v1/storefront_workspaces?select=' + select, {
-        token, method: 'POST', body: { ...profile, slug, owner_id: user.id }, prefer: 'return=representation'
-      });
-      if (result.status === 409) return json({ error: 'That shop URL is already taken.' }, 409);
-      if (!result.ok) return json({ error: 'Could not create the shop.' }, 502);
-      const [shop] = await result.json();
-      return json({ shop }, 201);
+      const shop = await db.prepare(`INSERT INTO storefront_workspaces (id,owner_id,slug,name,description,whatsapp)
+        VALUES (?,?,?,?,?,?) ON CONFLICT(slug) DO NOTHING RETURNING ${select}`)
+        .bind(crypto.randomUUID(), session.owner_id, slug, name, description, whatsapp).first();
+      return shop ? json({ shop: present(shop) }, 201) : json({ error: 'That shop URL is already taken.' }, 409);
     }
-    if (action === 'update' && /^[0-9a-f-]{36}$/i.test(input.id ?? '') && typeof input.published === 'boolean') {
-      // Published rows are readable by design; RLS separately gates writes.
-      const query = new URLSearchParams({ id: 'eq.' + input.id, select });
-      const result = await upstream(settings, '/rest/v1/storefront_workspaces?' + query, {
-        token, method: 'PATCH', body: { ...profile, published: input.published }, prefer: 'return=representation'
-      });
-      if (!result.ok) return json({ error: 'Could not update the shop.' }, 502);
-      const [shop] = await result.json();
-      return shop ? json({ shop }) : json({ error: 'Shop not found.' }, 404);
+    if (action === 'update' && typeof input.id === 'string' && typeof input.published === 'boolean') {
+      const shop = await db.prepare(`UPDATE storefront_workspaces SET name = ?, description = ?, whatsapp = ?, published = ?
+        WHERE id = ? AND owner_id = ? RETURNING ${select}`)
+        .bind(name, description, whatsapp, Number(input.published), input.id, session.owner_id).first();
+      return shop ? json({ shop: present(shop) }) : json({ error: 'Shop not found.' }, 404);
     }
     return json({ error: 'Invalid workspace action.' }, 400);
   } catch {
@@ -104,11 +160,6 @@ export async function onRequest({ request, env }) {
 }
 
 export async function publicWorkspace(env, slug) {
-  const settings = config(env);
-  if (!settings || !slugPattern.test(slug) || slug.length > 48) return null;
-  const query = new URLSearchParams({ select, slug: 'eq.' + slug, published: 'eq.true', limit: '1' });
-  const response = await upstream(settings, '/rest/v1/storefront_workspaces?' + query);
-  if (!response.ok) throw new Error('Could not load storefront.');
-  const [shop] = await response.json();
-  return shop ?? null;
+  if (!env.CATALOG_DB || !slugPattern.test(slug) || slug.length > 48) return null;
+  return present(await env.CATALOG_DB.prepare(`SELECT ${select} FROM storefront_workspaces WHERE slug = ? AND published = 1`).bind(slug).first());
 }

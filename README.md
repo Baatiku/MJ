@@ -80,10 +80,10 @@ The static storefront can run on Pages. If the production site uses **Workers Bu
 
 Bind the existing D1 catalog database as `CATALOG_DB` and keep the admin password and runtime token in Cloudflare secrets. Deploy the linked ChatWithStars PR before enabling delegation. The contact picker reads only the linked account's unmerged direct WhatsApp contacts. Manual entry still requires a matching contact. Verify a real text message, voice note, reconnect, inbound call and outbound call before enabling production automation.
 
-## Shared shop workspaces
+## Shared shop workspaces on Cloudflare D1
 
-Deploy the existing executable Worker or Pages Functions and configure `SHOP_SUPABASE_URL` and `SHOP_SUPABASE_PUBLIC_KEY` once on the shared deployment. Use the Supabase publishable or anon key. Apply `supabase/migrations/20261106000100_storefront_workspaces.sql` to its Postgres database. Enable email sign-in and configure the Supabase sign-in email template to include `{{ .Token }}`, plus a production email sender before onboarding clients.
+Apply both SQL migrations in `migrations/` to the shared `CATALOG_DB`. On the executable Worker or Pages deployment configure one strong random runtime secret named `SHOP_PASSWORD_PEPPER` (at least 32 characters). Keep it stable because existing owner passwords depend on it. The existing `ADMIN_PASSWORD` is the platform operator credential and is configured once.
 
-Owners open `/manage/`, verify their email, create a draft, then publish to `/shops/<slug>/`. They can edit the storefront name, description, public WhatsApp contact and publication status. Access tokens stay in a secure HTTP-only cookie. Row-level policies authorize writes with the verified owner's identity. Public reads are limited to published storefront profiles.
+The operator signs in at `/admin/`, then opens `/manage/` to create a 24-hour single-use invite for a client email. Send that link privately. The client chooses their own password, then can create and publish shops at `/shops/<slug>/`. Shops are scoped to the signed-in owner. Client onboarding needs no email provider and no per-shop Cloudflare secrets or bindings.
 
-This first slice manages storefront profiles and click-to-chat numbers. It does not migrate the existing Maknoon Jamil catalog or add multi-store catalog editing and WhatsApp device pairing. The original shop and admin routes remain available during that migration.
+The workspace manages storefront profiles and public click-to-chat numbers. The existing Maknoon Jamil catalog and live WhatsApp runtime still use their separate paths. Supabase is not required by the shared storefront or owner login.

@@ -1,54 +1,75 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { DatabaseSync } from 'node:sqlite';
 import { test } from 'node:test';
 import worker from '../worker.js';
 
-test('shared workspace flow uses the verified owner, keeps drafts private and scopes public WhatsApp links', async (t) => {
+test('D1 owner invites are single-use and storefront writes are isolated', async () => {
+  const sql = new DatabaseSync(':memory:');
+  for (const file of ['0001_catalog.sql', '0002_workspaces.sql']) {
+    sql.exec(readFileSync(new URL('../migrations/' + file, import.meta.url), 'utf8'));
+  }
+  const db = {
+    prepare(statement) {
+      const query = sql.prepare(statement);
+      const bind = (...args) => ({
+        first: async () => query.get(...args),
+        all: async () => ({ results: query.all(...args) }),
+        run: async () => query.run(...args)
+      });
+      return { ...bind(), bind };
+    },
+    async batch(statements) {
+      sql.exec('BEGIN');
+      try {
+        const results = [];
+        for (const statement of statements) results.push(await statement.all());
+        sql.exec('COMMIT');
+        return results;
+      } catch (error) {
+        sql.exec('ROLLBACK');
+        throw error;
+      }
+    }
+  };
+  const env = { CATALOG_DB: db, ADMIN_PASSWORD: 'operator-password', SHOP_PASSWORD_PEPPER: 'test-pepper-at-least-32-characters' };
   const origin = 'https://shop.example';
-  const env = { SHOP_SUPABASE_URL: 'https://auth.example', SHOP_SUPABASE_PUBLIC_KEY: 'public-key' };
-  const auth = '__Host-shop-session=owner-token';
-  const workspace = { id: '12345678-1234-1234-1234-123456789abc', slug: 'new-shop', name: 'A & B', description: 'Custom garments', whatsapp: '2348012345678', published: false };
-  t.mock.method(globalThis, 'fetch', async (url, options) => {
-    assert.equal(url.origin, 'https://auth.example');
-    if (url.pathname === '/auth/v1/otp') return Response.json({});
-    if (url.pathname === '/auth/v1/verify') return Response.json({ access_token: 'owner-token', refresh_token: 'never-return', expires_in: 1200 });
-    if (url.pathname === '/auth/v1/user') return Response.json({ id: 'verified-owner' });
-    if (url.pathname.endsWith('/my_storefront_workspaces')) {
-      assert.equal(options.headers.Authorization, 'Bearer owner-token');
-      return Response.json([workspace]);
-    }
-    if (options.method === 'POST') {
-      assert.equal(JSON.parse(options.body).owner_id, 'verified-owner');
-      assert.equal(JSON.parse(options.body).published, undefined);
-      return Response.json([workspace], { status: 201 });
-    }
-    if (options.method === 'PATCH') {
-      assert.equal(options.headers.Authorization, 'Bearer owner-token');
-      return Response.json([]);
-    }
-    assert.equal(options.headers.Authorization, undefined);
-    assert.equal(url.searchParams.get('published'), 'eq.true');
-    return Response.json(workspace.published ? [workspace] : []);
-  });
-  const call = (body, cookie, source = origin) => worker.fetch(new Request(origin + '/api/workspaces', {
-    method: body ? 'POST' : 'GET',
-    headers: { Origin: source, ...(cookie ? { Cookie: cookie } : {}) },
+  const call = (path, body, cookie) => worker.fetch(new Request(origin + path, {
+    method: body ? 'POST' : 'GET', headers: { Origin: origin, Cookie: cookie || '' },
     ...(body ? { body: JSON.stringify(body) } : {})
   }), env);
-  assert.equal((await call()).status, 401);
-  assert.equal((await call({ action: 'otp', email: 'owner@example.com' }, null, 'https://other.example')).status, 403);
-  assert.equal((await call({ action: 'otp', email: 'owner@example.com' })).status, 200);
-  const verified = await call({ action: 'verify', email: 'owner@example.com', code: '123456' });
-  assert.match(verified.headers.get('set-cookie'), /HttpOnly; Secure; SameSite=Strict/);
-  assert.deepEqual(await verified.json(), { ok: true });
-  const created = await call({ ...workspace, action: 'create', owner_id: 'someone-else', published: true }, auth);
+  const api = (body, cookie) => call('/api/workspaces', body, cookie);
+  const session = (response) => response.headers.get('set-cookie').split(';')[0];
+  const admin = session(await call('/api/admin', { password: env.ADMIN_PASSWORD }));
+  const password = 'a long owner password';
+  assert.equal((await api({ action: 'invite', email: 'a@example.com' })).status, 403);
+  async function owner(email) {
+    const created = await api({ action: 'invite', email }, admin);
+    assert.equal(created.status, 201);
+    const { link } = await created.json();
+    const invite = new URLSearchParams(new URL(link).hash.slice(1)).get('invite');
+    const accepted = await api({ action: 'accept', invite, password });
+    assert.equal(accepted.status, 200);
+    assert.equal((await api({ action: 'accept', invite, password })).status, 400);
+    return session(accepted);
+  }
+  const a = await owner('a@example.com');
+  const b = await owner('b@example.com');
+  const profile = { name: 'A & B', description: 'Clothes', whatsapp: '+2348012345678' };
+  const created = await api({ action: 'create', slug: 'new-shop', ...profile }, a);
   assert.equal(created.status, 201);
-  assert.deepEqual(await (await call(null, auth)).json(), { shops: [workspace] });
-  assert.equal((await call({ ...workspace, action: 'update' }, auth)).status, 404);
-  const publicPage = () => worker.fetch(new Request(origin + '/shops/new-shop/'), env);
-  assert.equal((await publicPage()).status, 404);
-  workspace.published = true;
-  const page = await (await publicPage()).text();
+  const { shop } = await created.json();
+  assert.equal((await call('/shops/new-shop/')).status, 404);
+  assert.deepEqual((await (await api(null, b)).json()).shops, []);
+  const update = { ...profile, action: 'update', id: shop.id, published: true };
+  assert.equal((await api(update, b)).status, 404);
+  assert.equal((await api(update, a)).status, 200);
+  assert.equal((await api(update, b)).status, 404);
+  const page = await (await call('/shops/new-shop/')).text();
   assert.match(page, /A &amp; B/);
   assert.match(page, /wa.me\/2348012345678/);
-  assert.doesNotMatch(page, /2348022519062/);
+  assert.equal((await api({ action: 'logout' }, a)).status, 200);
+  assert.equal((await api(null, a)).status, 401);
+  assert.equal((await api({ action: 'login', email: 'a@example.com', password })).status, 200);
+  sql.close();
 });

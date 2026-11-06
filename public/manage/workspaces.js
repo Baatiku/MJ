@@ -1,18 +1,21 @@
 const find = (id) => document.getElementById(id);
 const signIn = find('sign-in');
-const verify = find('verify');
+const accept = find('accept');
+const inviteOwner = find('invite-owner');
+const invite = new URLSearchParams(location.hash.slice(1)).get('invite');
+if (invite) history.replaceState(null, '', location.pathname + location.search);
 const workspace = find('workspace');
 const form = find('shop');
 const notice = find('notice');
 let current;
-let email = '';
+let hasInvite = Boolean(invite);
 
 async function request(body) {
   const response = await fetch('/api/workspaces', body ? {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
   } : undefined);
   const result = await response.json().catch(() => ({}));
-  if (!response.ok) throw Object.assign(new Error(result.error || 'The workspace service is unavailable.'), { status: response.status });
+  if (!response.ok) throw Object.assign(new Error(result.error || 'The workspace service is unavailable.'), { status: response.status, canInvite: result.canInvite === true });
   return result;
 }
 
@@ -56,14 +59,17 @@ function render(shops) {
 
 async function load() {
   try {
-    const { shops } = await request();
-    signIn.hidden = verify.hidden = true;
-    workspace.hidden = false;
+    const { shops, canInvite } = await request();
+    inviteOwner.hidden = !canInvite;
+    signIn.hidden = accept.hidden = true;
+    workspace.hidden = hasInvite;
+    accept.hidden = !hasInvite;
     render(shops);
   } catch (error) {
     workspace.hidden = true;
-    verify.hidden = true;
-    signIn.hidden = error.status !== 401;
+    inviteOwner.hidden = !error.canInvite;
+    accept.hidden = error.status !== 401 || !hasInvite;
+    signIn.hidden = error.status !== 401 || hasInvite;
     if (error.status !== 401) notice.textContent = error.message;
   }
 }
@@ -79,20 +85,24 @@ function submit(target, action) {
   };
 }
 
-submit(signIn, async () => {
-  email = signIn.elements.email.value.trim();
-  await request({ action: 'otp', email });
-  signIn.hidden = true;
-  verify.hidden = false;
-  notice.textContent = 'Check your email for a sign-in code.';
-  verify.elements.code.focus();
+submit(inviteOwner, async () => {
+  const { link } = await request({ action: 'invite', email: inviteOwner.elements.email.value });
+  inviteOwner.elements.link.value = link;
+  find('invite-result').hidden = false;
+  inviteOwner.elements.link.select();
+  notice.textContent = 'Invite created. It expires in 24 hours.';
 });
-submit(verify, async () => {
-  await request({ action: 'verify', email, code: verify.elements.code.value.trim() });
-  verify.reset();
+submit(signIn, async () => {
+  await request({ action: 'login', email: signIn.elements.email.value, password: signIn.elements.password.value });
+  signIn.reset();
   await load();
 });
-find('change-email').onclick = () => { verify.hidden = true; signIn.hidden = false; signIn.elements.email.focus(); };
+submit(accept, async () => {
+  await request({ action: 'accept', invite, password: accept.elements.password.value });
+  hasInvite = false;
+  accept.reset();
+  await load();
+});
 find('sign-out').onclick = async () => {
   try { await request({ action: 'logout' }); edit(null); await load(); }
   catch (error) { notice.textContent = error.message; }
