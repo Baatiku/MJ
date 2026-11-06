@@ -5,7 +5,7 @@ import { contactLink, displayWhatsAppNumber } from '../lib/shop.js';
 import { siteHeader } from './site-header.js';
 import { productCard } from './product-card.js';
 
-export function storefront(origin, catalog = products) {
+export function storefront(origin, catalog = products, sharePath = '/') {
   const categoryLinks = categories.flatMap(({ id, name }) => {
     const lead = catalog.find((product) => product.category === id);
     if (!lead) return [];
@@ -20,8 +20,8 @@ export function storefront(origin, catalog = products) {
   const data = JSON.stringify(catalog).replaceAll('<', '\\u003c');
   const title = 'Maknoon Jamil | Modestwear Catalog';
   const description = 'Shop abayas, khimars, hijabs, niqabs and modest dresses. Order on WhatsApp.';
-  const homepage = origin ? new URL('/', origin).href : null;
-  const cover = homepage ? new URL('/previews/maknoon-jamil-catalog.jpg', homepage).href : null;
+  const homepage = origin ? new URL(sharePath, origin).href : null;
+  const cover = homepage ? new URL('/previews/maknoon-jamil-square.jpg', homepage).href : null;
   const social = homepage ? `
   <link rel="canonical" href="${html(homepage)}">
   <meta property="og:type" content="website">
@@ -30,9 +30,6 @@ export function storefront(origin, catalog = products) {
   <meta property="og:title" content="${html(title)}">
   <meta property="og:description" content="${html(description)}">
   <meta property="og:image" content="${html(cover)}">
-  <meta property="og:image:type" content="image/jpeg">
-  <meta property="og:image:width" content="960">
-  <meta property="og:image:height" content="504">
   <meta property="og:image:alt" content="Maknoon Jamil catalog cover showing modestwear from across the collection.">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="${html(title)}">

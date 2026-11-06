@@ -32,6 +32,7 @@ await mkdir(new URL('lib/', output));
 await cp(new URL('src/lib/shop.js', root), new URL('lib/shop.js', output));
 await writeFile(new URL('lib/shop-number.js', output), `export const whatsappNumber = ${JSON.stringify(whatsappNumber)};\n`);
 await writeFile(new URL('index.html', output), storefront(origin));
+await writeFile(new URL('catalog/index.html', output), storefront(origin, undefined, '/catalog/'));
 for (const product of products) {
   for (const variant of product.variants) {
     const directory = new URL(`.${variantPath(product, variant)}`, output);

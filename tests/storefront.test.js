@@ -49,10 +49,16 @@ test('static HTML contains every product and checkout works before JS loads', ()
 test('homepage provides a catalog share card and a separate store setup chat', () => {
   const markup = storefront(origin);
   assert.match(markup, /property="og:url" content="https:\/\/shop.example\/"/);
-  assert.match(markup, /property="og:image" content="https:\/\/shop.example\/previews\/maknoon-jamil-catalog.jpg"/);
+  assert.match(markup, /property="og:image" content="https:\/\/shop.example\/previews\/maknoon-jamil-square.jpg"/);
   assert.match(markup, /name="twitter:card" content="summary_large_image"/);
   const banner = new URL(markup.match(/class="announcement" href="([^"]+)"/)[1]);
   assert.equal(banner.pathname, '/2348161564273');
   assert.match(banner.searchParams.get('text'), /free online store/);
   assert.match(markup, /class="contact whatsapp-contact" href="https:\/\/wa.me\/2348022519062/);
+});
+
+test('the catalog share route has a distinct canonical preview URL', () => {
+  const markup = storefront(origin, undefined, '/catalog/');
+  assert.ok(markup.includes('property="og:url" content="https://shop.example/catalog/"'));
+  assert.ok(markup.includes('property="og:image" content="https://shop.example/previews/maknoon-jamil-square.jpg"'));
 });

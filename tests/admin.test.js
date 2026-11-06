@@ -85,5 +85,5 @@ test('homepage share metadata uses the requested public host without an admin da
   assert.equal(response.status, 200);
   const head = (await response.text()).split('</head>')[0];
   assert.match(head, /property="og:url" content="https:\/\/store.example\/"/);
-  assert.match(head, /property="og:image" content="https:\/\/store.example\/previews\/maknoon-jamil-catalog.jpg"/);
+  assert.match(head, /property="og:image" content="https:\/\/store.example\/previews\/maknoon-jamil-square.jpg"/);
 });
