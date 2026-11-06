@@ -76,7 +76,7 @@ Role presets save owner instructions. The upstream automatic router still contro
 
 ### Cloudflare Worker deployment
 
-The static storefront can run on Pages. If the production site uses **Workers Builds**, use the committed `wrangler.worker.jsonc` with build command `npm run build` and deploy command `npx wrangler deploy --config wrangler.worker.jsonc`. Set the Wrangler Worker name to the existing production Worker name before applying the configuration to an existing deployment. Its asset routing explicitly invokes the Worker for `/api/*`, so a missing binding returns an actionable JSON error rather than a static 404.
+The static storefront can run on Pages. If the production site uses **Workers Builds**, use the committed `wrangler.worker.jsonc` with build command `npm run build` and deploy command `node scripts/deploy-admin.mjs`. In **Build settings → Build variables**, set `MJ_WORKER_NAME` to the existing production Worker name and `MJ_CATALOG_DATABASE_ID` to the ID of the existing D1 catalog. The deploy script includes that exact database as `CATALOG_DB` on every release. The build variables apply to the whole platform. Its asset routing explicitly invokes the Worker for `/api/*`, so a missing binding returns an actionable JSON error rather than a static 404.
 
 Bind the existing D1 catalog database as `CATALOG_DB` and keep the admin password and runtime token in Cloudflare secrets. Deploy the linked ChatWithStars PR before enabling delegation. The contact picker reads only the linked account's unmerged direct WhatsApp contacts. Manual entry still requires a matching contact. Verify a real text message, voice note, reconnect, inbound call and outbound call before enabling production automation.
 
