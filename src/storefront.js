@@ -1,3 +1,4 @@
+import { bindProductShare } from './lib/product-share.js';
 import { orderLink, variantPath } from './lib/shop.js';
 
 const catalogData = document.querySelector('#catalog-data');
@@ -10,6 +11,10 @@ for (const product of products) {
   const image = photo.querySelector('img');
   const selected = card.querySelector('[data-selected]');
   const order = card.querySelector('.order');
+  bindProductShare(card.querySelector('[data-share-product]'), () => ({
+    product,
+    variant: product.variants.find(({ id }) => id === options.querySelector(':checked').value)
+  }), { home: catalogData.dataset.shopHome, name: catalogData.dataset.shopName });
   function updateSelection() {
     const variant = product.variants.find(({ id }) => id === options.querySelector(':checked').value);
     image.src = variant.image;

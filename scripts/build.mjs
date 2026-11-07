@@ -29,7 +29,9 @@ for (const path of ['catalog/', 'styles/', 'storefront.js']) {
   await cp(new URL(`src/${path}`, root), new URL(path, output), { recursive: true });
 }
 await mkdir(new URL('lib/', output));
-await cp(new URL('src/lib/shop.js', root), new URL('lib/shop.js', output));
+for (const filename of ['shop.js', 'product-share.js']) {
+  await cp(new URL('src/lib/' + filename, root), new URL('lib/' + filename, output));
+}
 await writeFile(new URL('lib/shop-number.js', output), `export const whatsappNumber = ${JSON.stringify(whatsappNumber)};\n`);
 await writeFile(new URL('index.html', output), storefront(origin));
 await writeFile(new URL('catalog/index.html', output), storefront(origin, undefined, '/catalog/'));
