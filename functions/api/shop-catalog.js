@@ -95,7 +95,7 @@ export async function onRequest({ request, env }) {
       if (env.SHOP_IMAGES) await env.SHOP_IMAGES.put(key, photo, { httpMetadata: { contentType: 'image/jpeg' } });
       try {
         await db.prepare('INSERT INTO workspace_shop_media VALUES (?, ?, ?)')
-          .bind(id, shop.id, env.SHOP_IMAGES ? new ArrayBuffer(0) : photo.buffer).run();
+          .bind(id, shop.id, env.SHOP_IMAGES ? new Uint8Array([0]).buffer : photo.buffer).run();
       } catch (error) {
         if (env.SHOP_IMAGES) await env.SHOP_IMAGES.delete(key).catch(() => {});
         throw error;

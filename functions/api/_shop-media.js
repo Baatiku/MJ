@@ -13,7 +13,7 @@ export async function serveMedia(request, env) {
       !await adminSessionHash(request, env))) return new Response(null, { status: 404 });
   const stored = new Uint8Array(photo.data);
   let body = stored;
-  if (!stored.byteLength) {
+  if (stored.byteLength === 1 && stored[0] === 0) {
     const object = await env.SHOP_IMAGES?.get('shop-media/' + photo.shop_id + '/' + match[1] + '.jpg');
     if (!object) return new Response(null, { status: 404 });
     body = object.body;

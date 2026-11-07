@@ -129,3 +129,13 @@ h2 { font-size: clamp(40px, 6vw, 72px); line-height: 1; margin-top: 7px; letter-
 .share-actions a, .share-actions button, .share-close { min-height: 44px; padding: 9px 12px; background: transparent; border: 1px solid var(--line); color: var(--ink); font: inherit; font-size: 13px; cursor: pointer; }
 .share-actions .share-photo { width: 100%; background: var(--ink); color: var(--paper); }
 .share-photo:disabled { opacity: .55; cursor: wait; }
+
+.masthead .wordmark { min-width: 0; max-width: 100%; white-space: normal; overflow-wrap: anywhere; padding-block: 10px; }
+.wordmark > img { width: 36px; height: 36px; object-fit: contain; margin: 0 auto 7px; }
+.hero h1 { overflow-wrap: anywhere; }
+.hero-gallery[data-count="1"] { grid-template-columns: minmax(0, 420px); justify-content: center; }
+.hero-gallery[data-count="2"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.footer-inner > div { min-width: 0; }
+.footer .wordmark { white-space: normal; overflow-wrap: anywhere; }
+.category-grid[data-count="1"], .product-grid[data-count="1"] { grid-template-columns: minmax(0, 420px); justify-content: center; }
+.category-grid[data-count="2"], .product-grid[data-count="2"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }

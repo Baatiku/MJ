@@ -62,11 +62,11 @@ export function storefront(origin, catalog = products, sharePath = '/', number =
         <p>${brand.name ? html(brand.description || '') : 'Fluid silhouettes and rich colours, from wide-sleeve abayas to softly layered khimars.'}</p>
         <a class="primary" href="#collection">Explore the collection <span aria-hidden="true">↓</span></a>
       </div>
-      ${hero ? `<div class="hero-gallery" aria-hidden="true">${hero}</div>` : ''}
+      ${hero ? `<div class="hero-gallery" data-count="${Math.min(3, catalog.length)}" aria-hidden="true">${hero}</div>` : ''}
     </section>
     <section class="style-section" id="styles" aria-labelledby="styles-title">
       <p class="kicker">Find your silhouette</p><h2 id="styles-title">Shop by style</h2>
-      <div class="category-grid">${categoryLinks}</div>
+      <div class="category-grid" data-count="${Math.min(3, shopCategories.length)}">${categoryLinks}</div>
     </section>
     <section class="collection" id="collection" aria-labelledby="collection-title">
       <div class="section-head">
@@ -79,7 +79,7 @@ export function storefront(origin, catalog = products, sharePath = '/', number =
       <p class="collection-note">${number ? 'Choose a colour to see its photo, then message us on WhatsApp to confirm availability.' : 'Choose a colour to see its photo.'}</p>
       <p class="sr-only" data-result-count aria-live="polite"></p>
       ${catalog.length ? '' : '<p>No styles are listed right now.</p>'}
-      <div class="product-grid">${catalog.map((product) => productCard(product, origin, number, brand)).join('')}</div>
+      <div class="product-grid" data-count="${Math.min(3, catalog.length)}">${catalog.map((product) => productCard(product, origin, number, brand)).join('')}</div>
     </section>
   </main>
   <footer class="footer">
