@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Create your free storefront</title>
+  <link rel="stylesheet" href="/styles/storefront.css">
+  <link rel="stylesheet" href="/setup/setup.css">
+  <script type="module" src="/setup/setup.js"></script>
+</head>
+<body>
+<main class="setup-shell">
+  <header class="setup-header"><a href="/">Storefronts</a><a href="/manage/">Owner sign-in</a></header>
+  <p class="kicker">Your business, beautifully online</p>
+  <h1>Make it your own.</h1>
+  <p class="intro">A few simple steps to your own shop, with product photos and orders on WhatsApp.</p>
+  <ol class="setup-steps" aria-label="Setup progress">
+    <li data-step-label="0" aria-current="step">1 <span>Your business</span></li>
+    <li data-step-label="1">2 <span>Your look</span></li>
+    <li data-step-label="2">3 <span>Your products</span></li>
+    <li data-step-label="3">4 <span>Go live</span></li>
+  </ol>
+  <p id="setup-notice" role="status"></p>
+  <form id="business" class="setup-panel" data-step="0">
+    <h2>Tell us about your business</h2>
+    <label>Business name <input name="name" required maxlength="100" autocomplete="organization"></label>
+    <label>WhatsApp order number <input name="whatsapp" type="tel" required maxlength="40" autocomplete="tel" placeholder="+234 802 123 4567"><small>Customers will place their orders with this number.</small></label>
+    <label>About your business <textarea name="description" required maxlength="300" placeholder="What do you sell?"></textarea></label>
+    <label>Your shop link <span class="url-field"><span>/shops/</span><input name="slug" required minlength="3" maxlength="48" pattern="[a-z0-9]+(-[a-z0-9]+)*" autocapitalize="none" spellcheck="false"></span></label>
+    <div id="account-fields">
+      <label>Choose a username <input name="username" autocomplete="username" required minlength="3" maxlength="32" pattern="[A-Za-z0-9]+(-[A-Za-z0-9]+)*" autocapitalize="none" spellcheck="false"></label>
+      <label>Choose a password <input name="password" type="password" autocomplete="new-password" required minlength="14" maxlength="128"><small>Use at least 14 characters. Keep it so you can manage your shop later.</small></label>
+    </div>
+    <p id="existing-account" hidden>You are signed in. Your new shop will belong to your account.</p>
+    <button class="setup-primary" type="submit">Continue to your look →</button>
+  </form>
+  <form id="look" class="setup-panel" data-step="1" hidden>
+    <h2>Give your shop its own look</h2>
+    <label>Welcome headline <input name="headline" maxlength="100" placeholder="Something beautiful for every day"></label>
+    <label>Brand colour <input name="accent" type="color" value="#875749"></label>
+    <div class="photo-fields">
+      <label>Business logo <input name="logoFile" type="file" accept="image/*"><img id="logo-preview" alt="Your logo" hidden><small>Optional. Your business name will display without a logo.</small></label>
+      <label>Cover photo <input name="coverFile" type="file" accept="image/*"><img id="cover-preview" alt="Your cover photo" hidden><small>Optional. Your first product photo will be used if you leave this blank.</small></label>
+    </div>
+    <div class="setup-actions"><button type="button" data-back="0">Back</button><button class="setup-primary" type="submit">Continue to products →</button></div>
+  </form>
+  <section class="setup-panel" data-step="2" hidden>
+    <h2>Fill your shop with your products</h2>
+    <p>Add a product and its photos. You can add more before publishing.</p>
+    <div id="product-list"></div>
+    <form id="product-form">
+      <h3 id="product-heading">Add a product</h3>
+      <label>Product name <input name="name" required maxlength="100"></label>
+      <label>Description <textarea name="description" required maxlength="450"></textarea></label>
+      <div class="field-pair">
+        <label>Category <input name="category" required maxlength="50" placeholder="Dresses, shoes, bags…"></label>
+        <label>Price in ₦ <input name="price" type="number" min="0" max="100000000" step="1" placeholder="Ask on WhatsApp"><small>Leave empty for customers to ask you.</small></label>
+      </div>
+      <h3>Colours and photos</h3>
+      <p>Upload a photo for each colour you offer.</p>
+      <div id="product-colours"></div>
+      <button type="button" id="add-setup-colour">Add another colour</button>
+      <div class="setup-actions"><button type="button" id="cancel-product" hidden>Cancel edit</button><button class="setup-primary" type="submit">Save product</button></div>
+    </form>
+    <div class="setup-actions section-actions"><button type="button" data-back="1">Back</button><button type="button" id="review-shop" class="setup-primary">Review your shop →</button></div>
+  </section>
+  <section class="setup-panel" data-step="3" hidden>
+    <h2>Ready for your first customer?</h2>
+    <div id="shop-summary"></div>
+    <p>Your shop will have your own product pages, colour choices, prices, photo sharing and WhatsApp order buttons.</p>
+    <a id="preview-shop" class="setup-secondary" target="_blank" rel="noopener">Preview your shop ↗</a>
+    <div class="setup-actions"><button type="button" data-back="2">Back</button><button type="button" id="publish-shop" class="setup-primary">Publish my shop</button></div>
+  </section>
+  <section id="setup-complete" class="setup-panel" hidden>
+    <p class="kicker">Open for business</p><h2>Your shop is ready.</h2>
+    <label>Your storefront link <input id="shop-url" readonly></label>
+    <div class="setup-actions"><a id="open-shop" class="setup-primary" target="_blank" rel="noopener">Visit your shop ↗</a><button id="copy-shop" type="button">Copy shop link</button></div>
+    <p><a id="owner-dashboard">Manage products and shop settings →</a></p>
+  </section>
+  <p id="resume-setup" hidden>Your draft saves as you go. <a id="resume-link">Return to your shop dashboard</a>.</p>
+</main>
+<template id="setup-colour">
+  <fieldset class="setup-colour">
+    <legend>Product colour</legend>
+    <div class="field-pair"><label>Colour name <input name="colour" required maxlength="60" placeholder="Navy blue"></label><label>Colour swatch <input name="swatch" type="color" value="#555555"></label></div>
+    <label>Product photo <input name="photo" type="file" accept="image/*"><img alt="Colour photo" hidden></label>
+    <button type="button" data-remove-colour>Remove colour</button>
+  </fieldset>
+</template>
+</body>
+</html>

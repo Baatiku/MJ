@@ -3,6 +3,11 @@ import { readFileSync, writeFileSync, unlinkSync } from 'node:fs';
 
 const name = process.env.MJ_WORKER_NAME?.trim();
 const database = process.env.MJ_CATALOG_DATABASE_ID?.trim();
+const bucket = process.env.MJ_IMAGES_BUCKET?.trim();
+if (bucket && !/^[a-z0-9][a-z0-9-]{1,61}[a-z0-9]$/.test(bucket)) {
+  console.error('MJ_IMAGES_BUCKET must be an existing R2 bucket name.');
+  process.exit(1);
+}
 const uuid = /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i;
 if (!/^[a-z0-9][a-z0-9-]{0,62}$/.test(name ?? '') || !database) {
   console.error('Set MJ_WORKER_NAME to the existing Worker name and MJ_CATALOG_DATABASE_ID to the existing D1 database UUID or exact name.');
@@ -40,7 +45,8 @@ const base = JSON.parse(readFileSync('wrangler.worker.jsonc', 'utf8'));
 const config = {
   ...base,
   name,
-  d1_databases: [{ binding: 'CATALOG_DB', database_id: databaseId }]
+  d1_databases: [{ binding: 'CATALOG_DB', database_id: databaseId }],
+  ...(bucket ? { r2_buckets: [{ binding: 'SHOP_IMAGES', bucket_name: bucket }] } : {})
 };
 const temporary = `.wrangler-admin-${process.pid}.json`;
 writeFileSync(temporary, JSON.stringify(config), { flag: 'wx' });

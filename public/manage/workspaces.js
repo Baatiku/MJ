@@ -160,7 +160,7 @@ submit(register, async () => {
   const fields = Object.fromEntries(['name', 'slug', 'username', 'password'].map((key) => [key, register.elements[key].value]));
   const { shop } = await request({ action: 'register', ...fields });
   register.reset();
-  location.assign('/manage/' + shop.slug + '/');
+  location.assign('/setup/?shop=' + encodeURIComponent(shop.slug));
 });
 submit(accept, async () => {
   await request({ action: 'accept', invite, password: accept.elements.password.value });
@@ -186,7 +186,7 @@ submit(form, async () => {
   const { shop } = await request(current
     ? { action: 'update', ...profile, id: current.id, published: form.elements.published.checked }
     : { action: 'create', ...profile, slug: form.elements.slug.value });
-  location.assign('/manage/' + shop.slug + '/');
+  location.assign('/setup/?shop=' + encodeURIComponent(shop.slug));
 });
 submit(find('import-original'), async () => {
   if (!window.confirm('Move the live Maknoon Jamil catalog to this owner?')) return;

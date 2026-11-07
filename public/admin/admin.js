@@ -1,3 +1,4 @@
+import { photoData } from '/lib/photo-upload.js';
 import { categories } from '/catalog/products.js';
 import { displayWhatsAppNumber } from '/lib/shop.js';
 import { assistantPanel } from './whatsapp-assistant.js';
@@ -268,15 +269,7 @@ async function uploadPhoto(input, destination, updated = () => {}) {
   input.disabled = save.disabled = true;
   notice.textContent = 'Uploading photo…';
   try {
-    if (file.size > 20 * 1024 * 1024) throw new Error('Choose a photo under 20 MB.');
-    const bitmap = await createImageBitmap(file);
-    const scale = Math.min(1, 1400 / Math.max(bitmap.width, bitmap.height));
-    const canvas = document.createElement('canvas');
-    canvas.width = Math.max(1, Math.round(bitmap.width * scale));
-    canvas.height = Math.max(1, Math.round(bitmap.height * scale));
-    canvas.getContext('2d').drawImage(bitmap, 0, 0, canvas.width, canvas.height);
-    bitmap.close();
-    const data = canvas.toDataURL('image/jpeg', 0.84).split(',')[1];
+    const data = await photoData(file);
     const { url } = await api('PUT', { action: 'upload-photo', data });
     if (form === editor && current !== product) return;
     destination.value = url;

@@ -87,12 +87,12 @@ Apply `0001_catalog.sql`, `0002_workspaces.sql` and `0003_shop_catalogs.sql` in 
 | URL | Who uses it |
 | --- | --- |
 | `/platform-admin/` | Operator creates 24-hour owner invites, lists shops, migrates the original catalog and assigns dedicated WhatsApp runtime tenants |
-| `/manage/?setup=1` | Visitors create an owner account and draft shop without an invite |
+| `/setup/` | Visitors create an account, add business details and photos, upload products, preview and publish |
 | `/manage/` | Owners sign in, accept operator invites, choose a shop and change their password |
 | `/manage/<slug>/` | Owner edits products, colours, prices, shop settings and WhatsApp assistant settings |
 | `/shops/<slug>/` | Public storefront once published |
 
-Every storefront links to self-service signup. New owners sign in with a username and password. Operator-invited owners can still sign in by email. Client onboarding uses the existing Worker and shared D1. It requires no per-client GitHub access or Cloudflare secret. New storefronts start private with an empty catalog and use the same renderer, layout and colour selector as Maknoon Jamil. Upload matching photos from the device or use HTTPS image links. To share a storefront, publish it first. A dedicated cover, or the first visible product photo as fallback, becomes the social preview. Native Status sharing depends on whether the browser and WhatsApp expose the relevant share target.
+Every storefront’s header links to `/setup/`. The four-step setup saves a private draft under the owner account, accepts the customer order number, logo and cover photos, and adds products with prices and up to 16 colour photos. Owners can resume setup at `/setup/?shop=<slug>`. Publishing opens the shop to customers. Every storefront links to self-service signup. New owners sign in with a username and password. Operator-invited owners can still sign in by email. Client onboarding uses the existing Worker and shared D1. It requires no per-client GitHub access or Cloudflare secret. New storefronts start private with an empty catalog and use the same renderer, layout and colour selector as Maknoon Jamil. Upload matching photos from the device or use HTTPS image links. To share a storefront, publish it first. A dedicated cover, or the first visible product photo as fallback, becomes the social preview. Native Status sharing depends on whether the browser and WhatsApp expose the relevant share target.
 
 To move the original shop to owner access, create an invite for its owner, have them accept it, then use **Move Maknoon Jamil** in platform admin. The move copies the current catalog, visibility, availability, prices, colour images and order number into the owner workspace. The root domain and existing `/products/...` and catalog URLs then read that workspace. The owner signs in at `/manage/` and edits it at `/manage/maknoon-jamil/`. The pre-move data remains in the legacy table. Avoid editing the old dashboard during the move.
 
@@ -101,3 +101,7 @@ To move the original shop to owner access, create an invite for its owner, have 
 Create a dedicated tenant in the configured ChatWithStars runtime, then assign its UUID to exactly one shop in platform admin. Maknoon Jamil keeps the existing `WA_TENANT_ID`. Each linked owner can use QR or pairing code, set role guidance, and browse contacts for delegation. The proxy derives the tenant from the owner's authorized shop and keeps the shared runtime credentials on the server.
 
 The runtime must be deployed and have a real account paired to confirm QR login, reconnect, replies and text or voice delivery. Calls, groups and Channels are outside the current bridge. The presets send role guidance while the upstream router still selects the actual specialist.
+
+### Product photo storage
+
+Bind one R2 bucket as `SHOP_IMAGES` for all client photo uploads. Set `MJ_IMAGES_BUCKET` to that existing bucket name in Workers Builds when using `scripts/deploy-admin.mjs`. The app writes JPEGs to R2 and keeps the ownership record in D1. It serves the photo through `/shop-media/<id>`, checking draft access before retrieving the object. Existing photos stored in D1 continue to work. Without the R2 binding, uploads use the existing D1 storage. The browser compresses uploads before sending and explains when a photo needs to be smaller.

@@ -51,7 +51,7 @@ test('homepage provides a catalog share card and a self-service shop setup link'
   assert.match(markup, /property="og:url" content="https:\/\/shop.example\/"/);
   assert.match(markup, /property="og:image" content="https:\/\/shop.example\/previews\/maknoon-jamil-square.jpg"/);
   assert.match(markup, /name="twitter:card" content="summary_large_image"/);
-  assert.match(markup, /class="announcement" href="\/manage\/\?setup=1"/);
+  assert.match(markup, /class="announcement" href="\/setup\/"/);
   assert.match(markup, /class="contact whatsapp-contact" href="https:\/\/wa.me\/2348022519062/);
 });
 

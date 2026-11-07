@@ -46,7 +46,7 @@ test('owner can edit a colour, set or clear its product price, and unlist it', a
   assert.match(updatedHome, /data-order-number="2348012345678"/);
   assert.match(updatedHome, /\+234 801 234 5678/);
   const links = [...updatedHome.matchAll(/href="https:\/\/wa.me\/(\d+)\?text=/g)].map((match) => match[1]);
-  assert.match(updatedHome, /class="announcement" href="\/manage\/\?setup=1"/);
+  assert.match(updatedHome, /class="announcement" href="\/setup\/"/);
   assert.ok(links.length > 20 && links.every((number) => number === newNumber));
   const variantMarkup = await (await detail({
     env, request: new Request(origin + '/products/flow-abaya/navy/'), params: { path: ['flow-abaya', 'navy'] }

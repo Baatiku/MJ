@@ -6,7 +6,7 @@ export function siteHeader(home = '/', number, brand = {}) {
   const target = (brand.home || '/') + (brand.preview ? '?preview=1' : '');
   const nav = (home || (brand.preview ? brand.home : '')) + (brand.preview ? '?preview=1' : '');
   return `  <a class="skip-link" href="#main">Skip to content</a>
-  <a class="announcement" href="/manage/?setup=1">Get a free online store for your business <span aria-hidden="true">↗</span></a>
+  <a class="announcement" href="/setup/">Get a free online store for your business <span aria-hidden="true">↗</span></a>
   ${brand.banner && brand.banner !== 'Get a free online store for your business' ? `<p class="shop-announcement">${html(brand.banner)}</p>` : ''}
   <header class="shell masthead">
     <nav aria-label="Storefront"><a href="${html(nav)}#styles">Styles</a><a href="${html(nav)}#collection">Collection</a></nav>

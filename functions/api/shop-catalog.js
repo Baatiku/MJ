@@ -90,7 +90,16 @@ export async function onRequest({ request, env }) {
       try { bytes = atob(input.data); } catch { return json({ error: 'Invalid photo.' }, 400); }
       if (!bytes.startsWith('\xff\xd8\xff')) return json({ error: 'This photo could not be converted to JPEG.' }, 400);
       const id = crypto.randomUUID();
-      await db.prepare('INSERT INTO workspace_shop_media VALUES (?, ?, ?)').bind(id, shop.id, Uint8Array.from(bytes, (byte) => byte.charCodeAt(0)).buffer).run();
+      const photo = Uint8Array.from(bytes, (byte) => byte.charCodeAt(0));
+      const key = 'shop-media/' + shop.id + '/' + id + '.jpg';
+      if (env.SHOP_IMAGES) await env.SHOP_IMAGES.put(key, photo, { httpMetadata: { contentType: 'image/jpeg' } });
+      try {
+        await db.prepare('INSERT INTO workspace_shop_media VALUES (?, ?, ?)')
+          .bind(id, shop.id, env.SHOP_IMAGES ? new ArrayBuffer(0) : photo.buffer).run();
+      } catch (error) {
+        if (env.SHOP_IMAGES) await env.SHOP_IMAGES.delete(key).catch(() => {});
+        throw error;
+      }
       return json({ url: '/shop-media/' + id }, 201);
     }
     if (input.action === 'settings') {

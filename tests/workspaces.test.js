@@ -78,13 +78,15 @@ test('D1 owner invites are single-use and storefront writes are isolated', async
   assert.equal((await edit('second-shop', null, a)).status, 404);
   assert.equal((await call('/api/workspaces?platform=1', null, a)).status, 401);
   assert.equal((await (await call('/api/workspaces?platform=1', null, admin)).json()).shops.length, 2);
-  const signup = { action: 'register', name: 'New Client', slug: 'new-client', username: 'Client-Owner', password };
+  const signup = { action: 'register', name: 'New Client', slug: 'new-client', username: 'Client-Owner', whatsapp: '+234 802 345 6789', description: 'Our newest collection', password };
   assert.equal((await api({ ...signup, slug: 'new-shop' })).status, 409);
   assert.equal((await api({ ...signup, slug: 'maknoon-jamil' })).status, 400);
   const registered = await api(signup);
   assert.equal(registered.status, 201);
   const client = session(registered);
-  assert.equal((await registered.json()).shop.published, false);
+  const registeredShop = (await registered.json()).shop;
+  assert.equal(registeredShop.published, false);
+  assert.equal(registeredShop.whatsapp, '2348023456789');
   assert.equal((await api({ ...signup, slug: 'duplicate-client' })).status, 409);
   assert.equal((await call('/shops/new-client/')).status, 404);
   assert.equal((await edit('new-client', null, client)).status, 200);
@@ -94,7 +96,7 @@ test('D1 owner invites are single-use and storefront writes are isolated', async
     action: 'settings', name: 'New Client', published: true, banner: 'New arrivals'
   }, client)).status, 200);
   const clientPage = await (await call('/shops/new-client/')).text();
-  assert.match(clientPage, /class="announcement" href="\/manage\/\?setup=1"/);
+  assert.match(clientPage, /class="announcement" href="\/setup\/"/);
   assert.match(clientPage, /New arrivals/);
   const upload = await edit('second-shop', { action: 'upload-photo', data: btoa('\xff\xd8\xff\xd9') }, b);
   assert.equal(upload.status, 201);
@@ -102,6 +104,21 @@ test('D1 owner invites are single-use and storefront writes are isolated', async
   assert.equal((await call(photo)).status, 404);
   assert.equal((await call(photo, null, a)).status, 404);
   assert.equal((await call(photo, null, b)).headers.get('content-type'), 'image/jpeg');
+  const bucket = new Map();
+  env.SHOP_IMAGES = {
+    put: async (key, data) => bucket.set(key, data),
+    get: async (key) => bucket.has(key) ? { body: bucket.get(key) } : null,
+    delete: async (key) => bucket.delete(key)
+  };
+  const objectUpload = await edit('second-shop', { action: 'upload-photo', data: btoa('\xff\xd8\xff\xd9') }, b);
+  assert.equal(objectUpload.status, 201);
+  const { url: objectPhoto } = await objectUpload.json();
+  assert.equal(bucket.size, 1);
+  assert.equal((await call(objectPhoto)).status, 404);
+  assert.equal((await call(objectPhoto, null, a)).status, 404);
+  const privateObject = await call(objectPhoto, null, b);
+  assert.equal(privateObject.status, 200);
+  assert.equal(new Uint8Array(await privateObject.arrayBuffer()).length, 4);
   const product = {
     id: 'linen-dress', name: 'Linen Dress', description: 'A long linen dress', category: 'dresses',
     available: true, hidden: false, price: 25000, revision: 0, position: 10,
@@ -124,6 +141,7 @@ test('D1 owner invites are single-use and storefront writes are isolated', async
   };
   assert.equal((await edit('second-shop', settings, b)).status, 200);
   assert.equal((await call(photo)).status, 200);
+  assert.equal((await call(objectPhoto)).status, 200);
   const secondPage = await (await call('/shops/second-shop/')).text();
   assert.match(secondPage, /Linen for every day/);
   assert.match(secondPage, /Linen dresses/);

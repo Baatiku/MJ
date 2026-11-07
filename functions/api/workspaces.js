@@ -1,3 +1,4 @@
+import { normalizeOrderNumber } from '../../src/catalog/shop-settings.js';
 import { categories } from '../../src/catalog/products.js';
 import { readCatalog } from '../../src/catalog/live.js';
 import { readOrderNumber } from '../../src/catalog/shop-settings.js';
@@ -54,8 +55,8 @@ function validShopSlug(slug) {
 function cleanProfile(input) {
   const name = typeof input?.name === 'string' ? input.name.trim() : '';
   const description = typeof input?.description === 'string' ? input.description.trim() : '';
-  const whatsapp = typeof input?.whatsapp === 'string' ? input.whatsapp.trim().replace(/^\+/, '') : '';
-  if (!name || name.length > 100 || description.length > 300 || (whatsapp && !phonePattern.test(whatsapp))) return null;
+  const whatsapp = input?.whatsapp ? normalizeOrderNumber(input.whatsapp) : '';
+  if (!name || name.length > 100 || description.length > 300 || (whatsapp === null || whatsapp && !phonePattern.test(whatsapp))) return null;
   return { name, description, whatsapp };
 }
 
