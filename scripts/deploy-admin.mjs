@@ -1,9 +1,11 @@
 import { spawnSync } from 'node:child_process';
 import { readFileSync, writeFileSync, unlinkSync } from 'node:fs';
 
-const name = process.env.MJ_WORKER_NAME?.trim();
-const database = process.env.MJ_CATALOG_DATABASE_ID?.trim();
-const bucket = process.env.MJ_IMAGES_BUCKET?.trim();
+const base = JSON.parse(readFileSync('wrangler.jsonc', 'utf8'));
+const name = process.env.MJ_WORKER_NAME?.trim() || base.name;
+const configuredDatabase = base.d1_databases?.find(({ binding }) => binding === 'CATALOG_DB');
+const database = process.env.MJ_CATALOG_DATABASE_ID?.trim() || configuredDatabase?.database_id;
+const bucket = process.env.MJ_IMAGES_BUCKET?.trim() || base.r2_buckets?.find(({ binding }) => binding === 'SHOP_IMAGES')?.bucket_name;
 if (bucket && !/^[a-z0-9][a-z0-9-]{1,61}[a-z0-9]$/.test(bucket)) {
   console.error('MJ_IMAGES_BUCKET must be an existing R2 bucket name.');
   process.exit(1);
@@ -41,7 +43,6 @@ if (!uuid.test(databaseId)) {
   databaseId = matches[0].uuid;
 }
 
-const base = JSON.parse(readFileSync('wrangler.worker.jsonc', 'utf8'));
 const config = {
   ...base,
   name,

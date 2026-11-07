@@ -1,11 +1,1 @@
-{
-  "name": "maknoon-jamil",
-  "main": "worker.js",
-  "compatibility_date": "2026-11-06",
-  "keep_vars": true,
-  "assets": {
-    "directory": "./dist",
-    "binding": "ASSETS",
-    "run_worker_first": ["/api/*", "/", "/index.html", "/catalog", "/catalog/", "/products/*", "/shops/*", "/manage/*", "/platform-admin", "/platform-admin/", "/shop-media/*"]
-  }
-}
+wrangler.jsonc
