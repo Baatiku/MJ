@@ -3,3 +3,19 @@
 @media(max-width:900px){.portfolio-header nav{gap:12px}.brand-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.brand-glow{grid-column:1/-1;width:min(100%,500px);justify-self:center}.brand-image-link{height:400px}.brand-glow .brand-image-link{height:330px}}
 @media(max-width:600px){.shell{width:min(91%,520px)}.top-strip{font-size:9px;letter-spacing:.055em}.portfolio-header{min-height:66px;grid-template-columns:1fr;justify-items:center;padding:13px 0 15px;gap:10px}.portfolio-wordmark{font-size:26px}.portfolio-header nav{font-size:10px;gap:18px}.owner-link{border:0;padding:0}.portfolio-hero{padding-top:63px}.portfolio-hero h1{max-width:360px;font-size:clamp(51px,12vw,70px);margin:18px auto}.hero-lede{max-width:335px;font-size:13px}.portfolio-mosaic{gap:6px;height:245px;margin-top:55px}.mosaic-glow-label{bottom:12px;font-size:6px;letter-spacing:.1em}.sun-disc{width:76%}.brand-section{padding-top:80px}.brand-section h2{font-size:47px}.section-intro{margin-bottom:27px;font-size:12px}.brand-grid{grid-template-columns:1fr;gap:23px}.brand-glow{grid-column:auto;width:100%}.brand-image-link,.brand-glow .brand-image-link{height:clamp(310px,100vw,455px)}.brand-copy{padding:27px 20px 32px}.brand-copy h3{font-size:35px}.brand-copy>p:not(.brand-category){min-height:0;max-width:260px;margin:0 auto}.closing-note{padding:82px 0}.footer-inner{flex-direction:column;text-align:center}.footer-inner>div{justify-content:center;flex-wrap:wrap;gap:15px}.footer-inner small{font-size:8px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.brand-image-link img{transition:none}}
+
+/* A quieter homepage: the brands and photography carry the story. */
+.portfolio-hero{padding-top:clamp(73px,9vw,122px)}
+.portfolio-hero h1{max-width:1080px;margin:0 auto 25px}
+.hero-lede{max-width:650px;font-size:clamp(13px,1.6vw,16px);letter-spacing:.015em}
+.hero-lede span{padding-inline:7px;color:var(--rose)}
+.brand-section{padding-top:clamp(76px,9vw,117px)}
+.brand-section h2{margin:0 auto 38px}
+.brand-copy a{margin-top:7px}
+@media(max-width:600px){
+  .portfolio-hero{padding-top:63px}
+  .portfolio-hero h1{max-width:360px;margin:0 auto 20px}
+  .hero-lede{max-width:340px;font-size:12px}
+  .hero-lede span{padding-inline:3px}
+  .brand-section h2{margin-bottom:27px}
+}

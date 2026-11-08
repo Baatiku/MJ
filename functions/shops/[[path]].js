@@ -5,6 +5,7 @@ import { storefront } from '../../src/components/storefront.js';
 import { variantPage } from '../../src/components/variant-page.js';
 import { page } from '../_catalog.js';
 import { popPetalsBrand } from '../../src/catalog/pop-petals.js';
+import { flawlessGlowBrand } from '../../src/catalog/flawless-glow.js';
 
 const notFound = () => page('<!doctype html><title>Shop not found</title><h1>Shop not found</h1>', 404);
 
@@ -23,7 +24,8 @@ export async function onRequestGet({ request, env, params }) {
     const [catalog, appearance] = await Promise.all([shopCatalog(db, shop.id), shopAppearance(db, shop.id)]);
     const curated = ['pop-and-petals', 'flawless-glow-co'].includes(shop.slug);
     const home = !preview && curated ? `/${shop.slug}/` : `/shops/${shop.slug}/`;
-    const brand = { ...(shop.slug === 'pop-and-petals' ? popPetalsBrand : {}), ...appearance, name: shop.name, description: shop.description, home, preview, admin: `/manage/${shop.slug}/` };
+    const curatedBrand = shop.slug === 'pop-and-petals' ? popPetalsBrand : shop.slug === 'flawless-glow-co' ? flawlessGlowBrand : {};
+    const brand = { ...curatedBrand, ...appearance, name: shop.name, description: shop.description || curatedBrand.description, home, preview, admin: `/manage/${shop.slug}/` };
     const products = catalog.filter((product) => !product.hidden);
     if (!variantRoute) return page(storefront(preview ? null : url.origin, products, home, (preview ? '' : shop.whatsapp), brand));
     const product = products.find(({ id }) => id === productId);

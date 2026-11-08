@@ -1,8 +1,13 @@
 import { escapeHtml as html } from '../lib/html.js';
 import { contactLink } from '../lib/shop.js';
 import { whatsappIcon } from './whatsapp-icon.js';
+import { globalHeader, isFeaturedShop } from './global-header.js';
 
 export function siteHeader(home = '/', number, brand = {}) {
+  const path = brand.home || home;
+  if (isFeaturedShop(path) || (!brand.name && (path === '/' || path === ''))) {
+    return globalHeader(isFeaturedShop(path) ? path : '/maknoon-jamil/', number, brand.name || 'Maknoon Jamil');
+  }
   const target = (brand.home || '/') + (brand.preview ? '?preview=1' : '');
   const nav = (home || (brand.preview ? brand.home : '')) + (brand.preview ? '?preview=1' : '');
   return `  <a class="skip-link" href="#main">Skip to content</a>

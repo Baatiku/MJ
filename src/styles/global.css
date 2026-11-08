@@ -1,0 +1,31 @@
+.global-site-header{position:relative;z-index:2;background:#fffcf8;border-bottom:1px solid #e8ded3;color:#332924}
+.global-header-inner{width:min(94%,1320px);min-height:86px;margin-inline:auto;display:flex;align-items:center;justify-content:space-between;gap:clamp(14px,3vw,40px)}
+.global-wordmark{display:inline-flex;align-items:center;gap:7px;flex:0 0 auto;font:32px/1 Georgia,serif;letter-spacing:-.07em;white-space:nowrap}
+.global-symbol{font:23px/1 system-ui,sans-serif;color:#ab6772;letter-spacing:0}
+.global-wordmark-dot,.global-footer-mark span{color:#ab6772}
+.global-nav{display:flex;flex:1;align-items:center;justify-content:center;gap:clamp(12px,2.5vw,36px)}
+.global-nav a{display:inline-flex;align-items:center;justify-content:center;min-height:44px;white-space:nowrap;font:500 13px/1.2 system-ui,sans-serif;border-bottom:2px solid transparent;color:#655851;text-align:center}
+.global-nav a:hover,.global-nav a[aria-current="page"]{color:#332924;border-bottom-color:#ab6772}
+.global-contact{display:inline-flex;align-items:center;justify-content:center;gap:7px;flex:0 0 auto;min-height:42px;padding:9px 12px;border:1px solid #25d366;background:#25d366;color:#12301d;font:700 12px/1 system-ui,sans-serif;white-space:nowrap}
+.global-contact:hover{background:#1ebe5d;border-color:#1ebe5d}
+.global-contact .whatsapp-icon{width:18px;height:18px}
+.global-site-footer{margin-top:clamp(60px,8vw,110px);background:#f3ede5;border-top:1px solid #e3d7ca;color:#45352e}
+.global-footer-inner{width:min(94%,1320px);margin-inline:auto;padding:31px 0;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.global-footer-mark{font:31px/1 Georgia,serif;letter-spacing:-.07em}
+.global-footer-inner nav{display:flex;flex-wrap:wrap;justify-content:center;gap:12px 25px;font:12px system-ui,sans-serif}
+.global-footer-inner nav a:hover{text-decoration:underline;text-underline-offset:4px}
+@media(max-width:800px){
+  .global-header-inner{display:grid;grid-template-columns:1fr auto;row-gap:8px;padding:15px 0 12px}
+  .global-wordmark{grid-column:1/-1;grid-row:1;justify-self:center;font-size:29px}
+  .global-nav{grid-column:1/-1;grid-row:2;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));width:100%;gap:3px}
+  .global-nav a{font-size:11px;min-height:36px;white-space:normal;padding-inline:4px}
+  .global-contact{grid-column:2;grid-row:1;z-index:1;justify-self:end;padding:6px;min-height:32px}
+  .global-contact span{display:none}
+}
+@media(max-width:420px){
+  .global-header-inner{padding-bottom:9px}
+  .global-nav{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:8px}
+  .global-nav a{min-height:31px;font-size:12px}
+  .global-footer-inner{flex-direction:column;text-align:center}
+  .global-footer-inner nav{gap:12px 17px}
+}

@@ -29,10 +29,8 @@ test('each style has distinct colour choices and uniquely addressed images', () 
       assert.ok(page.includes(`property="og:url" content="${variantUrl}"`));
       assert.ok(page.includes(`property="og:image" content="${origin + previewImage(variant)}"`));
       assert.ok(page.includes(`src="${variant.image}"`));
-      assert.match(page, /class="announcement"/);
-      assert.match(page, /class="shell masthead"/);
-      assert.match(page, /href="\/#styles"/);
-      assert.match(page, /href="\/#collection"/);
+      assert.match(page, /class="global-site-header"/);
+      assert.match(page, /href="\/maknoon-jamil\/" aria-current="page"/);
     }
   }
 });
@@ -46,13 +44,14 @@ test('static HTML contains every product and checkout works before JS loads', ()
   }
 });
 
-test('homepage provides a catalog share card and a self-service shop setup link', () => {
+test('Maknoon Jamil keeps its catalog share card and uses the shared public header', () => {
   const markup = storefront(origin);
   assert.match(markup, /property="og:url" content="https:\/\/shop.example\/"/);
   assert.match(markup, /property="og:image" content="https:\/\/shop.example\/previews\/maknoon-jamil-square.jpg"/);
   assert.match(markup, /name="twitter:card" content="summary_large_image"/);
-  assert.match(markup, /class="announcement" href="\/setup\/"/);
-  assert.match(markup, /class="contact whatsapp-contact" href="https:\/\/wa.me\/2348022519062/);
+  assert.match(markup, /class="global-site-header"/);
+  assert.match(markup, /class="global-contact" href="https:\/\/wa.me\/2348022519062/);
+  assert.doesNotMatch(markup, /Owner sign-in|Create a store/);
 });
 
 test('the catalog share route has a distinct canonical preview URL', () => {

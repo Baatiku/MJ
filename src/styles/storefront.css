@@ -126,6 +126,7 @@ h2 { font-size: clamp(40px, 6vw, 72px); line-height: 1; margin-top: 7px; letter-
   font-weight: 700;
 }
 .order:hover, .whatsapp-contact:hover { background: #1ebe5d; border-color: #1ebe5d; }
+.order-pending,.order-pending:hover { background:#d8d5d0; border-color:#d8d5d0; color:#5d5752; cursor:not-allowed; opacity:1; }
 .whatsapp-icon { width: 1.25em; height: 1.25em; flex: 0 0 auto; }
 
 .product-share { display: flex; align-items: center; justify-content: center; gap: 5px; min-height: 44px; margin: 5px auto 0; padding: 7px 10px; border: 0; background: transparent; color: var(--muted); font: inherit; font-size: 12px; cursor: pointer; }
@@ -152,3 +153,11 @@ h2 { font-size: clamp(40px, 6vw, 72px); line-height: 1; margin-top: 7px; letter-
 .footer .wordmark { white-space: normal; overflow-wrap: anywhere; }
 .category-grid[data-count="1"], .product-grid[data-count="1"] { grid-template-columns: minmax(0, 420px); justify-content: center; }
 .category-grid[data-count="2"], .product-grid[data-count="2"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+.flawless-glow-theme { --paper:#fcf5f0;--card:#fffcf8;--sand:#f1dfd7;--ink:#48352f;--muted:#806b64;--accent:#a77f76;--line:#e4cbc0;--green:#25d366;--green-hover:#1ebe5d; }
+.flawless-glow-theme .hero { background:#f2e5dd; }
+.flawless-glow-theme .hero h1 { max-width:860px;margin-inline:auto; }
+.glow-brand-art { display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;min-height:clamp(240px,30vw,390px);margin-top:8px;background:radial-gradient(ellipse at 45% 28%,#f7e9d4,#ebcfc8 70%,#d7b2aa);color:#806058;font:11px/1.2 var(--sans);letter-spacing:.24em; }
+.glow-art-disc { width:clamp(145px,24vw,235px);height:clamp(145px,24vw,235px);display:grid;place-items:center;border:1px solid #ba9881;border-radius:50%;font:clamp(49px,8vw,90px)/1 var(--serif);letter-spacing:-.11em;color:#715346; }
+.empty-collection { max-width:440px;margin:25px auto 0;padding:32px;border:1px solid var(--line);background:var(--card);color:var(--muted);text-align:center;font:clamp(17px,3vw,24px)/1.3 var(--serif); }
+.pop-petals-theme .product-title > span { display: inline; }
