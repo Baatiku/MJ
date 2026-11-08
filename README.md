@@ -2,6 +2,8 @@
 
 One site, three businesses: Maknoon Jamil, Pop & Petals, and Flawless Glow Co. The root homepage introduces all three through a centered, responsive editorial design. Maknoon Jamil retains its existing modestwear catalogue and native colour/WhatsApp ordering features at `/maknoon-jamil/`. Original `/products/...` URLs continue to work.
 
+The root homepage has its own 1200 × 630 social preview showing the available Maknoon Jamil and Pop & Petals product photographs alongside a text-only Flawless Glow Co panel. Its Open Graph and Twitter metadata use the site's canonical origin, so sharing the root URL represents the full three-brand collection rather than only Maknoon Jamil.
+
 Pop & Petals has its own palette and a first catalogue of doughnuts, decorated cupcakes, dessert cups and bottled drinks at `/pop-and-petals/`. Product photos came from the owner; one chocolate dessert cup photo was edited for a cleaner background while preserving the actual dessert. Prices and the WhatsApp ordering number remain unconfirmed, so ordering is deliberately not enabled for Pop & Petals yet. Images showing unverified health claims have not been used as medical marketing claims.
 
 Flawless Glow Co has a dedicated introduction at `/flawless-glow-co/`, with its product catalogue awaiting the owner's sunscreen and skincare images. The landing page does not pretend to show products that have not been supplied.

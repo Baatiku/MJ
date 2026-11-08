@@ -33,6 +33,18 @@ const brands = [
 
 export function portfolio(origin) {
   const canonical = origin ? `<link rel="canonical" href="${html(new URL('/', origin).href)}">` : '';
+  const preview = origin ? new URL('/previews/our-brands-social.jpg', origin).href : '';
+  const social = preview ? `<meta property="og:type" content="website">
+  <meta property="og:site_name" content="Our Brands">
+  <meta property="og:title" content="Three brands. One lovely place.">
+  <meta property="og:description" content="Discover Maknoon Jamil modestwear, Pop & Petals treats, and Flawless Glow Co skincare.">
+  <meta property="og:url" content="${html(new URL('/', origin).href)}">
+  <meta property="og:image" content="${html(preview)}">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Maknoon Jamil fashion, Pop & Petals treats, and Flawless Glow Co skincare together">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="${html(preview)}">` : '';
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -42,6 +54,7 @@ export function portfolio(origin) {
   <title>Our Brands | Maknoon Jamil, Pop & Petals & Flawless Glow Co</title>
   <meta name="description" content="One thoughtful destination for Maknoon Jamil modestwear, Pop & Petals treats, and Flawless Glow Co skincare.">
   ${canonical}
+  ${social}
   <link rel="stylesheet" href="/styles/portfolio.css">
 </head>
 <body>
