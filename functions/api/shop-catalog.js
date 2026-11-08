@@ -30,7 +30,7 @@ export async function shopAppearance(db, shopId) {
 function image(value) {
   if (!value) return '';
   if (typeof value !== 'string' || value.length > 500) return null;
-  if (mediaPath.test(value) || value === '/previews/maknoon-jamil-square.jpg') return value;
+  if (mediaPath.test(value) || value === '/previews/maknoon-jamil-square.jpg' || /^\/images\/pop-petals\/[a-z0-9-]+\.(?:jpg|jpeg|png|webp)$/.test(value)) return value;
   try {
     const url = new URL(value);
     return url.protocol === 'https:' && !url.username && !url.password ? url.href : null;

@@ -4,7 +4,8 @@ import { DatabaseSync } from 'node:sqlite';
 import { test } from 'node:test';
 import { products as defaults } from '../src/catalog/products.js';
 import { onRequest } from '../functions/api/admin.js';
-import { onRequestGet as shop } from '../functions/index.js';
+import { legacyShopGet as shop } from '../functions/_legacy-shop.js';
+import { onRequestGet as homepage } from '../functions/index.js';
 import { onRequestGet as detail } from '../functions/products/[[path]].js';
 
 test('owner can edit a colour, set or clear its product price, and unlist it', async () => {
@@ -93,13 +94,13 @@ test('owner can edit a colour, set or clear its product price, and unlist it', a
   sql.close();
 });
 
-test('homepage share metadata uses the requested public host without an admin database', async () => {
+test('the unified homepage identifies all three brands and uses the requested host', async () => {
   const request = new Request('https://store.example/?share=2', {
     headers: { 'User-Agent': 'WhatsApp/2.24.0 A' }
   });
-  const response = await shop({ env: {}, request });
+  const response = await homepage({ env: {}, request });
   assert.equal(response.status, 200);
   const head = (await response.text()).split('</head>')[0];
-  assert.match(head, /property="og:url" content="https:\/\/store.example\/"/);
-  assert.match(head, /property="og:image" content="https:\/\/store.example\/previews\/maknoon-jamil-square.jpg"/);
+  assert.match(head, /rel="canonical" href="https:\/\/store.example\/"/);
+  assert.match(head, /Maknoon Jamil, Pop &amp; Petals &amp; Flawless Glow Co|Maknoon Jamil, Pop & Petals & Flawless Glow Co/);
 });

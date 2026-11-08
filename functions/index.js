@@ -1,16 +1,6 @@
-import { originalView } from './_original-shop.js';
-import { readOrderNumber } from '../src/catalog/shop-settings.js';
-import { storefront } from '../src/components/storefront.js';
-import { readCatalog } from '../src/catalog/live.js';
+import { portfolio } from '../src/components/portfolio.js';
 import { page } from './_catalog.js';
 
-export async function onRequestGet({ request, env }) {
-  const { origin, pathname } = new URL(request.url);
-  const sharePath = pathname === '/catalog' || pathname === '/catalog/' ? '/catalog/' : '/';
-  const original = await originalView(env.CATALOG_DB);
-  if (original) return original.published
-    ? page(storefront(origin, original.products.filter(({ hidden }) => !hidden), sharePath, original.whatsapp, original.brand))
-    : page('<!doctype html><title>Shop unavailable</title><h1>Shop unavailable</h1>', 404);
-  const [catalog, number] = await Promise.all([env.CATALOG_DB ? readCatalog(env.CATALOG_DB) : undefined, readOrderNumber(env.CATALOG_DB)]);
-  return page(storefront(origin, catalog?.filter((product) => !product.hidden), sharePath, number));
+export async function onRequestGet({ request }) {
+  return page(portfolio(new URL(request.url).origin));
 }

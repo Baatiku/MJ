@@ -36,7 +36,7 @@ export function orderLabel(product) {
 }
 
 export function orderLink(product, variant, origin, number, home = '/', name = 'Maknoon Jamil') {
-  const selection = `${product.name} in ${variant.name}`;
+  const selection = variant.id === 'pictured' ? product.name : `${product.name} in ${variant.name}`;
   const price = product.price === null ? '' : ` (${formatNaira(product.price)})`;
   const question = product.price === null
     ? 'Please confirm the price and availability.'

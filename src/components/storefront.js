@@ -52,7 +52,7 @@ export function storefront(origin, catalog = products, sharePath = '/', number =
   <link rel="stylesheet" href="/styles/storefront.css">
   <script src="/storefront.js" type="module"></script>
 </head>
-<body${brand.accent ? ` style="--accent:${html(brand.accent)}"` : ''}>
+<body${brand.themeClass ? ` class="${html(brand.themeClass)}"` : ''}${brand.accent ? ` style="--accent:${html(brand.accent)}"` : ''}>
   ${siteHeader('', number, brand)}
   <main class="shell" id="main">
     <section class="hero" aria-labelledby="hero-title">
@@ -65,18 +65,18 @@ export function storefront(origin, catalog = products, sharePath = '/', number =
       ${hero ? `<div class="hero-gallery" data-count="${Math.min(3, catalog.length)}" aria-hidden="true">${hero}</div>` : ''}
     </section>
     <section class="style-section" id="styles" aria-labelledby="styles-title">
-      <p class="kicker">Find your silhouette</p><h2 id="styles-title">Shop by style</h2>
+      <p class="kicker">${html(brand.stylesKicker || 'Find your silhouette')}</p><h2 id="styles-title">${html(brand.stylesHeading || 'Shop by style')}</h2>
       <div class="category-grid" data-count="${Math.min(3, shopCategories.length)}">${categoryLinks}</div>
     </section>
     <section class="collection" id="collection" aria-labelledby="collection-title">
       <div class="section-head">
-        <div><p class="kicker">The collection</p><h2 id="collection-title">Find your colour</h2></div>
+        <div><p class="kicker">The collection</p><h2 id="collection-title">${html(brand.collectionHeading || 'Find your colour')}</h2></div>
         <div class="filters" aria-label="Filter collection" hidden>
           <button type="button" data-filter="all" aria-pressed="true">All styles</button>
           ${shopCategories.filter(({ id }) => catalog.some(({ category }) => category === id)).map(({ id, name }) => `<button type="button" data-filter="${id}" aria-pressed="false">${html(name)}</button>`).join('')}
         </div>
       </div>
-      <p class="collection-note">${number ? 'Choose a colour to see its photo, then message us on WhatsApp to confirm availability.' : 'Choose a colour to see its photo.'}</p>
+      <p class="collection-note">${brand.orderPending ? 'Browse the menu. Prices and ordering details will be confirmed before checkout opens.' : number ? 'Choose a colour to see its photo, then message us on WhatsApp to confirm availability.' : 'Choose a colour to see its photo.'}</p>
       <p class="sr-only" data-result-count aria-live="polite"></p>
       ${catalog.length ? '' : '<p>No styles are listed right now.</p>'}
       <div class="product-grid" data-count="${Math.min(3, catalog.length)}">${catalog.map((product) => productCard(product, origin, number, brand)).join('')}</div>

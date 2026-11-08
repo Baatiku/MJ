@@ -3,6 +3,9 @@ import { categories, products } from '../src/catalog/products.js';
 import { storefront } from '../src/components/storefront.js';
 import { variantPage } from '../src/components/variant-page.js';
 import { previewImage, variantPath, whatsappNumber } from '../src/lib/shop.js';
+import { portfolio } from '../src/components/portfolio.js';
+import { flawlessGlowPage } from '../src/components/coming-soon.js';
+import { popPetalsBrand, popPetalsProducts } from '../src/catalog/pop-petals.js';
 
 const publicSiteUrl = 'https://mj.masanawa.com';
 const origin = new URL(process.env.SITE_URL || publicSiteUrl).origin;
@@ -11,7 +14,8 @@ const root = new URL('../', import.meta.url);
 const output = new URL('dist/', root);
 const images = new Set([
   ...categories.map(({ image }) => image),
-  ...products.flatMap(({ variants }) => variants.flatMap((variant) => [variant.image, previewImage(variant)]))
+  ...products.flatMap(({ variants }) => variants.flatMap((variant) => [variant.image, previewImage(variant)])),
+  ...popPetalsProducts.flatMap(({ variants, gallery = [] }) => [...variants.flatMap((variant) => [variant.image, previewImage(variant)]), ...gallery])
 ]);
 
 for (const image of images) {
@@ -33,8 +37,14 @@ for (const filename of ['shop.js', 'product-share.js', 'photo-upload.js']) {
   await cp(new URL('src/lib/' + filename, root), new URL('lib/' + filename, output));
 }
 await writeFile(new URL('lib/shop-number.js', output), `export const whatsappNumber = ${JSON.stringify(whatsappNumber)};\n`);
-await writeFile(new URL('index.html', output), storefront(origin));
-await writeFile(new URL('catalog/index.html', output), storefront(origin, undefined, '/catalog/'));
+await writeFile(new URL('index.html', output), portfolio(origin));
+await writeFile(new URL('catalog/index.html', output), storefront(origin, undefined, '/maknoon-jamil/', whatsappNumber, { home: '/maknoon-jamil/' }));
+await mkdir(new URL('maknoon-jamil/', output));
+await writeFile(new URL('maknoon-jamil/index.html', output), storefront(origin, undefined, '/maknoon-jamil/', whatsappNumber, { home: '/maknoon-jamil/' }));
+await mkdir(new URL('pop-and-petals/', output));
+await writeFile(new URL('pop-and-petals/index.html', output), storefront(origin, popPetalsProducts, '/pop-and-petals/', '', popPetalsBrand));
+await mkdir(new URL('flawless-glow-co/', output));
+await writeFile(new URL('flawless-glow-co/index.html', output), flawlessGlowPage(origin));
 for (const product of products) {
   for (const variant of product.variants) {
     const directory = new URL(`.${variantPath(product, variant)}`, output);
@@ -42,4 +52,11 @@ for (const product of products) {
     await writeFile(new URL('index.html', directory), variantPage(product, variant, origin));
   }
 }
-console.log(`Built ${products.length} styles with ${images.size} images in dist/.`);
+for (const product of popPetalsProducts) {
+  for (const variant of product.variants) {
+    const directory = new URL(`.${variantPath(product, variant, popPetalsBrand.home)}`, output);
+    await mkdir(directory, { recursive: true });
+    await writeFile(new URL('index.html', directory), variantPage(product, variant, origin, '', popPetalsBrand));
+  }
+}
+console.log(`Built ${products.length} Maknoon styles and ${popPetalsProducts.length} Pop & Petals products with ${images.size} images in dist/.`);

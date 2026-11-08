@@ -17,7 +17,7 @@ export async function readCatalog(db) {
 }
 
 const slug = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-const asset = /^\/(?:images|previews)\/[a-z0-9-]+\.(?:jpg|jpeg|png|webp)$/;
+const asset = /^\/(?:images|previews)\/(?:pop-petals\/)?[a-z0-9-]+\.(?:jpg|jpeg|png|webp)$/;
 function imageUrl(value, workspace) {
   if (typeof value !== 'string' || value.length > 500) return false;
   if (asset.test(value) || (workspace && /^\/shop-media\/[a-f0-9-]{36}$/.test(value))) return true;
@@ -50,5 +50,7 @@ export function validateProduct(input, { workspace = false } = {}) {
     return { id: variant.id, name: variant.name.trim(), swatch: variant.swatch, image: variant.image };
   });
   const { id, category, price, available, hidden } = input;
-  return { id, category, price, available, hidden, colourEdition, name: input.name.trim(), description: input.description.trim(), variants };
+  const gallery = Array.isArray(input.gallery) && input.gallery.length <= 12 && input.gallery.every((url) => imageUrl(url, workspace))
+    ? input.gallery : [];
+  return { id, category, price, available, hidden, colourEdition, name: input.name.trim(), description: input.description.trim(), variants, ...(gallery.length ? { gallery } : {}) };
 }

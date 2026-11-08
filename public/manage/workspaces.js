@@ -99,6 +99,7 @@ async function load() {
     find('change-password').hidden = platform;
     find('import-original').hidden = !platform || shops.some(({ slug }) => slug === 'maknoon-jamil');
     find('original-shop').hidden = !platform || shops.some(({ slug }) => slug === 'maknoon-jamil');
+    find('bootstrap-brands').hidden = !platform || !shops.some(({ slug }) => slug === 'maknoon-jamil') || ['pop-and-petals','flawless-glow-co'].every((slug) => shops.some((shop) => shop.slug === slug));
     render(shops);
     if (setup && !hasInvite) {
       form.elements.name.focus();
@@ -106,7 +107,7 @@ async function load() {
     }
   } catch (error) {
     workspace.hidden = true;
-    find('change-password').hidden = find('import-original').hidden = true;
+    find('change-password').hidden = find('import-original').hidden = find('bootstrap-brands').hidden = true;
     inviteOwner.hidden = !error.canInvite;
     accept.hidden = error.status !== 401 || !hasInvite;
     signIn.hidden = platform || error.status !== 401 || hasInvite || setup;
@@ -192,6 +193,11 @@ submit(find('import-original'), async () => {
   if (!window.confirm('Move the live Maknoon Jamil catalog to this owner?')) return;
   const { admin } = await request({ action: 'import-original', email: find('import-original').elements.email.value });
   location.assign(admin);
+});
+submit(find('bootstrap-brands'), async () => {
+  const response = await request({ action: 'bootstrap-brands' });
+  notice.textContent = response.already ? 'The three brands are already set up.' : 'Sister brands created under the same owner.';
+  await load();
 });
 submit(find('change-password'), async () => {
   const form = find('change-password');

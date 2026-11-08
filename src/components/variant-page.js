@@ -8,7 +8,7 @@ export function variantPage(product, variant, origin, number, brand = {}) {
   const name = brand.name || 'Maknoon Jamil';
   const home = brand.home || '/';
   const preview = brand.preview ? '?preview=1' : '';
-  const title = `${product.name} in ${variant.name}`;
+  const title = variant.id === 'pictured' ? product.name : `${product.name} in ${variant.name}`;
   const price = product.price === null ? 'Ask for price' : formatNaira(product.price);
   const description = `${price}. Order through ${name} on WhatsApp.`;
   const path = variantPath(product, variant, home);
@@ -44,7 +44,8 @@ export function variantPage(product, variant, origin, number, brand = {}) {
         <h1>${html(product.name)}</h1>
         <p class="variant-description">${html(product.description)}</p>
         ${product.price === null ? '' : `<p class="variant-price"><strong>${html(price)}</strong></p>`}
-        <nav class="variant-colours" aria-label="Available colours">
+        ${product.gallery?.length ? `<div class="product-gallery" aria-label="More photographs of ${html(product.name)}">${product.gallery.map((src) => `<img src="${html(src)}" alt="More views of ${html(product.name)}" loading="lazy">`).join('')}</div>` : ''}
+        <nav class="variant-colours" aria-label="${html(brand.optionsLabel || 'Available colours')}">
           ${product.variants.map((option) => `<a href="${variantPath(product, option, home)}${preview}"${option === variant ? ' aria-current="page"' : ''}>${html(option.name)}</a>`).join('')}
         </nav>
         ${product.available === false ? '<p class="stock-note">Currently unavailable</p>' : number === '' ? '' : `<a class="order" href="${html(orderLink(product, variant, origin, number, home, name))}" target="_blank" rel="noopener noreferrer">${orderLabel(product)} ${whatsappIcon}</a>`}

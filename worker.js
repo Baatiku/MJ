@@ -4,7 +4,11 @@ import { onRequest as workspaces } from './functions/api/workspaces.js';
 import { onRequestGet as publicShop } from './functions/shops/[[path]].js';
 import { onRequest as admin } from './functions/api/admin.js';
 import { onRequest as whatsapp } from './functions/api/whatsapp.js';
-import { onRequestGet as storefront } from './functions/index.js';
+import { onRequestGet as portfolio } from './functions/index.js';
+import { legacyShopGet } from './functions/_legacy-shop.js';
+import { onRequestGet as maknoon } from './functions/maknoon-jamil/[[path]].js';
+import { onRequestGet as petals } from './functions/pop-and-petals/[[path]].js';
+import { onRequestGet as glow } from './functions/flawless-glow-co/[[path]].js';
 import { onRequestGet as product } from './functions/products/[[path]].js';
 
 export default {
@@ -26,8 +30,16 @@ export default {
       if (/^\/manage\/[a-z0-9-]+\/?$/.test(pathname)) {
         return env.ASSETS.fetch(new Request(new URL('/admin/', request.url), request));
       }
-      if (['/', '/index.html', '/catalog', '/catalog/'].includes(pathname) && env.CATALOG_DB) {
-        return storefront({ request, env, next });
+      if (['/', '/index.html'].includes(pathname)) return portfolio({ request, env });
+      if (['/catalog', '/catalog/'].includes(pathname) && env.CATALOG_DB) return legacyShopGet({ request, env });
+      if (['/maknoon-jamil', '/maknoon-jamil/'].includes(pathname) || pathname.startsWith('/maknoon-jamil/products/')) {
+        const path = pathname.replace(/^\/maknoon-jamil\/?/, '').replace(/\/$/, '').split('/').filter(Boolean);
+        return maknoon({ request, env, params: { path }, next });
+      }
+      if (['pop-and-petals', 'flawless-glow-co'].some((slug) => pathname === `/${slug}` || pathname === `/${slug}/` || pathname.startsWith(`/${slug}/products/`))) {
+        const slug = pathname.split('/')[1];
+        const path = pathname.slice(slug.length + 2).replace(/\/$/, '').split('/').filter(Boolean);
+        return (slug === 'pop-and-petals' ? petals : glow)({ request, env, params: { path }, next });
       }
       if (pathname.startsWith('/products/')) {
         const path = pathname.slice('/products/'.length).replace(/\/$/, '').split('/');
