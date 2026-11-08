@@ -4,6 +4,14 @@ import { DatabaseSync } from 'node:sqlite';
 import { test } from 'node:test';
 import worker from '../worker.js';
 
+test('Cloudflare calls the Worker for all three curated brands before static assets', () => {
+  const config = JSON.parse(readFileSync(new URL('../wrangler.jsonc', import.meta.url), 'utf8'));
+  for (const slug of ['maknoon-jamil', 'pop-and-petals', 'flawless-glow-co']) {
+    assert.ok(config.assets.run_worker_first.includes(`/${slug}`));
+    assert.ok(config.assets.run_worker_first.includes(`/${slug}/*`));
+  }
+});
+
 test('D1 owner invites are single-use and storefront writes are isolated', async (t) => {
   const sql = new DatabaseSync(':memory:');
   for (const file of ['0001_catalog.sql', '0002_workspaces.sql', '0003_shop_catalogs.sql']) {
