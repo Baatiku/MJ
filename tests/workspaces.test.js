@@ -198,8 +198,8 @@ test('D1 owner invites are single-use and storefront writes are isolated', async
   const owned = (await (await api(null, a)).json()).shops.map(({ slug }) => slug);
   assert.deepEqual(owned, ['flawless-glow-co', 'maknoon-jamil', 'new-shop', 'pop-and-petals']);
   const pop = await (await call('/pop-and-petals/')).text();
-  assert.match(pop, /Signature Doughnut Box/);
-  assert.match(pop, /Zobo Drink/);
+  assert.match(pop, /Midnight Drizzle Box/);
+  assert.match(pop, /Ruby Zobo/);
   assert.match(pop, /pop-petals-theme/);
   assert.match(pop, /data-order-number=""/);
 

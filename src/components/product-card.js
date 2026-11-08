@@ -21,7 +21,7 @@ export function productCard(product, origin, number, brand = {}) {
           </label>`).join('')}
         </div>
       </fieldset>
-      ${product.available === false ? '<p class="stock-note">Currently unavailable</p>' : number === '' ? '' : `<a class="order" href="${html(orderLink(product, first, origin, number, brand.home, brand.name))}" target="_blank" rel="noopener noreferrer">
+      ${product.available === false ? '<p class="stock-note">Currently unavailable</p>' : number === '' ? (brand.orderPending ? `<button type="button" class="order order-pending" disabled title="Business WhatsApp number pending">WhatsApp ordering soon ${whatsappIcon}</button>` : '') : `<a class="order" href="${html(orderLink(product, first, origin, number, brand.home, brand.name))}" target="_blank" rel="noopener noreferrer">
         ${orderLabel(product)} ${whatsappIcon}
       </a>`}
       ${productShare(product.name, brand.preview)}

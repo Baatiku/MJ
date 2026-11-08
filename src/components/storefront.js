@@ -4,9 +4,11 @@ import { escapeHtml as html } from '../lib/html.js';
 import { contactLink, displayWhatsAppNumber, whatsappNumber } from '../lib/shop.js';
 import { siteHeader } from './site-header.js';
 import { productCard } from './product-card.js';
+import { globalFooter, isFeaturedShop } from './global-header.js';
 
 export function storefront(origin, catalog = products, sharePath = '/', number = whatsappNumber, brand = {}) {
   const name = brand.name || 'Maknoon Jamil';
+  const featured = isFeaturedShop(brand.home || '/maknoon-jamil/') && (!brand.preview || brand.home !== '/shops/maknoon-jamil/');
   const shopCategories = brand.name ? [...new Set(catalog.map(({ category }) => category))].map((id) => ({
     id, name: Object.hasOwn(brand.categoryLabels || {}, id) ? brand.categoryLabels[id] : id.replaceAll('-', ' ')
   })) : categories;
@@ -50,6 +52,7 @@ export function storefront(origin, catalog = products, sharePath = '/', number =
   <meta name="theme-color" content="#faf6ef">
   <title>${html(title)}</title>
   <link rel="stylesheet" href="/styles/storefront.css">
+  <link rel="stylesheet" href="/styles/global.css">
   <script src="/storefront.js" type="module"></script>
 </head>
 <body${brand.themeClass ? ` class="${html(brand.themeClass)}"` : ''}${brand.accent ? ` style="--accent:${html(brand.accent)}"` : ''}>
@@ -62,30 +65,28 @@ export function storefront(origin, catalog = products, sharePath = '/', number =
         <p>${brand.name ? html(brand.description || '') : 'Fluid silhouettes and rich colours, from wide-sleeve abayas to softly layered khimars.'}</p>
         <a class="primary" href="#collection">Explore the collection <span aria-hidden="true">↓</span></a>
       </div>
-      ${hero ? `<div class="hero-gallery" data-count="${Math.min(3, catalog.length)}" aria-hidden="true">${hero}</div>` : ''}
+      ${hero ? `<div class="hero-gallery" data-count="${Math.min(3, catalog.length)}" aria-hidden="true">${hero}</div>` : brand.emptyMessage ? `<div class="glow-brand-art" aria-hidden="true"><span class="glow-art-disc">FG</span><span>FLAWLESS GLOW CO</span></div>` : ''}
     </section>
-    <section class="style-section" id="styles" aria-labelledby="styles-title">
+    ${shopCategories.length ? `<section class="style-section" id="styles" aria-labelledby="styles-title">
       <p class="kicker">${html(brand.stylesKicker || 'Find your silhouette')}</p><h2 id="styles-title">${html(brand.stylesHeading || 'Shop by style')}</h2>
       <div class="category-grid" data-count="${Math.min(3, shopCategories.length)}">${categoryLinks}</div>
-    </section>
+    </section>` : ''}
     <section class="collection" id="collection" aria-labelledby="collection-title">
       <div class="section-head">
         <div><p class="kicker">The collection</p><h2 id="collection-title">${html(brand.collectionHeading || 'Find your colour')}</h2></div>
         <div class="filters" aria-label="Filter collection" hidden>
-          <button type="button" data-filter="all" aria-pressed="true">All styles</button>
+          <button type="button" data-filter="all" aria-pressed="true">${html(brand.filterAllLabel || 'All styles')}</button>
           ${shopCategories.filter(({ id }) => catalog.some(({ category }) => category === id)).map(({ id, name }) => `<button type="button" data-filter="${id}" aria-pressed="false">${html(name)}</button>`).join('')}
         </div>
       </div>
-      <p class="collection-note">${brand.orderPending ? 'Browse the menu. Prices and ordering details will be confirmed before checkout opens.' : number ? 'Choose a colour to see its photo, then message us on WhatsApp to confirm availability.' : 'Choose a colour to see its photo.'}</p>
+      ${catalog.length ? `<p class="collection-note">${brand.orderPending && !number ? 'WhatsApp ordering opens as soon as the contact number is confirmed.' : number ? 'Choose your favourite, then order on WhatsApp.' : 'Explore the collection.'}</p>` : ''}
       <p class="sr-only" data-result-count aria-live="polite"></p>
-      ${catalog.length ? '' : '<p>No styles are listed right now.</p>'}
+      ${catalog.length ? '' : `<p class="empty-collection">${html(brand.emptyMessage || 'The collection is being updated.')}</p>`}
       <div class="product-grid" data-count="${Math.min(3, catalog.length)}">${catalog.map((product) => productCard(product, origin, number, brand)).join('')}</div>
     </section>
   </main>
-  <footer class="footer">
-    <div class="shell footer-inner"><div><span class="wordmark">${html(name)}</span><p><a href="${html(brand.admin || '/admin/')}">Owner sign-in</a></p></div>
-    ${number ? `<a class="contact whatsapp-contact" href="${html(contactLink(number, name))}" target="_blank" rel="noopener noreferrer">${html(displayWhatsAppNumber(number))} ${whatsappIcon}</a>` : ''}</div>
-  </footer>
+  ${featured ? globalFooter() : `<footer class="footer"><div class="shell footer-inner"><span class="wordmark">${html(name)}</span>
+    ${number ? `<a class="contact whatsapp-contact" href="${html(contactLink(number, name))}" target="_blank" rel="noopener noreferrer">${html(displayWhatsAppNumber(number))} ${whatsappIcon}</a>` : ''}</div></footer>`}
   <script type="application/json" id="catalog-data" data-order-number="${html(number)}" data-shop-home="${html(brand.home || '/')}" data-shop-name="${html(name)}" data-preview="${brand.preview ? '1' : '0'}">${data}</script>
 </body>
 </html>`;

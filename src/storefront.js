@@ -44,7 +44,7 @@ function showCategory(category) {
     card.hidden = active !== 'all' && card.dataset.category !== active;
     if (!card.hidden) visible += 1;
   }
-  result.textContent = `${visible} styles shown`;
+  result.textContent = `${visible} products shown`;
 }
 
 function categoryFromUrl() {
