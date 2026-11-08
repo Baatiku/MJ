@@ -35,10 +35,15 @@ h1 em { color: var(--accent); font-weight: 400; }
 .primary, .order { display: inline-flex; align-items: center; gap: 13px; background: var(--green); color: white; padding: 10px 15px; font-size: 13px; }
 .primary { margin-top: 21px; }
 .primary:hover, .order:hover { background: var(--green-hover); }
+.hero-actions { display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:11px;margin-top:24px; }
+.hero-actions .primary { margin:0; }
+.hero-contact { display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:10px 16px;background:#25d366;color:#10261a;font-size:13px;font-weight:700; }
+.hero-contact:hover { background:#1ebe5d; }
 .hero-gallery { display: grid; grid-template-columns: 1fr 1.12fr 1fr; gap: 4px; }
 .hero-gallery img { height: clamp(148px, 34vw, 450px); object-fit: cover; object-position: center 24%; }
 
 .style-section, .collection { padding-block: clamp(38px, 6vw, 78px) 0; scroll-margin-top: 10px; }
+.style-section { text-align:center; }
 h2 { font-size: clamp(40px, 6vw, 72px); line-height: 1; margin-top: 7px; letter-spacing: -.055em; }
 .category-grid, .product-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(9px, 2vw, 24px); }
 .category-grid { margin-top: 20px; }
@@ -71,6 +76,7 @@ h2 { font-size: clamp(40px, 6vw, 72px); line-height: 1; margin-top: 7px; letter-
 .swatch input:checked + span { outline: 1px solid var(--ink); outline-offset: 3px; }
 .swatch input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 4px; }
 .order { width: 100%; justify-content: space-between; }
+.product-body .order { margin-top:auto; }
 
 .footer { border-top: 1px solid var(--line); margin-top: clamp(40px, 7vw, 90px); }
 .footer-inner { display: flex; justify-content: space-between; align-items: center; gap: 9px; padding-block: 28px; }
@@ -81,7 +87,13 @@ h2 { font-size: clamp(40px, 6vw, 72px); line-height: 1; margin-top: 7px; letter-
   .masthead nav { display: none; }
   .masthead .wordmark { justify-self: start; }
   .product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .category-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .category-grid .category:last-child:nth-child(odd) { grid-column:1/-1;width:min(100%,270px);justify-self:center; }
   .order { gap: 4px; padding: 8px; font-size: 12px; }
+}
+@media (max-width:420px) {
+  .product-grid { grid-template-columns:1fr; }
+  .hero-contact,.hero-actions .primary { min-height:44px; }
 }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
@@ -90,12 +102,12 @@ h2 { font-size: clamp(40px, 6vw, 72px); line-height: 1; margin-top: 7px; letter-
 
 /* The shared layout remains Maknoon Jamil's; each additional brand owns only its palette and imagery. */
 .pop-petals-theme { --paper: #fff8f6; --card: #fffcfb; --sand: #f5e2df; --ink: #3f2b32; --muted: #7c6168; --accent: #ae6478; --line: #edcfd2; --green: #6c4657; --green-hover: #805569; }
-.pop-petals-theme .product-media img { object-fit: cover; }
+.pop-petals-theme .product-media img,.flawless-glow-theme .product-media img { aspect-ratio:4/5;object-fit:cover; }
 .pop-petals-theme .hero-gallery img { object-position: center 50%; }
+.flawless-glow-theme .hero-gallery img { object-position:center 50%; }
 .pop-petals-theme .hero h1 { max-width: 1000px; margin-inline: auto; }
 .pop-petals-theme .hero-copy > p:not(.kicker) { max-width: 48ch; }
 .pop-petals-theme .product-body { text-align: center; align-items: center; }
-.pop-petals-theme .product-title > span { display: none; }
 .pop-petals-theme .collection-note { max-width: 570px; margin-inline: auto; }
 .product-gallery { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; margin-top: 18px; }
 .product-gallery img { width: 100%; height: 155px; object-fit: cover; border: 1px solid var(--line); }

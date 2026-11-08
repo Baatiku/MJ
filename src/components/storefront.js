@@ -20,8 +20,9 @@ export function storefront(origin, catalog = products, sharePath = '/', number =
       <span>${html(name)} <b aria-hidden="true">↗</b></span>
     </a>`;
   }).join('');
-  const hero = catalog.slice(0, 3).map(({ variants }) =>
-    `<img src="${html(variants[0].image)}" alt="" width="512" height="512" fetchpriority="high">`
+  const heroImages = brand.heroImages?.length ? brand.heroImages : catalog.slice(0, 3).map(({ variants }) => variants[0].image);
+  const hero = heroImages.slice(0, 3).map((image) =>
+    `<img src="${html(image)}" alt="" width="1122" height="1402" fetchpriority="high">`
   ).join('');
   const data = JSON.stringify(catalog).replaceAll('<', '\\u003c');
   const title = brand.name ? name + ' | Shop catalog' : 'Maknoon Jamil | Modestwear Catalog';
@@ -63,9 +64,10 @@ export function storefront(origin, catalog = products, sharePath = '/', number =
         <p class="kicker">${brand.name ? html(name) : 'Collection 01 <span aria-hidden="true">✦</span> The Drape Edit'}</p>
         <h1 id="hero-title">${brand.name ? html(brand.headline || name) : 'Grace in <em>every fold.</em>'}</h1>
         <p>${brand.name ? html(brand.description || '') : 'Fluid silhouettes and rich colours, from wide-sleeve abayas to softly layered khimars.'}</p>
-        <a class="primary" href="#collection">Explore the collection <span aria-hidden="true">↓</span></a>
+        <div class="hero-actions"><a class="primary" href="#collection">Explore the collection <span aria-hidden="true">↓</span></a>
+          ${number && brand.name ? `<a class="hero-contact" href="${html(contactLink(number, name))}" target="_blank" rel="noopener noreferrer">Chat on WhatsApp ${whatsappIcon}</a>` : ''}</div>
       </div>
-      ${hero ? `<div class="hero-gallery" data-count="${Math.min(3, catalog.length)}" aria-hidden="true">${hero}</div>` : brand.emptyMessage ? `<div class="glow-brand-art" aria-hidden="true"><span class="glow-art-disc">FG</span><span>FLAWLESS GLOW CO</span></div>` : ''}
+      ${hero ? `<div class="hero-gallery" data-count="${Math.min(3, heroImages.length)}" aria-hidden="true">${hero}</div>` : brand.emptyMessage ? `<div class="glow-brand-art" aria-hidden="true"><span class="glow-art-disc">FG</span><span>FLAWLESS GLOW CO</span></div>` : ''}
     </section>
     ${shopCategories.length ? `<section class="style-section" id="styles" aria-labelledby="styles-title">
       <p class="kicker">${html(brand.stylesKicker || 'Find your silhouette')}</p><h2 id="styles-title">${html(brand.stylesHeading || 'Shop by style')}</h2>
