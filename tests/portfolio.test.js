@@ -13,6 +13,10 @@ test('umbrella homepage presents exactly the three businesses with dedicated lin
   assert.match(html, /href="\/pop-and-petals\/"/);
   assert.match(html, /href="\/flawless-glow-co\/"/);
   assert.match(html, /styles\/portfolio\.css/);
+  assert.match(html, /property="og:image" content="https:\/\/mj\.masanawa\.com\/previews\/our-brands-social\.jpg"/);
+  assert.match(html, /property="og:image:width" content="1200"/);
+  assert.match(html, /name="twitter:card" content="summary_large_image"/);
+  assert.ok(existsSync(new URL('../public/previews/our-brands-social.jpg', import.meta.url)));
   assert.equal((html.match(/class="brand-card /g) || []).length, 3);
   assert.doesNotMatch(html, /₦|Buy now/);
 });
