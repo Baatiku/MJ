@@ -195,6 +195,9 @@ test('D1 owner invites are single-use and storefront writes are isolated', async
   assert.equal(bootstrapped.status, 201);
   assert.deepEqual((await bootstrapped.json()).shops, ['maknoon-jamil', 'pop-and-petals', 'flawless-glow-co']);
   assert.equal((await api({ action: 'bootstrap-brands' }, admin)).status, 200);
+  const glowing = await (await edit('flawless-glow-co', null, a)).json();
+  assert.equal(glowing.products.length, 10);
+  assert.ok(glowing.products.some(({ name }) => name === 'SADOER Fruit Crush Hand Cream Trio'));
   const owned = (await (await api(null, a)).json()).shops.map(({ slug }) => slug);
   assert.deepEqual(owned, ['flawless-glow-co', 'maknoon-jamil', 'new-shop', 'pop-and-petals']);
   const pop = await (await call('/pop-and-petals/')).text();
@@ -202,6 +205,10 @@ test('D1 owner invites are single-use and storefront writes are isolated', async
   assert.match(pop, /Ruby Zobo/);
   assert.match(pop, /pop-petals-theme/);
   assert.match(pop, /data-order-number=""/);
+  const glowPage = await (await call('/flawless-glow-co/')).text();
+  assert.match(glowPage, /LAIKOU Botanical Mud Mask Mix/);
+  assert.match(glowPage, /flawless-glow-theme/);
+  assert.match(glowPage, /data-order-number=""/);
 
   const changed = await api({ action: 'change-password', currentPassword: password, password: 'a newer owner password' }, a);
   assert.equal(changed.status, 200);

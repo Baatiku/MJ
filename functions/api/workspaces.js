@@ -5,6 +5,7 @@ import { readOrderNumber } from '../../src/catalog/shop-settings.js';
 import { originalMarker, originalSlug } from '../_original-id.js';
 import { adminSessionHash } from './admin.js';
 import { popPetalsBrand, popPetalsProducts } from '../../src/catalog/pop-petals.js';
+import { flawlessGlowBrand, flawlessGlowProducts } from '../../src/catalog/flawless-glow.js';
 
 const sessionCookie = '__Host-shop-session';
 const select = 'id,slug,name,description,whatsapp,published';
@@ -157,12 +158,11 @@ export async function onRequest({ request, env }) {
       if (!await adminSessionHash(request, env, now)) return json({ error: 'Platform admin sign-in is required.' }, 403);
       const original = await db.prepare('SELECT owner_id FROM storefront_workspaces WHERE slug = ?').bind(originalSlug).first();
       if (!original) return json({ error: 'Move Maknoon Jamil to its owner dashboard first.' }, 409);
-      const { results } = await db.prepare("SELECT slug,owner_id FROM storefront_workspaces WHERE slug IN ('pop-and-petals','flawless-glow-co')").all();
+      const { results } = await db.prepare("SELECT id,slug,owner_id FROM storefront_workspaces WHERE slug IN ('pop-and-petals','flawless-glow-co')").all();
       if (results.some(({ owner_id }) => owner_id !== original.owner_id)) {
         return json({ error: 'A brand shop already belongs to another owner. No changes made.' }, 409);
       }
       const existing = new Set(results.map(({ slug }) => slug));
-      if (existing.size === 2) return json({ ok: true, already: true });
       const statements = [];
       if (!existing.has('pop-and-petals')) {
         const id = crypto.randomUUID();
@@ -176,11 +176,24 @@ export async function onRequest({ request, env }) {
       }
       if (!existing.has('flawless-glow-co')) {
         const id = crypto.randomUUID();
-        statements.push(db.prepare('INSERT INTO storefront_workspaces VALUES (?, ?, ?, ?, ?, ?, 0)')
-          .bind(id, original.owner_id, 'flawless-glow-co', 'Flawless Glow Co', 'Sunscreen and skincare essentials.', ''));
+        statements.push(db.prepare('INSERT INTO storefront_workspaces VALUES (?, ?, ?, ?, ?, ?, 1)')
+          .bind(id, original.owner_id, 'flawless-glow-co', flawlessGlowBrand.name, flawlessGlowBrand.description, ''));
         statements.push(db.prepare('INSERT INTO workspace_shop_appearance VALUES (?, ?)')
-          .bind(id, JSON.stringify({ headline: 'Flawless Glow Co', accent: '#a77f76' })));
+          .bind(id, JSON.stringify(flawlessGlowBrand)));
+        for (const [index, product] of flawlessGlowProducts.entries()) statements.push(
+          db.prepare('INSERT INTO workspace_shop_products VALUES (?, ?, ?, 1, ?)')
+            .bind(id, product.id, JSON.stringify({ ...product, hidden: false, available: true }), index * 10));
+      } else {
+        const glow = results.find(({ slug }) => slug === 'flawless-glow-co');
+        const row = await db.prepare('SELECT COUNT(*) AS count FROM workspace_shop_products WHERE shop_id = ?').bind(glow.id).first();
+        // Backfill the empty historic draft once; never overwrite an owner's existing catalogue.
+        if (!row.count) {
+          for (const [index, product] of flawlessGlowProducts.entries()) statements.push(
+            db.prepare('INSERT INTO workspace_shop_products VALUES (?, ?, ?, 1, ?)')
+              .bind(glow.id, product.id, JSON.stringify({ ...product, hidden: false, available: true }), index * 10));
+        }
       }
+      if (!statements.length) return json({ ok: true, already: true });
       await db.batch(statements);
       return json({ ok: true, shops: ['maknoon-jamil', 'pop-and-petals', 'flawless-glow-co'] }, 201);
     }

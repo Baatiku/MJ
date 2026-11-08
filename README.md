@@ -2,11 +2,11 @@
 
 One site, three businesses: Maknoon Jamil, Pop & Petals, and Flawless Glow Co. The root homepage now leads with “Wear it. Crave it. Glow.”, real product imagery, and a quiet global navigation shared by all three storefronts. Public site headers do not expose owner sign-in or store creation links. Maknoon Jamil retains its existing modestwear catalogue and native colour/WhatsApp ordering features at `/maknoon-jamil/`. Original `/products/...` URLs continue to work.
 
-The root homepage has its own 1200 × 630 social preview showing available Maknoon Jamil and Pop & Petals product photographs alongside a graphic Flawless Glow Co panel. Its Open Graph and Twitter metadata match the updated headline and use the site's canonical origin.
+The root homepage has three professionally art-directed category portraits (modestwear, baked treats and skincare) plus a 1200 × 630 social preview. Its Open Graph and Twitter metadata match the updated headline and use the site's canonical origin.
 
 Pop & Petals uses the same product-card, variant-detail and WhatsApp ordering system as Maknoon Jamil, with a distinct colour palette and 13 memorable product names at `/pop-and-petals/`. Product photos came from the owner; one chocolate dessert cup photo was edited for a cleaner background while preserving the actual dessert. Prices and the WhatsApp ordering number remain unconfirmed: visible WhatsApp controls are disabled until a genuine number is supplied, at which point configured ordering links work. Images showing unverified health claims have not been used as medical marketing claims.
 
-Flawless Glow Co now uses the same storefront structure, ready to display product cards and WhatsApp ordering when genuine sunscreen and skincare details arrive. Until then, `/flawless-glow-co/` contains a branded hero and an honest empty collection, with no fabricated product names, photos or prices.
+Flawless Glow Co has **10 product cards** at `/flawless-glow-co/`: SADOER fruit hand creams, hyaluronic/blueberry/aloe masks, BIOAQUA eye/lip patches and overnight masks, LAIKOU mud masks, roll-on wax, a mirror/hairbrush compact and silicone cleansing brushes. Each photograph was professionally regenerated from the owner's supplied product photo, preserving the original manufacturer branding and adding a small **Flawless Glow Co** retailer signature. Products have unique, orderable names and concise descriptions, grouped by hand care, face masks, eye/lip care, hair removal and beauty tools. No sunscreen was identifiable among the 10 uploaded photos, so no SPF listing or unverified UV-protection claim was invented. Prices and the Flawless Glow WhatsApp number still need owner confirmation; buttons remain visibly pending instead of pointing to a guessed contact.
 
 The existing multi-shop setup remains in place. After Maknoon Jamil has been moved to its owner workspace, the operator can use **Set up sister brands** in `/platform-admin/` to create Pop & Petals with its initial catalogue and a draft Flawless Glow Co shop under the **same owner account**. The owner can manage all three from `/manage/`. Existing shops are never overwritten by that setup action. Published curated shops use their individual branded URLs and owner catalogue edits; static catalogue fallbacks remain available until the shared workspace is activated.
 
@@ -37,13 +37,13 @@ Cloudflare builds and publishes `dist/`. Subsequent pushes to the connected prod
 
 ## Project structure
 
-- `src/catalog/products.js` holds Maknoon Jamil's existing styles and variants; `src/catalog/pop-petals.js` holds the bakery's first product catalogue.
+- `src/catalog/products.js` holds Maknoon Jamil's existing styles and variants; `src/catalog/pop-petals.js` and `src/catalog/flawless-glow.js` hold the two sister-brand catalogues.
 - `src/components/portfolio.js` builds the three-brand default homepage, styled by `src/styles/portfolio.css`.
 - `src/components/` contains build-time page and card templates.
 - `src/lib/shop.js` owns WhatsApp order messages and naira formatting.
 - `src/storefront.js` manages colour selection and category filters.
 - `src/styles/theme.css` contains typography and colour tokens. `storefront.css` holds component and layout styles.
-- `public/images/` contains existing modestwear photos and the owner's Pop & Petals photographs, with the edited dessert-cup variant.
+- `public/images/` contains existing modestwear photos, the owner's Pop & Petals photographs, regenerated Flawless Glow Co product images, and the three category cover images.
 - `scripts/build.mjs` validates image paths and generates the static deployment.
 
 The Maknoon Jamil catalog uses studio renderings. The only confirmed price remains ₦25,000 for the Flow Abaya. Confirm availability, price, and details over WhatsApp.

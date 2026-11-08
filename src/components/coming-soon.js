@@ -1,7 +1,7 @@
 import { storefront } from './storefront.js';
-import { flawlessGlowBrand } from '../catalog/flawless-glow.js';
+import { flawlessGlowBrand, flawlessGlowProducts } from '../catalog/flawless-glow.js';
 
-// Use the same catalog renderer without inventing products before photos arrive.
+// Keep the curated skincare collection on the same product-card and WhatsApp flow.
 export function flawlessGlowPage(origin) {
-  return storefront(origin, [], flawlessGlowBrand.home, '', flawlessGlowBrand);
+  return storefront(origin, flawlessGlowProducts, flawlessGlowBrand.home, '', flawlessGlowBrand);
 }

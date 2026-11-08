@@ -6,8 +6,8 @@ const brands = [
     id: 'maknoon',
     name: 'Maknoon Jamil',
     category: 'MODEST FASHION',
-    image: '/images/flow-abaya-navy.webp',
-    alt: 'A flowing navy-blue abaya from the Maknoon Jamil collection',
+    image: '/images/brand-covers/maknoon-jamil.webp',
+    alt: 'Maknoon Jamil navy abaya worn in a sunlit stone courtyard',
     href: '/maknoon-jamil/',
     cta: 'Shop modestwear'
   },
@@ -15,15 +15,17 @@ const brands = [
     id: 'petals',
     name: 'Pop & Petals',
     category: 'BAKED TREATS & DRINKS',
-    image: '/images/pop-petals/02-1000039706.jpg',
-    alt: 'A six-piece box of assorted chocolate and cream-topped doughnuts',
+    image: '/images/brand-covers/pop-and-petals.webp',
+    alt: 'Pop & Petals doughnuts, cupcake and bottled Zobo',
     href: '/pop-and-petals/',
     cta: 'Shop the treats'
   },
   {
     id: 'glow',
     name: 'Flawless Glow Co',
-    category: 'SUNCARE & SKINCARE',
+    category: 'SKINCARE & BEAUTY',
+    image: '/images/brand-covers/flawless-glow-co.webp',
+    alt: 'Flawless Glow Co hand creams, face masks and eye patches',
     href: '/flawless-glow-co/',
     cta: 'Explore skincare'
   }
@@ -64,9 +66,9 @@ export function portfolio(origin) {
       <p class="hero-lede">Maknoon Jamil <span aria-hidden="true">·</span> Pop & Petals <span aria-hidden="true">·</span> Flawless Glow Co</p>
       <a class="hero-button" href="#brands">Explore the collections <span aria-hidden="true">↓</span></a>
       <div class="portfolio-mosaic" aria-hidden="true">
-        <div class="mosaic-frame mosaic-fashion"><img src="/images/flow-abaya-navy.webp" alt="" width="512" height="600" fetchpriority="high"></div>
-        <div class="mosaic-frame mosaic-treat"><img src="/images/pop-petals/chocolate-dessert-cup-polished.png" alt="" width="1084" height="1451" fetchpriority="high"></div>
-        <div class="mosaic-frame mosaic-glow"><div class="sun-disc"><span>F</span><span class="sun-ray" aria-hidden="true">✳</span><span>G</span></div><span class="mosaic-glow-label">FLAWLESS GLOW CO</span></div>
+        <div class="mosaic-frame mosaic-fashion"><img src="/images/brand-covers/maknoon-jamil.webp" alt="" width="1122" height="1402" fetchpriority="high"></div>
+        <div class="mosaic-frame mosaic-treat"><img src="/images/brand-covers/pop-and-petals.webp" alt="" width="1122" height="1402" fetchpriority="high"></div>
+        <div class="mosaic-frame mosaic-glow"><img src="/images/brand-covers/flawless-glow-co.webp" alt="" width="1122" height="1402" fetchpriority="high"></div>
       </div>
     </section>
     <section class="brand-section shell" id="brands" aria-labelledby="brands-heading">
@@ -74,7 +76,7 @@ export function portfolio(origin) {
       <div class="brand-grid">
         ${brands.map((brand, index) => `<article class="brand-card brand-${html(brand.id)}">
           <a class="brand-image-link" href="${html(brand.href)}" aria-label="Explore ${html(brand.name)}">
-            ${brand.image ? `<img src="${html(brand.image)}" alt="${html(brand.alt)}" width="720" height="900" loading="lazy">` : '<span class="glow-art" aria-hidden="true"><span class="glow-art-sun">✳</span><span>Flawless<br>Glow Co</span><small>SUNCARE · SKINCARE</small></span>'}
+            <img src="${html(brand.image)}" alt="${html(brand.alt)}" width="1122" height="1402" loading="lazy">
             <span class="brand-number">0${index + 1}</span>
           </a>
           <div class="brand-copy"><p class="brand-category">${html(brand.category)}</p><h3>${html(brand.name)}</h3><a href="${html(brand.href)}">${html(brand.cta)} <span aria-hidden="true">↗</span></a></div>

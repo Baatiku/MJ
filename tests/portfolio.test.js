@@ -5,6 +5,7 @@ import { portfolio } from '../src/components/portfolio.js';
 import { storefront } from '../src/components/storefront.js';
 import { flawlessGlowPage } from '../src/components/coming-soon.js';
 import { popPetalsProducts, popPetalsBrand, popPetalsCategories } from '../src/catalog/pop-petals.js';
+import { flawlessGlowProducts, flawlessGlowCategories } from '../src/catalog/flawless-glow.js';
 
 test('umbrella homepage presents exactly the three businesses with dedicated links', () => {
   const html = portfolio('https://mj.masanawa.com');
@@ -21,6 +22,11 @@ test('umbrella homepage presents exactly the three businesses with dedicated lin
   assert.match(html, /name="twitter:card" content="summary_large_image"/);
   assert.ok(existsSync(new URL('../public/previews/our-brands-social.jpg', import.meta.url)));
   assert.equal((html.match(/class="brand-card /g) || []).length, 3);
+  for (const slug of ['maknoon-jamil', 'pop-and-petals', 'flawless-glow-co']) {
+    assert.equal((html.match(new RegExp(`/images/brand-covers/${slug}\\.webp`, 'g')) || []).length, 2);
+    assert.ok(existsSync(new URL(`../public/images/brand-covers/${slug}.webp`, import.meta.url)));
+  }
+  assert.doesNotMatch(html, /glow-art|sun-disc|mosaic-glow-label/);
   assert.doesNotMatch(html, /₦|Buy now/);
 });
 
@@ -51,11 +57,27 @@ test('Pop & Petals catalogue only uses real supplied photographs and verified vi
   assert.doesNotMatch(html, /wa\.me\//);
 });
 
-test('Flawless Glow Co has an honest placeholder until product photos arrive', () => {
+test('Flawless Glow Co offers ten clearly named, photographed products in a shared storefront', () => {
+  assert.equal(flawlessGlowProducts.length, 10);
+  assert.equal(new Set(flawlessGlowProducts.map(({ id }) => id)).size, 10);
+  assert.equal(new Set(flawlessGlowProducts.map(({ name }) => name)).size, 10);
+  for (const product of flawlessGlowProducts) {
+    assert.ok(flawlessGlowCategories.some(({ id }) => id === product.category));
+    assert.ok(product.description.length < 70);
+    assert.doesNotMatch(product.description, /pictured|packaging|in the image|visible|SPF|cures|treats acne/i);
+    assert.equal(product.price, null);
+    for (const variant of product.variants) {
+      assert.ok(existsSync(new URL('../public' + variant.image, import.meta.url)), `Missing beauty photo: ${variant.image}`);
+    }
+  }
   const html = flawlessGlowPage('https://mj.masanawa.com');
   assert.match(html, /Flawless Glow Co/);
-  assert.match(html, /Our first skincare drop is on its way/);
+  assert.match(html, /SADOER Fruit Crush Hand Cream Trio/);
+  assert.match(html, /LAIKOU Botanical Mud Mask Mix/);
+  assert.match(html, /Rainbow Silicone Facial Brush Set/);
+  assert.match(html, /BIOAQUA Colour Pop Eye &amp; Lip Patches/);
   assert.match(html, /class="global-site-header"/);
-  assert.match(html, /class="glow-brand-art"/);
-  assert.doesNotMatch(html, /class="product"|class="announcement"|Owner sign-in/);
+  assert.equal((html.match(/class="product"/g) || []).length, 10);
+  assert.match(html, /WhatsApp ordering soon/);
+  assert.doesNotMatch(html, /class="glow-brand-art"|wa\.me\/|Owner sign-in/);
 });

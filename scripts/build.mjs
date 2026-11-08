@@ -6,6 +6,7 @@ import { previewImage, variantPath, whatsappNumber } from '../src/lib/shop.js';
 import { portfolio } from '../src/components/portfolio.js';
 import { flawlessGlowPage } from '../src/components/coming-soon.js';
 import { popPetalsBrand, popPetalsProducts } from '../src/catalog/pop-petals.js';
+import { flawlessGlowBrand, flawlessGlowProducts } from '../src/catalog/flawless-glow.js';
 
 const publicSiteUrl = 'https://mj.masanawa.com';
 const origin = new URL(process.env.SITE_URL || publicSiteUrl).origin;
@@ -15,7 +16,9 @@ const output = new URL('dist/', root);
 const images = new Set([
   ...categories.map(({ image }) => image),
   ...products.flatMap(({ variants }) => variants.flatMap((variant) => [variant.image, previewImage(variant)])),
-  ...popPetalsProducts.flatMap(({ variants, gallery = [] }) => [...variants.flatMap((variant) => [variant.image, previewImage(variant)]), ...gallery])
+  ...popPetalsProducts.flatMap(({ variants, gallery = [] }) => [...variants.flatMap((variant) => [variant.image, previewImage(variant)]), ...gallery]),
+  ...flawlessGlowProducts.flatMap(({ variants, gallery = [] }) => [...variants.flatMap((variant) => [variant.image, previewImage(variant)]), ...gallery]),
+  ...['maknoon-jamil', 'pop-and-petals', 'flawless-glow-co'].map((name) => `/images/brand-covers/${name}.webp`)
 ]);
 
 for (const image of images) {
@@ -59,4 +62,11 @@ for (const product of popPetalsProducts) {
     await writeFile(new URL('index.html', directory), variantPage(product, variant, origin, '', popPetalsBrand));
   }
 }
-console.log(`Built ${products.length} Maknoon styles and ${popPetalsProducts.length} Pop & Petals products with ${images.size} images in dist/.`);
+for (const product of flawlessGlowProducts) {
+  for (const variant of product.variants) {
+    const directory = new URL(`.${variantPath(product, variant, flawlessGlowBrand.home)}`, output);
+    await mkdir(directory, { recursive: true });
+    await writeFile(new URL('index.html', directory), variantPage(product, variant, origin, '', flawlessGlowBrand));
+  }
+}
+console.log(`Built ${products.length} Maknoon styles, ${popPetalsProducts.length} Pop & Petals products and ${flawlessGlowProducts.length} Flawless Glow Co products with ${images.size} images in dist/.`);
