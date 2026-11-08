@@ -17,7 +17,7 @@ export async function readCatalog(db) {
 }
 
 const slug = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-const asset = /^\/(?:images|previews)\/(?:pop-petals\/)?[a-z0-9-]+\.(?:jpg|jpeg|png|webp)$/;
+const asset = /^\/(?:images|previews)\/(?:(?:pop-petals|flawless-glow)(?:\/curated)?\/|brand-covers\/)?[a-z0-9-]+\.(?:jpg|jpeg|png|webp)$/;
 function imageUrl(value, workspace) {
   if (typeof value !== 'string' || value.length > 500) return false;
   if (asset.test(value) || (workspace && /^\/shop-media\/[a-f0-9-]{36}$/.test(value))) return true;

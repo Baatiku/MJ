@@ -45,7 +45,7 @@ await writeFile(new URL('catalog/index.html', output), storefront(origin, undefi
 await mkdir(new URL('maknoon-jamil/', output));
 await writeFile(new URL('maknoon-jamil/index.html', output), storefront(origin, undefined, '/maknoon-jamil/', whatsappNumber, { home: '/maknoon-jamil/' }));
 await mkdir(new URL('pop-and-petals/', output));
-await writeFile(new URL('pop-and-petals/index.html', output), storefront(origin, popPetalsProducts, '/pop-and-petals/', '', popPetalsBrand));
+await writeFile(new URL('pop-and-petals/index.html', output), storefront(origin, popPetalsProducts, '/pop-and-petals/', whatsappNumber, popPetalsBrand));
 await mkdir(new URL('flawless-glow-co/', output));
 await writeFile(new URL('flawless-glow-co/index.html', output), flawlessGlowPage(origin));
 for (const product of products) {
@@ -59,14 +59,14 @@ for (const product of popPetalsProducts) {
   for (const variant of product.variants) {
     const directory = new URL(`.${variantPath(product, variant, popPetalsBrand.home)}`, output);
     await mkdir(directory, { recursive: true });
-    await writeFile(new URL('index.html', directory), variantPage(product, variant, origin, '', popPetalsBrand));
+    await writeFile(new URL('index.html', directory), variantPage(product, variant, origin, whatsappNumber, popPetalsBrand));
   }
 }
 for (const product of flawlessGlowProducts) {
   for (const variant of product.variants) {
     const directory = new URL(`.${variantPath(product, variant, flawlessGlowBrand.home)}`, output);
     await mkdir(directory, { recursive: true });
-    await writeFile(new URL('index.html', directory), variantPage(product, variant, origin, '', flawlessGlowBrand));
+    await writeFile(new URL('index.html', directory), variantPage(product, variant, origin, whatsappNumber, flawlessGlowBrand));
   }
 }
 console.log(`Built ${products.length} Maknoon styles, ${popPetalsProducts.length} Pop & Petals products and ${flawlessGlowProducts.length} Flawless Glow Co products with ${images.size} images in dist/.`);

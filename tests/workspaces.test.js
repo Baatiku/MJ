@@ -212,11 +212,35 @@ test('D1 owner invites are single-use and storefront writes are isolated', async
   assert.match(pop, /Midnight Drizzle Box/);
   assert.match(pop, /Ruby Zobo/);
   assert.match(pop, /pop-petals-theme/);
-  assert.match(pop, /data-order-number=""/);
+  assert.match(pop, /data-order-number="2348022519062"/);
+  assert.match(pop, /Ask on WhatsApp/);
+  assert.match(pop, /wa\.me\/2348022519062/);
+  assert.match(pop, /\/images\/pop-petals\/curated\/ruby-zobo\.webp/);
+  const popProduct = await (await call('/pop-and-petals/products/zobo/pictured/')).text();
+  assert.match(popProduct, /Ruby Zobo/);
+  assert.match(popProduct, /wa\.me\/2348022519062/);
+  assert.match(popProduct, /Hello%20Pop%20%26%20Petals/);
+  assert.match(popProduct, /\/previews\/pop-petals\/curated\/ruby-zobo\.jpg/);
   const glowPage = await (await call('/flawless-glow-co/')).text();
   assert.match(glowPage, /LAIKOU Botanical Mud Mask Mix/);
   assert.match(glowPage, /flawless-glow-theme/);
-  assert.match(glowPage, /data-order-number=""/);
+  assert.match(glowPage, /data-order-number="2348022519062"/);
+  assert.match(glowPage, /wa\.me\/2348022519062/);
+  assert.match(glowPage, /Chat on WhatsApp/);
+  const glowProduct = await (await call('/flawless-glow-co/products/laikou-mud-mask-mix/pictured/')).text();
+  assert.match(glowProduct, /LAIKOU Botanical Mud Mask Mix/);
+  assert.match(glowProduct, /wa\.me\/2348022519062/);
+  assert.match(glowProduct, /Hello%20Flawless%20Glow%20Co/);
+  // A shop-specific contact always overrides the shared proprietor fallback.
+  const glowSettings = await (await edit('flawless-glow-co', null, a)).json();
+  assert.equal((await edit('flawless-glow-co', {
+    action: 'settings', name: glowSettings.shop.name,
+    description: glowSettings.shop.description, whatsapp: '+234 809 111 2222',
+    published: true, ...glowSettings.appearance
+  }, a)).status, 200);
+  const individualContact = await (await call('/flawless-glow-co/')).text();
+  assert.match(individualContact, /wa\.me\/2348091112222/);
+  assert.doesNotMatch(individualContact, /wa\.me\/2348022519062/);
 
   const changed = await api({ action: 'change-password', currentPassword: password, password: 'a newer owner password' }, a);
   assert.equal(changed.status, 200);

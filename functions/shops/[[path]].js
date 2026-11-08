@@ -4,8 +4,9 @@ import { findShop, shopCatalog, shopAppearance } from '../api/shop-catalog.js';
 import { storefront } from '../../src/components/storefront.js';
 import { variantPage } from '../../src/components/variant-page.js';
 import { page } from '../_catalog.js';
-import { popPetalsBrand } from '../../src/catalog/pop-petals.js';
+import { popPetalsBrand, withCurrentPopPetalsPhotos } from '../../src/catalog/pop-petals.js';
 import { flawlessGlowBrand } from '../../src/catalog/flawless-glow.js';
+import { whatsappNumber } from '../../src/lib/shop.js';
 
 const notFound = () => page('<!doctype html><title>Shop not found</title><h1>Shop not found</h1>', 404);
 
@@ -26,11 +27,13 @@ export async function onRequestGet({ request, env, params }) {
     const home = !preview && curated ? `/${shop.slug}/` : `/shops/${shop.slug}/`;
     const curatedBrand = shop.slug === 'pop-and-petals' ? popPetalsBrand : shop.slug === 'flawless-glow-co' ? flawlessGlowBrand : {};
     const brand = { ...curatedBrand, ...appearance, name: shop.name, description: shop.description || curatedBrand.description, home, preview, admin: `/manage/${shop.slug}/` };
-    const products = catalog.filter((product) => !product.hidden);
-    if (!variantRoute) return page(storefront(preview ? null : url.origin, products, home, (preview ? '' : shop.whatsapp), brand));
+    const products = (shop.slug === 'pop-and-petals' ? withCurrentPopPetalsPhotos(catalog) : catalog).filter((product) => !product.hidden);
+    // All curated shops belong to one proprietor; individual numbers in D1 win.
+    const orderNumber = preview ? '' : (shop.whatsapp || (curated ? whatsappNumber : ''));
+    if (!variantRoute) return page(storefront(preview ? null : url.origin, products, home, orderNumber, brand));
     const product = products.find(({ id }) => id === productId);
     const variant = product?.variants.find(({ id }) => id === colourId);
-    return variant ? page(variantPage(product, variant, preview ? null : url.origin, (preview ? '' : shop.whatsapp), brand)) : notFound();
+    return variant ? page(variantPage(product, variant, preview ? null : url.origin, orderNumber, brand)) : notFound();
   } catch {
     return page('<!doctype html><title>Shop unavailable</title><h1>Shop temporarily unavailable</h1>', 503);
   }

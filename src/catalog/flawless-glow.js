@@ -48,7 +48,11 @@ export const flawlessGlowBrand = {
   description: 'Your beauty-shelf favourites.',
   home: '/flawless-glow-co/',
   cover: '/images/brand-covers/flawless-glow-co.webp',
-  orderPending: true,
+  heroImages: [
+    '/images/flawless-glow/fruit-hand-cream-trio.webp',
+    '/images/brand-covers/flawless-glow-co.webp',
+    '/images/flawless-glow/botanical-mud-masks.webp'
+  ],
   accent: '#a77f76',
   themeClass: 'flawless-glow-theme',
   stylesKicker: 'Pick your favourite',
