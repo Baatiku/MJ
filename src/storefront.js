@@ -18,13 +18,13 @@ for (const product of products) {
   function updateSelection() {
     const variant = product.variants.find(({ id }) => id === options.querySelector(':checked').value);
     image.src = variant.image;
-    image.alt = `${product.name} in ${variant.name}`;
+    image.alt = variant.id === 'pictured' ? product.name : `${product.name} in ${variant.name}`;
     selected.textContent = variant.name;
     photo.href = variantPath(product, variant, catalogData.dataset.shopHome) + (catalogData.dataset.preview === '1' ? '?preview=1' : '');
     if (order) order.href = orderLink(product, variant, location.origin, catalogData.dataset.orderNumber, catalogData.dataset.shopHome, catalogData.dataset.shopName);
   }
   options.addEventListener('change', updateSelection);
-  options.hidden = false;
+  options.hidden = product.variants.length <= 1;
   updateSelection();
   window.addEventListener('pageshow', updateSelection);
 }

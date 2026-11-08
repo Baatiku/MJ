@@ -1,0 +1,9 @@
+import { escapeHtml as html } from '../lib/html.js';
+
+export function flawlessGlowPage(origin) {
+  const home = origin ? `<link rel="canonical" href="${html(new URL('/flawless-glow-co/', origin).href)}">` : '';
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f7ede6"><title>Flawless Glow Co | Suncare & Skincare</title><meta name="description" content="Discover Flawless Glow Co, our skincare and sunscreen collection. Product catalogue coming soon.">${home}<link rel="stylesheet" href="/styles/portfolio.css"></head>
+  <body class="glow-landing"><div class="top-strip">Our Brands · Three distinct collections</div><header class="portfolio-header shell"><a class="portfolio-wordmark" href="/">✳ Our Brands</a><nav aria-label="Main navigation"><a href="/">All brands</a><a href="/manage/">Owner sign-in</a></nav></header>
+  <main class="shell glow-main" style="text-align:center;padding:95px 0 110px;min-height:65vh"><p class="eyebrow">SUNCARE & SKINCARE</p><div style="width:125px;height:125px;border:1px solid #bf977c;border-radius:50%;margin:38px auto 30px;display:grid;place-items:center;font:55px Georgia,serif;color:#a58468">✳</div><h1 style="font:clamp(54px,10vw,100px)/.98 Georgia,serif;letter-spacing:-.07em;margin:0 auto 24px;max-width:790px">Flawless <em style="color:#b78079">Glow</em> Co</h1><p style="color:#73615b;max-width:480px;margin:0 auto 28px">A dedicated home for sunscreen and skincare. Product photographs and details will be added here soon.</p><a class="hero-button" href="/">← Explore all three brands</a></main>
+  <footer class="portfolio-footer"><div class="shell footer-inner"><p>Flawless Glow Co</p><a href="/">Browse our brands</a></div></footer></body></html>`;
+}

@@ -17,5 +17,6 @@ export async function onRequestGet({ request, env, params, next }) {
   if (!variant || path.length !== 2) {
     return page('<!doctype html><title>Style unavailable</title><h1>Style unavailable</h1><a href="/#collection">Browse the collection</a>', 404);
   }
-  return page(variantPage(product, variant, new URL(request.url).origin, number, original?.brand));
+  const home = new URL(request.url).pathname.startsWith('/maknoon-jamil/') ? '/maknoon-jamil/' : '/';
+  return page(variantPage(product, variant, new URL(request.url).origin, number, { ...original?.brand, home }));
 }

@@ -1,6 +1,12 @@
-# Maknoon Jamil
+# Three-brand storefront collection
 
-Static, progressively enhanced modestwear storefront. The catalog and first colour of every style render at build time. Native radio swatches update each product photograph and its prefilled WhatsApp message.
+One site, three businesses: Maknoon Jamil, Pop & Petals, and Flawless Glow Co. The root homepage introduces all three through a centered, responsive editorial design. Maknoon Jamil retains its existing modestwear catalogue and native colour/WhatsApp ordering features at `/maknoon-jamil/`. Original `/products/...` URLs continue to work.
+
+Pop & Petals has its own palette and a first catalogue of doughnuts, decorated cupcakes, dessert cups and bottled drinks at `/pop-and-petals/`. Product photos came from the owner; one chocolate dessert cup photo was edited for a cleaner background while preserving the actual dessert. Prices and the WhatsApp ordering number remain unconfirmed, so ordering is deliberately not enabled for Pop & Petals yet. Images showing unverified health claims have not been used as medical marketing claims.
+
+Flawless Glow Co has a dedicated introduction at `/flawless-glow-co/`, with its product catalogue awaiting the owner's sunscreen and skincare images. The landing page does not pretend to show products that have not been supplied.
+
+The existing multi-shop setup remains in place. After Maknoon Jamil has been moved to its owner workspace, the operator can use **Set up sister brands** in `/platform-admin/` to create Pop & Petals with its initial catalogue and a draft Flawless Glow Co shop under the **same owner account**. The owner can manage all three from `/manage/`. Existing shops are never overwritten by that setup action. Published curated shops use their individual branded URLs and owner catalogue edits; static catalogue fallbacks remain available until the shared workspace is activated.
 
 ## Local development
 
@@ -29,15 +35,16 @@ Cloudflare builds and publishes `dist/`. Subsequent pushes to the connected prod
 
 ## Project structure
 
-- `src/catalog/products.js` holds styles, categories, prices and variant metadata.
+- `src/catalog/products.js` holds Maknoon Jamil's existing styles and variants; `src/catalog/pop-petals.js` holds the bakery's first product catalogue.
+- `src/components/portfolio.js` builds the three-brand default homepage, styled by `src/styles/portfolio.css`.
 - `src/components/` contains build-time page and card templates.
 - `src/lib/shop.js` owns WhatsApp order messages and naira formatting.
 - `src/storefront.js` manages colour selection and category filters.
 - `src/styles/theme.css` contains typography and colour tokens. `storefront.css` holds component and layout styles.
-- `public/images/` contains separate generated WebP catalog photographs.
+- `public/images/` contains existing modestwear photos and the owner's Pop & Petals photographs, with the edited dessert-cup variant.
 - `scripts/build.mjs` validates image paths and generates the static deployment.
 
-The catalog uses studio renderings. The only confirmed price is ₦25,000 for the Flow Abaya. Confirm availability, price, and details over WhatsApp.
+The Maknoon Jamil catalog uses studio renderings. The only confirmed price remains ₦25,000 for the Flow Abaya. Confirm availability, price, and details over WhatsApp.
 
 Every colour has a static product page with a JPEG link preview. The WhatsApp order message includes that page’s URL. The static build uses `https://mj.masanawa.com` for public share links and preview images. Set the optional `SITE_URL` build variable to override that origin for a different storefront domain. WhatsApp controls whether its app displays a thumbnail.
 
@@ -94,7 +101,7 @@ Apply `0001_catalog.sql`, `0002_workspaces.sql` and `0003_shop_catalogs.sql` in 
 
 Every storefront’s header links to `/setup/`. The four-step setup saves a private draft under the owner account, accepts the customer order number, logo and cover photos, and adds products with prices and up to 16 colour photos. Owners can resume setup at `/setup/?shop=<slug>`. Publishing opens the shop to customers. Every storefront links to self-service signup. New owners sign in with a username and password. Operator-invited owners can still sign in by email. Client onboarding uses the existing Worker and shared D1. It requires no per-client GitHub access or Cloudflare secret. New storefronts start private with an empty catalog and use the same renderer, layout and colour selector as Maknoon Jamil. Upload matching photos from the device or use HTTPS image links. To share a storefront, publish it first. A dedicated cover, or the first visible product photo as fallback, becomes the social preview. Native Status sharing depends on whether the browser and WhatsApp expose the relevant share target.
 
-To move the original shop to owner access, create an invite for its owner, have them accept it, then use **Move Maknoon Jamil** in platform admin. The move copies the current catalog, visibility, availability, prices, colour images and order number into the owner workspace. The root domain and existing `/products/...` and catalog URLs then read that workspace. The owner signs in at `/manage/` and edits it at `/manage/maknoon-jamil/`. The pre-move data remains in the legacy table. Avoid editing the old dashboard during the move.
+To move the original shop to owner access, create an invite for its owner, have them accept it, then use **Move Maknoon Jamil** in platform admin. The move copies the current catalog, visibility, availability, prices, colour images and order number into the owner workspace. The `/maknoon-jamil/` storefront, original `/products/...` routes, and catalog URLs then read that workspace. The root URL always remains the three-brand homepage. The owner signs in at `/manage/` and edits it at `/manage/maknoon-jamil/`. The pre-move data remains in the legacy table. Avoid editing the old dashboard during the move.
 
 ### WhatsApp assistant for a client shop
 
