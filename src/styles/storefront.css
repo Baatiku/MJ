@@ -92,7 +92,19 @@ h2 { font-size: clamp(40px, 6vw, 72px); line-height: 1; margin-top: 7px; letter-
   .order { gap: 4px; padding: 8px; font-size: 12px; }
 }
 @media (max-width:420px) {
-  .product-grid { grid-template-columns:1fr; }
+  /* Keep two product cards on narrow phones, just like the original Maknoon
+     Jamil storefront; shared by the sister brands and owner-created shops. */
+  .product-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+  .product-body { padding:10px 8px; }
+  .product-title h3 { font-size:clamp(15px,4.2vw,19px); line-height:1.16; }
+  .product-title > span { font-size:11px; }
+  .description { font-size:11px; line-height:1.4; margin:7px 0 10px; }
+  .swatches { flex-wrap:wrap; gap:0 2px; }
+  .swatch { min-width:27px; min-height:30px; }
+  .swatch span { width:18px; height:18px; }
+  .order { justify-content:center; flex-wrap:wrap; min-height:42px; gap:4px; font-size:11px; text-align:center; }
+  .order .whatsapp-icon { width:15px; height:15px; }
+  .product-share { font-size:11px; min-height:38px; }
   .hero-contact,.hero-actions .primary { min-height:44px; }
 }
 @media (prefers-reduced-motion: reduce) {

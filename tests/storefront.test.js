@@ -5,9 +5,25 @@ import { maknoonPhotoBatch } from '../src/catalog/maknoon-photo-batch.js';
 import { storefront } from '../src/components/storefront.js';
 import { orderLink, previewImage, variantPath } from '../src/lib/shop.js';
 import { variantPage } from '../src/components/variant-page.js';
-import { existsSync } from 'node:fs';
+import { popPetalsBrand, popPetalsProducts } from '../src/catalog/pop-petals.js';
+import { flawlessGlowBrand, flawlessGlowProducts } from '../src/catalog/flawless-glow.js';
+import { existsSync, readFileSync } from 'node:fs';
 
 const origin = 'https://shop.example';
+
+test('all three storefronts retain two product cards per row on narrow phones', () => {
+  const css = readFileSync(new URL('../src/styles/storefront.css', import.meta.url), 'utf8');
+  const narrow = css.match(/@media \(max-width:420px\) \{([\s\S]*?)\n\}/)?.[1];
+  assert.ok(narrow, 'Missing narrow-screen product layout');
+  assert.match(narrow, /\.product-grid\s*\{\s*grid-template-columns:\s*repeat\(2,minmax\(0,1fr\)\)/);
+  assert.doesNotMatch(narrow, /\.product-grid\s*\{\s*grid-template-columns:\s*1fr/);
+  for (const [catalog, brand] of [[products, { home: '/maknoon-jamil/' }],
+    [popPetalsProducts, popPetalsBrand], [flawlessGlowProducts, flawlessGlowBrand]]) {
+    const page = storefront(origin, catalog, brand.home, undefined, brand);
+    assert.match(page, /href="\/styles\/storefront\.css"/);
+    assert.match(page, /class="product-grid"/);
+  }
+});
 
 test('each style has distinct colour choices and uniquely addressed images', () => {
   assert.equal(products.length, 25 + 7 + maknoonPhotoBatch.length);
