@@ -10,6 +10,7 @@ export async function readCatalog(db) {
     const edited = edits.get(product.id);
     if (!edited) return { ...product, revision: 0, hidden: false, available: true };
     if (edited.colourEdition === colourEdition || edited.variants.length >= 16) return edited;
+    if (!products.slice(0, 25).some(({ id }) => id === product.id)) return edited;
     const extra = fourthColour(product.id);
     if (edited.variants.some(({ id, name }) => id === extra.id || name.toLowerCase() === extra.name.toLowerCase())) return edited;
     return { ...edited, variants: [...edited.variants, extra] };
@@ -47,7 +48,9 @@ export function validateProduct(input, { workspace = false } = {}) {
       throw new Error('Each colour needs a unique ID, a name, a swatch and a valid HTTPS or catalog photo URL.');
     }
     ids.add(variant.id);
-    return { id: variant.id, name: variant.name.trim(), swatch: variant.swatch, image: variant.image };
+    const gallery = Array.isArray(variant.gallery) && variant.gallery.length <= 8 && variant.gallery.every((url) => imageUrl(url, workspace)) ? variant.gallery : [];
+    return { id: variant.id, name: variant.name.trim(), swatch: variant.swatch, image: variant.image,
+      ...(gallery.length ? { gallery } : {}) };
   });
   const { id, category, price, available, hidden } = input;
   const gallery = Array.isArray(input.gallery) && input.gallery.length <= 12 && input.gallery.every((url) => imageUrl(url, workspace))

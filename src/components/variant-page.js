@@ -51,7 +51,7 @@ export function variantPage(product, variant, origin, number, brand = {}) {
         <h1>${html(product.name)}</h1>
         <p class="variant-description">${html(product.description)}</p>
         ${product.price === null ? '' : `<p class="variant-price"><strong>${html(price)}</strong></p>`}
-        ${product.gallery?.length ? `<div class="product-gallery" aria-label="More photographs of ${html(product.name)}">${product.gallery.map((src) => `<img src="${html(src)}" alt="More views of ${html(product.name)}" loading="lazy">`).join('')}</div>` : ''}
+        ${(variant.gallery?.length || product.gallery?.length) ? `<div class="product-gallery" aria-label="More photographs of ${html(product.name)} in ${html(variant.name)}">${(variant.gallery?.length ? variant.gallery : product.gallery).map((src) => `<img src="${html(src)}" alt="Additional view of ${html(product.name)} in ${html(variant.name)}" loading="lazy">`).join('')}</div>` : ''}
         ${product.variants.length > 1 ? `<nav class="variant-colours" aria-label="${html(brand.optionsLabel || 'Available colours')}">
           ${product.variants.map((option) => `<a href="${variantPath(product, option, home)}${preview}"${option === variant ? ' aria-current="page"' : ''}>${html(option.name)}</a>`).join('')}
         </nav>` : ''}

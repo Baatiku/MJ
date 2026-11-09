@@ -1,4 +1,5 @@
 import { fourthColour } from './fourth-colours.js';
+import { maknoonPhotoBatch } from './maknoon-photo-batch.js';
 
 const product = (id, name, category, description, colours, price = null) => ({
   id, name, category, description, price,
@@ -76,6 +77,9 @@ const styles = [
   newStyle('pull-on-prayer-hijab', 'Pull-On Prayer Hijab', 'headwear', 'A pull-on prayer covering with a shoulder-length drape.')
 ];
 
-export const products = styles.map((style) => ({
-  ...style, variants: [...style.variants, fourthColour(style.id)]
-}));
+export const products = [
+  ...styles.map((style) => ({
+    ...style, variants: [...style.variants, fourthColour(style.id)]
+  })),
+  ...maknoonPhotoBatch
+];

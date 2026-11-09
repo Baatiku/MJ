@@ -1,6 +1,7 @@
 import { sitemapXml, curatedSitemapShops } from '../src/lib/sitemap.js';
 import { readCatalog } from '../src/catalog/live.js';
 import { shopCatalog } from './api/shop-catalog.js';
+import { withMaknoonPhotoBatch } from '../src/catalog/maknoon-photo-batch.js';
 
 export async function onRequestGet({ request, env }) {
   const origin = new URL(request.url).origin;
@@ -17,7 +18,8 @@ export async function onRequestGet({ request, env }) {
         const catalog = shop ? await shopCatalog(env.CATALOG_DB, shop.id)
           : slug === 'maknoon-jamil' ? await readCatalog(env.CATALOG_DB) : curated.catalog;
         // The historic empty Flawless Glow draft serves the static collection.
-        shops.push({ home: curated.home, catalog: slug === 'flawless-glow-co' && !catalog.length ? curated.catalog : catalog });
+        shops.push({ home: curated.home, catalog: slug === 'flawless-glow-co' && !catalog.length ? curated.catalog
+          : slug === 'maknoon-jamil' ? withMaknoonPhotoBatch(catalog) : catalog });
       }
       for (const shop of results) {
         if (!shop.published || ['maknoon-jamil', 'pop-and-petals', 'flawless-glow-co'].includes(shop.slug)) continue;

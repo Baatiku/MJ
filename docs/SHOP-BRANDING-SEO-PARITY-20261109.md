@@ -24,7 +24,7 @@ Scope: the shared `shop.` platform and its three owner-managed brands: Maknoon J
 - [x] Supply unique page titles and short descriptions for the umbrella homepage, all three shops, products and contact page.
 - [x] Include canonical URLs on public pages and correct canonical paths for the three flagship shops.
 - [x] Keep historic Maknoon `/products/` URLs working while their canonical and share targets resolve to `/maknoon-jamil/products/`.
-- [x] Build missing static `/maknoon-jamil/products/` pages for **all 25 × 4 = 100** clothing options.
+- [x] Build static `/maknoon-jamil/products/` pages for **100 original colour options and 6 newly photographed colour options** across 29 distinct designs.
 - [x] Serve descriptive Open Graph and Twitter metadata on homepage, three store pages, product pages and contact page.
 - [x] Provide fresh 1200 × 630 JPEG shop cover previews for all three business storefront addresses, plus the existing three-brand main share preview.
 - [x] Use explicit `og:image`, `og:image:secure_url`, image type and accessible descriptions, with dimensions on known 1200 × 630 covers.
@@ -33,7 +33,7 @@ Scope: the shared `shop.` platform and its three owner-managed brands: Maknoon J
 - [x] Supply structured `Product` and breadcrumb data for every individual product and option.
 - [x] Include an `Offer` only when a product actually has a recorded price; never fabricate prices, reviews, ratings, SPF levels or claims.
 - [x] Include the verified email and phone number in contact schema without inventing an address or office hours.
-- [x] Generate a static `sitemap.xml` covering root, contact, three shops and **123 product/option URLs**.
+- [x] Generate a static `sitemap.xml` covering root, contact, three shops and **129 product/option URLs**.
 - [x] Add a Worker sitemap route that reflects D1-published owner storefronts, visible products and hidden/deleted product changes.
 - [x] Create `robots.txt` pointing to the sitemap and excluding private owner, admin, API and photo-service URLs.
 - [x] Mark private editor/setup pages and preview pages `noindex` while keeping public catalogues indexable.
@@ -56,7 +56,7 @@ Scope: the shared `shop.` platform and its three owner-managed brands: Maknoon J
 
 ## Verification and publishing
 
-- [x] Automated tests cover logo files and image dimensions, icons, schema, share metadata, all 123 product/variant previews, working WhatsApp fallbacks, SEO sitemap, contact, D1 shop routing and overriding.
+- [x] Automated tests cover logo files and image dimensions, icons, schema, share metadata, all 129 product/variant previews, working WhatsApp fallbacks, SEO sitemap, contact, D1 shop routing and overriding.
 - [x] All automated tests pass and the full static build succeeds before publication.
 - [x] Static assets include all products, variants, favicons, preview images, contact page, manifest and sitemap.
 - [x] Changes are committed and submitted to the site's GitHub repository for merge to `main`.

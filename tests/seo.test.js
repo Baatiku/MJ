@@ -8,6 +8,7 @@ import { variantPage } from '../src/components/variant-page.js';
 import { popPetalsBrand, popPetalsProducts } from '../src/catalog/pop-petals.js';
 import { flawlessGlowBrand, flawlessGlowProducts } from '../src/catalog/flawless-glow.js';
 import { products } from '../src/catalog/products.js';
+import { maknoonPhotoBatch, withMaknoonPhotoBatch } from '../src/catalog/maknoon-photo-batch.js';
 import { sitemapXml } from '../src/lib/sitemap.js';
 import { shareDetails } from '../src/lib/share-details.js';
 import { whatsappNumber, previewImage } from '../src/lib/shop.js';
@@ -107,10 +108,44 @@ test('product share text is brand-specific, begins with a canonical link and omi
   assert.ok(result.text.includes(`${origin}/pop-and-petals/products/zobo/pictured/`));
 });
 
+test('nine new Maknoon photographs become four products, six colours and matching detail galleries', () => {
+  assert.deepEqual(maknoonPhotoBatch.map(({ id }) => id), [
+    'full-drape-jilbab', 'tiered-niqab-khimar', 'gathered-maxi-abaya', 'two-tone-long-khimar'
+  ]);
+  assert.equal(maknoonPhotoBatch.reduce((total, product) => total + product.variants.length, 0), 6);
+  const paths = maknoonPhotoBatch.flatMap(({ variants }) => variants.flatMap(({ image, gallery = [] }) => [image, ...gallery]));
+  assert.equal(paths.length, 9);
+  assert.equal(new Set(paths).size, 9);
+  for (const path of paths) {
+    assert.ok(existsSync(publicFile(path)), `Missing owner photo: ${path}`);
+    assert.equal(readFileSync(publicFile(path)).subarray(0, 3).toString('hex'), 'ffd8ff');
+  }
+  assert.match(readFileSync(publicFile('/brand/maknoon-photo-watermark.svg'), 'utf8'), /Maknoon_jamil/);
+  const niqab = maknoonPhotoBatch[1];
+  const petrol = variantPage(niqab, niqab.variants[0], origin, whatsappNumber, { name: 'Maknoon Jamil', home: '/maknoon-jamil/' });
+  const petrolGallery = petrol.match(/<div class="product-gallery"[^>]*>[^<]*<img[^>]*><\/div>/)?.[0];
+  assert.match(petrolGallery, /mj-tiered-niqab-petrol-blue-detail\.jpg/);
+  assert.doesNotMatch(petrolGallery, /mj-tiered-niqab-dusty-mauve-detail\.jpg/);
+  const mauve = variantPage(niqab, niqab.variants[2], origin, whatsappNumber, { name: 'Maknoon Jamil', home: '/maknoon-jamil/' });
+  const mauveGallery = mauve.match(/<div class="product-gallery"[^>]*>[^<]*<img[^>]*><\/div>/)?.[0];
+  assert.match(mauveGallery, /mj-tiered-niqab-dusty-mauve-detail\.jpg/);
+  assert.doesNotMatch(mauveGallery, /mj-tiered-niqab-petrol-blue-detail\.jpg/);
+  const original = products.filter(({ id }) => !maknoonPhotoBatch.some((photoProduct) => photoProduct.id === id));
+  assert.equal(original.length, 25);
+  const ownerEdited = { ...niqab, price: 42000, hidden: true, revision: 4, position: 7 };
+  const overlay = withMaknoonPhotoBatch([...original, ownerEdited]);
+  assert.equal(overlay.length, products.length);
+  assert.strictEqual(overlay.find(({ id }) => id === niqab.id), ownerEdited);
+  assert.equal(overlay.filter(({ id }) => id === niqab.id).length, 1);
+  assert.deepEqual(overlay.slice(-3).map(({ id }) => id), [
+    'full-drape-jilbab', 'gathered-maxi-abaya', 'two-tone-long-khimar'
+  ]);
+});
+
 test('sitemap lists all public canonical routes and robots excludes private services', () => {
   const xml = sitemapXml(origin);
   assert.match(xml, /<urlset xmlns="http:\/\/www\.sitemaps\.org\/schemas\/sitemap\/0\.9">/);
-  assert.equal((xml.match(/<loc>/g) || []).length, 2 + 3 + 25 * 4 + 13 + 10);
+  assert.equal((xml.match(/<loc>/g) || []).length, 2 + 3 + 25 * 4 + 6 + 13 + 10);
   assert.match(xml, /https:\/\/mj\.masanawa\.com\/maknoon-jamil\/products\/flow-abaya\/navy/);
   assert.match(xml, /https:\/\/mj\.masanawa\.com\/pop-and-petals\/products\/zobo\/pictured/);
   assert.match(xml, /https:\/\/mj\.masanawa\.com\/flawless-glow-co\/products\/laikou-mud-mask-mix\/pictured/);
