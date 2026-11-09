@@ -1,6 +1,7 @@
 import { fourthColour } from './fourth-colours.js';
 import { photographedStock } from './stock.js';
 import { maknoonPhotoBatch } from './maknoon-photo-batch.js';
+import { refineMaknoonDescription } from './maknoon-copy.js';
 
 const product = (id, name, category, description, colours, price = null) => ({
   id, name, category, description, price,
@@ -86,4 +87,4 @@ export const products = [
   ...styles.map((style) => ({
     ...style, variants: [...style.variants, fourthColour(style.id)]
   }))
-];
+].map(refineMaknoonDescription);

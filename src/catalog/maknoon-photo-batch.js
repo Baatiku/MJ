@@ -1,4 +1,5 @@
 import { photographedStock } from './stock.js';
+import { refineMaknoonDescription } from './maknoon-copy.js';
 
 // Uploaded 9 November 2026. Each distinct garment cut is one product; photographs
 // that differ only by colour or camera distance are variants and detail galleries.
@@ -36,7 +37,7 @@ export const maknoonPhotoBatch = [
     price: null,
     variants: [option('plum-mauve', 'Deep Plum & Dusty Mauve', '#6d2244', 'two-tone-khimar-plum-mauve')]
   }
-];
+].map(refineMaknoonDescription);
 
 // Both uploaded batches lead the Maknoon collection, before the historical
 // concept styles. Existing D1 records are retained verbatim, including their
@@ -48,5 +49,6 @@ export function withMaknoonPhotoBatch(catalog = []) {
   const stocked = uploaded.map((item, i) => existing.get(item.id) || {
     ...item, revision: 0, hidden: false, available: true, position: i
   });
-  return [...stocked, ...catalog.filter(({ id }) => !uploadedIds.has(id))];
+  return [...stocked, ...catalog.filter(({ id }) => !uploadedIds.has(id))]
+    .map(refineMaknoonDescription);
 }

@@ -1,3 +1,5 @@
+import { refineMaknoonDescription } from './maknoon-copy.js';
+
 // Owner-supplied, photographed stock. These records are deliberately grouped by
 // garment construction, with colour-specific images under a single product.
 // Never infer price, size or included accessories from an editorial photograph.
@@ -68,4 +70,4 @@ export const photographedStock = [
     'A relaxed maxi with a raised gathered waistline, long full sleeves and gathered cuffs.', [
       ['teal', 'Teal Blue', '#116690']
     ])
-];
+].map(refineMaknoonDescription);

@@ -1,5 +1,6 @@
 import { categories, products } from './products.js';
 import { fourthColour } from './fourth-colours.js';
+import { refineMaknoonDescription } from './maknoon-copy.js';
 
 const colourEdition = 1;
 
@@ -16,7 +17,7 @@ export async function readCatalog(db) {
     const extra = fourthColour(product.id);
     if (edited.variants.some(({ id, name }) => id === extra.id || name.toLowerCase() === extra.name.toLowerCase())) return edited;
     return { ...edited, variants: [...edited.variants, extra] };
-  });
+  }).map(refineMaknoonDescription);
 }
 
 const slug = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
