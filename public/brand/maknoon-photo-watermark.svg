@@ -1,7 +1,24 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="440" height="112" viewBox="0 0 440 112" aria-label="Maknoon Jamil photography watermark">
-  <g fill="#fff" stroke="#fff">
-    <text x="220" y="55" text-anchor="middle" font-family="P052, Palatino, Georgia, serif" font-size="46" font-style="italic" letter-spacing="-.65" stroke="none">Maknoon_jamil</text>
-    <path d="M32 82H181 M259 82H408" fill="none" stroke-width="1.8" stroke-linecap="round" opacity=".92"/>
-    <path d="M218 80C206 68 195 72 199 84c3 7 12 7 21-2c9-9 18-10 22-3c6 11-10 17-22 3 M220 82l-8 17 M220 82l8 17" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="208" viewBox="0 0 760 208" role="img" aria-label="Maknoon Jamil signature with double filigree lines and an eight-petalled arabesque">
+  <!-- Preserve the established italic Maknoon_jamil signature. The ornament
+       references restrained Islamic geometric and floral arabesque motifs. -->
+  <g fill="#fff9ed" stroke="#fff9ed" stroke-linejoin="round" stroke-linecap="round">
+    <text x="380" y="100" text-anchor="middle" font-family="P052, Palatino, Georgia, serif" font-size="88" font-style="italic" font-weight="400" letter-spacing="-1.5" stroke="none">Maknoon_jamil</text>
+
+    <!-- Symmetric double hairline rules and tapered inner terminals. -->
+    <path d="M34 153H317 M443 153H726" fill="none" stroke-width="2.2" opacity=".96"/>
+    <path d="M61 165H300 M460 165H699" fill="none" stroke-width="1" opacity=".76"/>
+    <path d="M34 153l15-5-5 5 5 5Z M726 153l-15-5 5 5-5 5Z" stroke="none" opacity=".9"/>
+    <path d="M306 145l11 8-11 8 M454 145l-11 8 11 8" fill="none" stroke-width="1.8" opacity=".9"/>
+
+    <!-- Eight-petalled geometric flower with delicate leaf-scroll terminals. -->
+    <g transform="translate(380 158)" fill="none">
+      <path d="M0-32Q9-20 0-11Q-9-20 0-32Z M0 32Q-9 20 0 11Q9 20 0 32Z
+        M-32 0Q-20-9-11 0Q-20 9-32 0Z M32 0Q20 9 11 0Q20-9 32 0Z
+        M-22-22Q-7-20-8-8Q-20-7-22-22Z M22 22Q7 20 8 8Q20 7 22 22Z
+        M22-22Q20-7 8-8Q7-20 22-22Z M-22 22Q-20 7-8 8Q-7 20-22 22Z" stroke-width="1.9"/>
+      <path d="M0-14L10-10 14 0 10 10 0 14-10 10-14 0-10-10Z" stroke-width="1.4"/>
+      <circle r="4.4" stroke-width="1.3"/>
+      <path d="M-42-2q-7-8-13-2q-3 6 4 8q5 0 6-4 M42-2q7-8 13-2q3 6-4 8q-5 0-6-4" stroke-width="1.4"/>
+    </g>
   </g>
 </svg>
