@@ -5,6 +5,7 @@ import { onRequestGet as publicShop } from './functions/shops/[[path]].js';
 import { onRequest as admin } from './functions/api/admin.js';
 import { onRequest as whatsapp } from './functions/api/whatsapp.js';
 import { onRequestGet as portfolio } from './functions/index.js';
+import { onRequestGet as sitemap } from './functions/sitemap.js';
 import { legacyShopGet } from './functions/_legacy-shop.js';
 import { onRequestGet as maknoon } from './functions/maknoon-jamil/[[path]].js';
 import { onRequestGet as petals } from './functions/pop-and-petals/[[path]].js';
@@ -31,6 +32,7 @@ export default {
         return env.ASSETS.fetch(new Request(new URL('/admin/', request.url), request));
       }
       if (['/', '/index.html'].includes(pathname)) return portfolio({ request, env });
+      if (pathname === '/sitemap.xml') return sitemap({ request, env });
       if (['/catalog', '/catalog/'].includes(pathname) && env.CATALOG_DB) return legacyShopGet({ request, env });
       if (['/maknoon-jamil', '/maknoon-jamil/'].includes(pathname) || pathname.startsWith('/maknoon-jamil/products/')) {
         const path = pathname.replace(/^\/maknoon-jamil\/?/, '').replace(/\/$/, '').split('/').filter(Boolean);

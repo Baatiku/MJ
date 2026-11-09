@@ -23,7 +23,7 @@ test('each style has distinct colour choices and uniquely addressed images', () 
       const message = url.searchParams.get('text');
       assert.ok(message.includes(product.name) && message.includes(variant.name));
       assert.equal(message.includes('₦25,000'), product.id === 'flow-abaya');
-      const variantUrl = origin + variantPath(product, variant);
+      const variantUrl = origin + variantPath(product, variant, '/maknoon-jamil/');
       assert.ok(message.endsWith(variantUrl));
       const page = variantPage(product, variant, origin);
       assert.ok(page.includes(`property="og:url" content="${variantUrl}"`));
@@ -47,7 +47,7 @@ test('static HTML contains every product and checkout works before JS loads', ()
 test('Maknoon Jamil keeps its catalog share card and uses the shared public header', () => {
   const markup = storefront(origin);
   assert.match(markup, /property="og:url" content="https:\/\/shop.example\/"/);
-  assert.match(markup, /property="og:image" content="https:\/\/shop.example\/previews\/maknoon-jamil-square.jpg"/);
+  assert.match(markup, /property="og:image" content="https:\/\/shop.example\/previews\/brand-covers\/maknoon-jamil.jpg"/);
   assert.match(markup, /name="twitter:card" content="summary_large_image"/);
   assert.match(markup, /class="global-site-header"/);
   assert.match(markup, /class="global-contact" href="https:\/\/wa.me\/2348022519062/);
@@ -57,5 +57,5 @@ test('Maknoon Jamil keeps its catalog share card and uses the shared public head
 test('the catalog share route has a distinct canonical preview URL', () => {
   const markup = storefront(origin, undefined, '/catalog/');
   assert.ok(markup.includes('property="og:url" content="https://shop.example/catalog/"'));
-  assert.ok(markup.includes('property="og:image" content="https://shop.example/previews/maknoon-jamil-square.jpg"'));
+  assert.ok(markup.includes('property="og:image" content="https://shop.example/previews/brand-covers/maknoon-jamil.jpg"'));
 });

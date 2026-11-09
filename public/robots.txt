@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /manage/
+Disallow: /setup/
+Disallow: /platform-admin/
+Disallow: /api/
+Disallow: /shop-media/
+
+Sitemap: https://mj.masanawa.com/sitemap.xml

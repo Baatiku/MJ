@@ -10,6 +10,7 @@
       "/api/*",
       "/",
       "/index.html",
+      "/sitemap.xml",
       "/catalog",
       "/catalog/",
       "/maknoon-jamil",

@@ -192,7 +192,7 @@ test('D1 owner invites are single-use and storefront writes are isolated', async
   assert.equal((await api(importShop, admin)).status, 201);
   assert.equal((await api(importShop, admin)).status, 409);
   const originalAfter = await (await call('/maknoon-jamil/')).text();
-  assert.ok(originalAfter.includes(origin + '/previews/maknoon-jamil-square.jpg'));
+  assert.ok(originalAfter.includes(origin + '/previews/brand-covers/maknoon-jamil.jpg'));
   const migrated = await (await edit('maknoon-jamil', null, a)).json();
   assert.deepEqual(migrated.products.map(({ id }) => id), legacyData.map(({ id }) => id));
   const first = migrated.products[0];
@@ -241,6 +241,13 @@ test('D1 owner invites are single-use and storefront writes are isolated', async
   const individualContact = await (await call('/flawless-glow-co/')).text();
   assert.match(individualContact, /wa\.me\/2348091112222/);
   assert.doesNotMatch(individualContact, /wa\.me\/2348022519062/);
+  const sitemapResponse = await call('/sitemap.xml');
+  assert.match(sitemapResponse.headers.get('content-type'), /application\/xml/);
+  const liveSitemap = await sitemapResponse.text();
+  assert.match(liveSitemap, /\/shops\/new-shop\//);
+  assert.match(liveSitemap, /\/pop-and-petals\/products\/zobo\/pictured\//);
+  assert.match(liveSitemap, /\/flawless-glow-co\/products\/laikou-mud-mask-mix\/pictured\//);
+  assert.doesNotMatch(liveSitemap, /\/shops\/second-shop\/products\/linen-dress/);
 
   const changed = await api({ action: 'change-password', currentPassword: password, password: 'a newer owner password' }, a);
   assert.equal(changed.status, 200);

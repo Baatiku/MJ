@@ -1,14 +1,15 @@
 import { whatsappIcon } from './whatsapp-icon.js';
 import { categories, products } from '../catalog/products.js';
 import { escapeHtml as html } from '../lib/html.js';
-import { contactLink, displayWhatsAppNumber, whatsappNumber } from '../lib/shop.js';
+import { contactLink, displayWhatsAppNumber, whatsappNumber, previewImage } from '../lib/shop.js';
+import { brandHead, shopSchema, socialPhoto } from '../lib/seo.js';
 import { siteHeader } from './site-header.js';
 import { productCard } from './product-card.js';
 import { globalFooter, isFeaturedShop } from './global-header.js';
 
 export function storefront(origin, catalog = products, sharePath = '/', number = whatsappNumber, brand = {}) {
   const name = brand.name || 'Maknoon Jamil';
-  const featured = isFeaturedShop(brand.home || '/maknoon-jamil/') && (!brand.preview || brand.home !== '/shops/maknoon-jamil/');
+  const featured = isFeaturedShop(brand.home || sharePath);
   const shopCategories = brand.name ? [...new Set(catalog.map(({ category }) => category))].map((id) => ({
     id, name: Object.hasOwn(brand.categoryLabels || {}, id) ? brand.categoryLabels[id] : id.replaceAll('-', ' ')
   })) : categories;
@@ -25,24 +26,23 @@ export function storefront(origin, catalog = products, sharePath = '/', number =
     `<img src="${html(image)}" alt="" width="1122" height="1402" fetchpriority="high">`
   ).join('');
   const data = JSON.stringify(catalog).replaceAll('<', '\\u003c');
-  const title = brand.name ? name + ' | Shop catalog' : 'Maknoon Jamil | Modestwear Catalog';
-  const description = brand.name ? (brand.description || 'Explore the collection from ' + name + '.') : 'Shop abayas, khimars, hijabs, niqabs and modest dresses. Order on WhatsApp.';
+  const title = brand.name ? `${name} | ${brand.seoTitle || 'Shop the Collection'}` : 'Maknoon Jamil | Abayas & Modestwear';
+  const description = brand.name ? `${name}: ${brand.description || 'Browse the collection.'} See products and order on WhatsApp.` : 'Shop Maknoon Jamil abayas, khimars, hijabs and modest dresses. Explore colours and ask about availability on WhatsApp.';
   const homepage = origin ? new URL(sharePath, origin).href : null;
-  const coverPath = brand.name ? (brand.cover || catalog[0]?.variants[0].image) : '/previews/maknoon-jamil-square.jpg';
+  const coverPath = brand.name ? (brand.shareImage || previewImage({ image: brand.cover || catalog[0]?.variants[0].image || '' })) : '/previews/brand-covers/maknoon-jamil.jpg';
   const cover = homepage && coverPath ? new URL(coverPath, homepage).href : null;
   const social = homepage ? `
   <link rel="canonical" href="${html(homepage)}">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="${html(name)}">
+  <meta property="og:locale" content="en_NG">
   <meta property="og:url" content="${html(homepage)}">
   <meta property="og:title" content="${html(title)}">
   <meta property="og:description" content="${html(description)}">
-  ${cover ? `<meta property="og:image" content="${html(cover)}">
-  <meta property="og:image:alt" content="${html(name)} catalog cover">` : ''}
-  <meta name="twitter:card" content="${cover ? 'summary_large_image' : 'summary'}">
+  ${cover ? socialPhoto(origin, coverPath, name + ' collection cover') : '<meta name="twitter:card" content="summary">'}
+  ${coverPath.startsWith('/previews/brand-covers/') ? '<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">' : ''}
   <meta name="twitter:title" content="${html(title)}">
-  <meta name="twitter:description" content="${html(description)}">
-  ${cover ? `<meta name="twitter:image" content="${html(cover)}">` : ''}` : '';
+  <meta name="twitter:description" content="${html(description)}">` : '';
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -50,8 +50,9 @@ export function storefront(origin, catalog = products, sharePath = '/', number =
   <meta name="viewport" content="width=device-width, initial-scale=1">
   ${brand.preview ? '<meta name="robots" content="noindex">' : ''}
   <meta name="description" content="${html(description)}">${social}
-  <meta name="theme-color" content="#faf6ef">
+  ${brandHead()}
   <title>${html(title)}</title>
+  ${homepage && !brand.preview ? shopSchema(origin, { name, description, home: sharePath }, number, cover || '') : ''}
   <link rel="stylesheet" href="/styles/storefront.css">
   <link rel="stylesheet" href="/styles/global.css">
   <script src="/storefront.js" type="module"></script>
@@ -87,7 +88,7 @@ export function storefront(origin, catalog = products, sharePath = '/', number =
       <div class="product-grid" data-count="${Math.min(3, catalog.length)}">${catalog.map((product) => productCard(product, origin, number, brand)).join('')}</div>
     </section>
   </main>
-  ${featured ? globalFooter() : `<footer class="footer"><div class="shell footer-inner"><span class="wordmark">${html(name)}</span>
+  ${featured ? globalFooter(number) : `<footer class="footer"><div class="shell footer-inner"><span class="wordmark">${html(name)}</span>
     ${number ? `<a class="contact whatsapp-contact" href="${html(contactLink(number, name))}" target="_blank" rel="noopener noreferrer">${html(displayWhatsAppNumber(number))} ${whatsappIcon}</a>` : ''}</div></footer>`}
   <script type="application/json" id="catalog-data" data-order-number="${html(number)}" data-shop-home="${html(brand.home || '/')}" data-shop-name="${html(name)}" data-preview="${brand.preview ? '1' : '0'}">${data}</script>
 </body>

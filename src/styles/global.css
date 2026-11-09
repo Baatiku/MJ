@@ -1,7 +1,7 @@
 .global-site-header{position:relative;z-index:2;background:#fffcf8;border-bottom:1px solid #e8ded3;color:#332924}
 .global-header-inner{width:min(94%,1320px);min-height:86px;margin-inline:auto;display:flex;align-items:center;justify-content:space-between;gap:clamp(14px,3vw,40px)}
 .global-wordmark{display:inline-flex;align-items:center;gap:7px;flex:0 0 auto;font:32px/1 Georgia,serif;letter-spacing:-.07em;white-space:nowrap}
-.global-symbol{font:23px/1 system-ui,sans-serif;color:#ab6772;letter-spacing:0}
+.global-symbol{display:block;width:40px;height:40px;flex:0 0 auto}
 .global-wordmark-dot,.global-footer-mark span{color:#ab6772}
 .global-nav{display:flex;flex:1;align-items:center;justify-content:center;gap:clamp(12px,2.5vw,36px)}
 .global-nav a{display:inline-flex;align-items:center;justify-content:center;min-height:44px;white-space:nowrap;font:500 13px/1.2 system-ui,sans-serif;border-bottom:2px solid transparent;color:#655851;text-align:center}
@@ -11,7 +11,13 @@
 .global-contact .whatsapp-icon{width:18px;height:18px}
 .global-site-footer{margin-top:clamp(60px,8vw,110px);background:#f3ede5;border-top:1px solid #e3d7ca;color:#45352e}
 .global-footer-inner{width:min(94%,1320px);margin-inline:auto;padding:31px 0;display:flex;align-items:center;justify-content:space-between;gap:24px}
-.global-footer-mark{font:31px/1 Georgia,serif;letter-spacing:-.07em}
+.global-footer-mark{display:inline-flex;align-items:center;gap:9px;font:31px/1 Georgia,serif;letter-spacing:-.07em}
+.global-footer-mark img{width:42px;height:42px}
+.global-footer-links{display:flex;flex-direction:column;align-items:flex-end;gap:11px}
+.global-footer-links small{font:11px/1.5 system-ui,sans-serif;color:#75635a}
+.global-footer-links small a{text-decoration:underline;text-underline-offset:3px}
+.global-footer-contact{display:flex;gap:8px 22px;flex-wrap:wrap;justify-content:flex-end;font:600 13px/1.4 system-ui,sans-serif}
+.global-footer-contact a:hover{color:#ab6772;text-decoration:underline;text-underline-offset:3px}
 .global-footer-inner nav{display:flex;flex-wrap:wrap;justify-content:center;gap:12px 25px;font:12px system-ui,sans-serif}
 .global-footer-inner nav a:hover{text-decoration:underline;text-underline-offset:4px}
 @media(max-width:800px){
@@ -29,3 +35,15 @@
   .global-footer-inner{flex-direction:column;text-align:center}
   .global-footer-inner nav{gap:12px 17px}
 }
+@media(max-width:800px){.global-footer-links{align-items:center}.global-footer-contact{justify-content:center}}
+.contact-page{margin:0;background:#fbf5ed;color:#332924;font-family:system-ui,sans-serif}
+.contact-page-main{display:flex;align-items:center;flex-direction:column;text-align:center;width:min(90%,780px);margin:clamp(55px,8vw,115px) auto 0}
+.contact-page-main>img{width:76px;height:76px}
+.contact-kicker{font:700 11px/1.4 system-ui,sans-serif;letter-spacing:.23em;color:#a1646e;margin:26px 0 13px}
+.contact-page-main h1{font:clamp(43px,8vw,78px)/1.07 Georgia,serif;letter-spacing:-.055em;margin:0 0 14px}
+.contact-page-main>p:not(.contact-kicker){font:14px/1.6 system-ui,sans-serif;color:#80665f;margin:0}
+.contact-page-options{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:12px;margin:32px auto 0}
+.contact-page-options a{display:inline-flex;align-items:center;justify-content:center;min-height:45px;padding:11px 16px;border:1px solid #d9c8be;background:#fffcf8;font-size:13px}
+.contact-page-options a:hover{border-color:#ab6772}
+.contact-page-options .contact-page-whatsapp{background:#25d366;border-color:#25d366;color:#12301d;font-weight:700}
+.contact-back{margin:37px auto 0;color:#755961;text-decoration:underline;text-underline-offset:4px;font-size:13px}

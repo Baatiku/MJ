@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 96 96" role="img" aria-labelledby="title">
+  <title id="title">shop. three-petal emblem</title>
+  <rect width="96" height="96" rx="25" fill="#fbf5ed"/>
+  <circle cx="48" cy="48" r="38" fill="none" stroke="#ded2c4" stroke-width="1.3"/>
+  <g>
+    <path d="M48 43C37 35 35 22 48 12C61 22 59 35 48 43Z" fill="#263e43"/>
+    <path d="M48 43C37 35 35 22 48 12C61 22 59 35 48 43Z" fill="#b76e79" transform="rotate(120 48 48)"/>
+    <path d="M48 43C37 35 35 22 48 12C61 22 59 35 48 43Z" fill="#c4a167" transform="rotate(240 48 48)"/>
+    <circle cx="48" cy="48" r="4" fill="#62434a"/>
+    <circle cx="48" cy="48" r="1.6" fill="#fbf5ed"/>
+  </g>
+</svg>
