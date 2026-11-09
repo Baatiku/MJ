@@ -193,6 +193,9 @@ test('D1 owner invites are single-use and storefront writes are isolated', async
   assert.equal((await api(importShop, admin)).status, 409);
   const originalAfter = await (await call('/maknoon-jamil/')).text();
   assert.ok(originalAfter.includes(origin + '/previews/brand-covers/maknoon-jamil.jpg'));
+  assert.match(originalAfter, /Tiered Niqab Khimar/);
+  assert.match(originalAfter, /Full-Drape Jilbab/);
+  assert.equal((await call('/maknoon-jamil/products/tiered-niqab-khimar/petrol-blue-black/')).status, 200);
   const migrated = await (await edit('maknoon-jamil', null, a)).json();
   assert.deepEqual(migrated.products.map(({ id }) => id), legacyData.map(({ id }) => id));
   const first = migrated.products[0];

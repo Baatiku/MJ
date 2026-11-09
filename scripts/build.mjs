@@ -17,7 +17,7 @@ const root = new URL('../', import.meta.url);
 const output = new URL('dist/', root);
 const images = new Set([
   ...categories.map(({ image }) => image),
-  ...products.flatMap(({ variants }) => variants.flatMap((variant) => [variant.image, previewImage(variant)])),
+  ...products.flatMap(({ variants, gallery = [] }) => [...variants.flatMap((variant) => [variant.image, previewImage(variant), ...(variant.gallery || [])]), ...gallery]),
   ...popPetalsProducts.flatMap(({ variants, gallery = [] }) => [...variants.flatMap((variant) => [variant.image, previewImage(variant)]), ...gallery]),
   ...flawlessGlowProducts.flatMap(({ variants, gallery = [] }) => [...variants.flatMap((variant) => [variant.image, previewImage(variant)]), ...gallery]),
   ...['maknoon-jamil', 'pop-and-petals', 'flawless-glow-co'].flatMap((name) => [`/images/brand-covers/${name}.webp`, `/previews/brand-covers/${name}.jpg`]),

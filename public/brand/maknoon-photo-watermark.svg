@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="440" height="112" viewBox="0 0 440 112" aria-label="Maknoon Jamil photography watermark">
+  <g fill="#fff" stroke="#fff">
+    <text x="220" y="55" text-anchor="middle" font-family="P052, Palatino, Georgia, serif" font-size="46" font-style="italic" letter-spacing="-.65" stroke="none">Maknoon_jamil</text>
+    <path d="M32 82H181 M259 82H408" fill="none" stroke-width="1.8" stroke-linecap="round" opacity=".92"/>
+    <path d="M218 80C206 68 195 72 199 84c3 7 12 7 21-2c9-9 18-10 22-3c6 11-10 17-22 3 M220 82l-8 17 M220 82l8 17" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

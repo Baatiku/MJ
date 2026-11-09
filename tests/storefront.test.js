@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { categories, products } from '../src/catalog/products.js';
+import { maknoonPhotoBatch } from '../src/catalog/maknoon-photo-batch.js';
 import { storefront } from '../src/components/storefront.js';
 import { orderLink, previewImage, variantPath } from '../src/lib/shop.js';
 import { variantPage } from '../src/components/variant-page.js';
@@ -8,12 +9,14 @@ import { variantPage } from '../src/components/variant-page.js';
 const origin = 'https://shop.example';
 
 test('each style has distinct colour choices and uniquely addressed images', () => {
-  assert.equal(products.length, 25);
+  assert.equal(products.length, 25 + maknoonPhotoBatch.length);
   assert.equal(new Set(products.map(({ id }) => id)).size, products.length);
   const images = new Set();
   for (const product of products) {
     assert.ok(categories.some(({ id }) => id === product.category));
-    assert.equal(product.variants.length, 4);
+    assert.equal(product.variants.length, maknoonPhotoBatch.includes(product) ? ({
+      'full-drape-jilbab': 1, 'tiered-niqab-khimar': 3, 'gathered-maxi-abaya': 1, 'two-tone-long-khimar': 1
+    })[product.id] : 4);
     assert.equal(new Set(product.variants.map(({ id }) => id)).size, product.variants.length);
     for (const variant of product.variants) {
       assert.ok(!images.has(variant.image));

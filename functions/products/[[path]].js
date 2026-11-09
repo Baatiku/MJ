@@ -3,6 +3,7 @@ import { readOrderNumber } from '../../src/catalog/shop-settings.js';
 import { variantPage } from '../../src/components/variant-page.js';
 import { readCatalog } from '../../src/catalog/live.js';
 import { page } from '../_catalog.js';
+import { whatsappNumber } from '../../src/lib/shop.js';
 
 export async function onRequestGet({ request, env, params, next }) {
   if (!env.CATALOG_DB) return next();
@@ -10,7 +11,7 @@ export async function onRequestGet({ request, env, params, next }) {
   const [productId, colourId] = path;
   const original = await originalView(env.CATALOG_DB);
   const [catalog, number] = original
-    ? [original.published ? original.products : [], original.whatsapp]
+    ? [original.published ? original.products : [], original.whatsapp || whatsappNumber]
     : await Promise.all([readCatalog(env.CATALOG_DB), readOrderNumber(env.CATALOG_DB)]);
   const product = catalog.find(({ id, hidden }) => id === productId && !hidden);
   const variant = product?.variants.find(({ id }) => id === colourId);

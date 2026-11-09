@@ -3,6 +3,7 @@ import { adminSessionHash } from './admin.js';
 import { validateProduct } from '../../src/catalog/live.js';
 import { mediaPath } from './_shop-media.js';
 import { normalizeOrderNumber } from '../../src/catalog/shop-settings.js';
+import { withMaknoonPhotoBatch } from '../../src/catalog/maknoon-photo-batch.js';
 
 const headers = { 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' };
 const json = (data, status = 200) => Response.json(data, { status, headers });
@@ -78,7 +79,7 @@ export async function onRequest({ request, env }) {
     if (!shop) return json({ error: 'Shop not found.' }, 404);
     if (request.method === 'GET') {
       const [products, appearance] = await Promise.all([shopCatalog(db, shop.id), shopAppearance(db, shop.id)]);
-      return json({ shop, products, appearance });
+      return json({ shop, products: shop.slug === 'maknoon-jamil' ? withMaknoonPhotoBatch(products) : products, appearance });
     }
     const input = await request.json().catch(() => null);
     if (!input) return json({ error: 'Invalid request.' }, 400);
@@ -124,7 +125,8 @@ export async function onRequest({ request, env }) {
     let product;
     try { product = validateProduct(input.product, { workspace: true }); }
     catch (error) { return json({ error: error.message }, 400); }
-    if (!await ownsMedia(db, shop.id, product.variants.map(({ image }) => image))) return json({ error: 'Upload photos for this shop.' }, 400);
+    const usedPhotos = [...product.variants.flatMap(({ image, gallery = [] }) => [image, ...gallery]), ...(product.gallery || [])];
+    if (!await ownsMedia(db, shop.id, usedPhotos)) return json({ error: 'Upload photos for this shop.' }, 400);
     const { revision, position } = input.product;
     if (!Number.isSafeInteger(position) || position < 0 || position > 100000) return json({ error: 'Use a valid display order.' }, 400);
     const saved = revision === 0

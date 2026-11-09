@@ -1,6 +1,7 @@
 import { findShop, shopCatalog, shopAppearance } from './api/shop-catalog.js';
 
 import { originalSlug, originalMarker } from './_original-id.js';
+import { withMaknoonPhotoBatch } from '../src/catalog/maknoon-photo-batch.js';
 
 export async function originalShop(db) {
   if (!db) return null;
@@ -13,7 +14,7 @@ export async function originalView(db) {
   if (!shop) return null;
   const [products, appearance] = await Promise.all([shopCatalog(db, shop.id), shopAppearance(db, shop.id)]);
   return {
-    ...shop, products,
+    ...shop, products: withMaknoonPhotoBatch(products),
     brand: { cover: '/previews/maknoon-jamil-square.jpg', ...appearance,
       shareImage: appearance.cover && appearance.cover !== '/previews/maknoon-jamil-square.jpg'
         ? appearance.cover : '/previews/brand-covers/maknoon-jamil.jpg',
