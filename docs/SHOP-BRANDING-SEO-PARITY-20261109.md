@@ -1,6 +1,6 @@
 # Shop — shared identity, search and WhatsApp parity register
 
-Date: 9 November 2026 · Public domain: `https://mj.masanawa.com`
+Date: 9 November 2026 · Public domain: `https://shop.masanawa.com`
 
 Scope: the shared `shop.` platform and its three owner-managed brands: Maknoon Jamil, Pop & Petals, Flawless Glow Co. The registered business name and physical address have **not** been supplied, so neither was invented. The contact details below came from the owner.
 
@@ -68,7 +68,7 @@ These require a reachable published domain or privileged accounts and are not su
 - [ ] Confirm the Cloudflare production deployment is serving this exact merged `main` commit.
 - [ ] Verify the public domain and all three shop/product URLs return HTTP 200, including JPEG preview images, from outside the restricted development network.
 - [ ] Paste live shop and product links into **WhatsApp** and verify its crawler actually displays the right thumbnail. WhatsApp may cache old thumbnails; re-scrape or share a refreshed URL after deployment.
-- [ ] Verify Search Console ownership and submit `https://mj.masanawa.com/sitemap.xml` to **Google Search Console** (and Bing Webmaster Tools if desired). A code deploy cannot claim domain verification or force indexing.
+- [ ] Verify Search Console ownership and submit `https://shop.masanawa.com/sitemap.xml` to **Google Search Console** (and Bing Webmaster Tools if desired). A code deploy cannot claim domain verification or force indexing.
 - [ ] Measure real mobile Core Web Vitals on the live domain; no actual field data is available in the development environment.
 - [ ] Supply confirmed owner policies, returns/shipping details and business registration/address if these should be published. None were fabricated.
 

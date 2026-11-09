@@ -10,7 +10,7 @@ import { flawlessGlowPage } from '../src/components/coming-soon.js';
 import { popPetalsBrand, popPetalsProducts } from '../src/catalog/pop-petals.js';
 import { flawlessGlowBrand, flawlessGlowProducts } from '../src/catalog/flawless-glow.js';
 
-const publicSiteUrl = 'https://mj.masanawa.com';
+const publicSiteUrl = 'https://shop.masanawa.com';
 const origin = new URL(process.env.SITE_URL || publicSiteUrl).origin;
 
 const root = new URL('../', import.meta.url);

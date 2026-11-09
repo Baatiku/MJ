@@ -1,3 +1,5 @@
+import { photographedStock } from './stock.js';
+
 // Uploaded 9 November 2026. Each distinct garment cut is one product; photographs
 // that differ only by colour or camera distance are variants and detail galleries.
 const photo = (name) => `/images/mj-${name}.jpg`;
@@ -36,12 +38,15 @@ export const maknoonPhotoBatch = [
   }
 ];
 
-// Database-owned records take priority over defaults, preserving user edits,
-// ordering, hidden status and price. Only missing stock photo styles are appended.
+// Both uploaded batches lead the Maknoon collection, before the historical
+// concept styles. Existing D1 records are retained verbatim, including their
+// owner-edited prices, visibility, image choices and colour selections.
 export function withMaknoonPhotoBatch(catalog = []) {
-  const known = new Set(catalog.map(({ id }) => id));
-  const lastPosition = catalog.reduce((max, product, i) => Math.max(max, Number.isSafeInteger(product.position) ? product.position : i), -1);
-  return [...catalog, ...maknoonPhotoBatch.filter(({ id }) => !known.has(id)).map((item, i) => ({
-    ...item, revision: 0, hidden: false, available: true, position: lastPosition + i + 1
-  }))];
+  const uploaded = [...photographedStock, ...maknoonPhotoBatch.map((item) => ({ ...item, stock: true }))];
+  const existing = new Map(catalog.map((item) => [item.id, item]));
+  const uploadedIds = new Set(uploaded.map(({ id }) => id));
+  const stocked = uploaded.map((item, i) => existing.get(item.id) || {
+    ...item, revision: 0, hidden: false, available: true, position: i
+  });
+  return [...stocked, ...catalog.filter(({ id }) => !uploadedIds.has(id))];
 }

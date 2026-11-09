@@ -1,4 +1,5 @@
 import { fourthColour } from './fourth-colours.js';
+import { photographedStock } from './stock.js';
 import { maknoonPhotoBatch } from './maknoon-photo-batch.js';
 
 const product = (id, name, category, description, colours, price = null) => ({
@@ -21,10 +22,10 @@ const newStyle = (id, name, category, description) => ({
 });
 
 export const categories = [
-  { id: 'abaya', name: 'Abayas', image: '/images/flow-abaya-navy.webp' },
-  { id: 'khimar', name: 'Khimars', image: '/images/rose-khimar-rose.webp' },
+  { id: 'abaya', name: 'Abayas', image: '/images/maknoon-stock/satin-waterfall-abaya-navy.webp' },
+  { id: 'khimar', name: 'Khimars', image: '/images/maknoon-stock/full-coverage-jilbab-purple.webp' },
   { id: 'niqab', name: 'Niqab looks', image: '/images/blue-veil-blue.webp' },
-  { id: 'dress', name: 'Maxi dresses', image: '/images/belted-shirt-maxi-navy.jpg' },
+  { id: 'dress', name: 'Maxi dresses', image: '/images/maknoon-stock/gathered-waist-maxi-teal.webp' },
   { id: 'layer', name: 'Layers & sets', image: '/images/open-kimono-abaya-olive.jpg' },
   { id: 'headwear', name: 'Hijabs & undercaps', image: '/images/chiffon-wrap-taupe.jpg' }
 ];
@@ -77,9 +78,12 @@ const styles = [
   newStyle('pull-on-prayer-hijab', 'Pull-On Prayer Hijab', 'headwear', 'A pull-on prayer covering with a shoulder-length drape.')
 ];
 
+// Real stock leads the collection. Preserve legacy catalogue entries during
+// the owner's stock audit; they must not be silently deleted or marked stocked.
 export const products = [
+  ...photographedStock,
+  ...maknoonPhotoBatch.map((item) => ({ ...item, stock: true })),
   ...styles.map((style) => ({
     ...style, variants: [...style.variants, fourthColour(style.id)]
-  })),
-  ...maknoonPhotoBatch
+  }))
 ];

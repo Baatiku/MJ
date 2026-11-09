@@ -9,7 +9,7 @@ import { flawlessGlowProducts, flawlessGlowCategories } from '../src/catalog/fla
 import { whatsappNumber } from '../src/lib/shop.js';
 
 test('umbrella homepage presents exactly the three businesses with dedicated links', () => {
-  const html = portfolio('https://mj.masanawa.com');
+  const html = portfolio('https://shop.masanawa.com');
   assert.match(html, /Wear it\. <em>Crave it\.<\/em> Glow\./);
   assert.match(html, /class="global-site-header"/);
   assert.match(html, /aria-current="page"/);
@@ -18,8 +18,8 @@ test('umbrella homepage presents exactly the three businesses with dedicated lin
   assert.match(html, /href="\/pop-and-petals\/"/);
   assert.match(html, /href="\/flawless-glow-co\/"/);
   assert.match(html, /styles\/portfolio\.css/);
-  assert.match(html, /property="og:image" content="https:\/\/mj\.masanawa\.com\/previews\/shop-all-brands-v3\.jpg"/);
-  assert.match(html, /property="og:image:secure_url" content="https:\/\/mj\.masanawa\.com\/previews\/shop-all-brands-v3\.jpg"/);
+  assert.match(html, /property="og:image" content="https:\/\/shop\.masanawa\.com\/previews\/shop-all-brands-v3\.jpg"/);
+  assert.match(html, /property="og:image:secure_url" content="https:\/\/shop\.masanawa\.com\/previews\/shop-all-brands-v3\.jpg"/);
   assert.match(html, /property="og:image:type" content="image\/jpeg"/);
   assert.match(html, /property="og:image:width" content="1200"/);
   assert.match(html, /name="twitter:card" content="summary_large_image"/);
@@ -50,7 +50,7 @@ test('Pop & Petals catalogue uses polished photographs, original galleries and c
       assert.ok(existsSync(new URL('../public' + src, import.meta.url)), `Missing Pop & Petals photo: ${src}`);
     }
   }
-  const html = storefront('https://mj.masanawa.com', popPetalsProducts, '/pop-and-petals/', whatsappNumber, popPetalsBrand);
+  const html = storefront('https://shop.masanawa.com', popPetalsProducts, '/pop-and-petals/', whatsappNumber, popPetalsBrand);
   assert.match(html, /Something for every sweet tooth/);
   assert.match(html, /Ruby Zobo/);
   assert.match(html, /Cocoa Velvet/);
@@ -94,7 +94,7 @@ test('Flawless Glow Co offers ten clearly named, photographed products in a shar
       assert.ok(existsSync(new URL('../public' + variant.image, import.meta.url)), `Missing beauty photo: ${variant.image}`);
     }
   }
-  const html = flawlessGlowPage('https://mj.masanawa.com');
+  const html = flawlessGlowPage('https://shop.masanawa.com');
   assert.match(html, /Flawless Glow Co/);
   assert.match(html, /SADOER Fruit Crush Hand Cream Trio/);
   assert.match(html, /LAIKOU Botanical Mud Mask Mix/);

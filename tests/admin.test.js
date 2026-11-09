@@ -23,8 +23,12 @@ test('owner can edit a colour, set or clear its product price, and unlist it', a
     },
     batch: async (statements) => Promise.all(statements.map((statement) => statement.run()))
   };
-  const legacy = { ...defaults[0], hidden: false, available: true, variants: defaults[0].variants.slice(0, 3) };
+  const originalFlow = defaults.find(({ id }) => id === 'flow-abaya');
+  const legacy = { ...originalFlow, hidden: false, available: true, variants: originalFlow.variants.slice(0, 3) };
   sql.prepare('INSERT INTO catalog_edits VALUES (?, ?, 1)').run(legacy.id, JSON.stringify(legacy));
+  const photographed = defaults.find(({ id }) => id === 'covered-button-abaya');
+  const stockEdit = { ...photographed, hidden: false, available: true, variants: photographed.variants.slice(0, 2) };
+  sql.prepare('INSERT INTO catalog_edits VALUES (?, ?, 1)').run(stockEdit.id, JSON.stringify(stockEdit));
   const origin = 'https://shop.example';
   const env = { CATALOG_DB: db, ADMIN_PASSWORD: 'test-only-secret' };
   const call = (method, body, cookie, requestOrigin = origin) => onRequest({
@@ -56,7 +60,9 @@ test('owner can edit a colour, set or clear its product price, and unlist it', a
   assert.match(variantMarkup, /wa.me\/2348012345678/);
   assert.doesNotMatch(variantMarkup, /wa.me\/2348022519062/);
   const { products } = await (await call('GET', null, cookie)).json();
-  const product = products[0];
+  const product = products.find(({ id }) => id === 'flow-abaya');
+  assert.equal(products.find(({ id }) => id === 'covered-button-abaya').variants.length, 2,
+    'editing stock does not add a fabricated fourth colour');
   assert.equal(product.variants.length, 4);
   assert.equal(product.variants[3].name, 'Deep Plum');
   product.price = 32000;

@@ -13,7 +13,7 @@ import { sitemapXml } from '../src/lib/sitemap.js';
 import { shareDetails } from '../src/lib/share-details.js';
 import { whatsappNumber, previewImage } from '../src/lib/shop.js';
 
-const origin = 'https://mj.masanawa.com';
+const origin = 'https://shop.masanawa.com';
 const publicFile = (path) => new URL('../public' + path, import.meta.url);
 const schema = (markup) => [...markup.matchAll(/<script type="application\/ld\+json">([^<]*)<\/script>/g)].map((match) => JSON.parse(match[1]));
 
@@ -130,27 +130,30 @@ test('nine new Maknoon photographs become four products, six colours and matchin
   const mauveGallery = mauve.match(/<div class="product-gallery"[^>]*>[^<]*<img[^>]*><\/div>/)?.[0];
   assert.match(mauveGallery, /mj-tiered-niqab-dusty-mauve-detail\.jpg/);
   assert.doesNotMatch(mauveGallery, /mj-tiered-niqab-petrol-blue-detail\.jpg/);
-  const original = products.filter(({ id }) => !maknoonPhotoBatch.some((photoProduct) => photoProduct.id === id));
+  const original = products.filter(({ stock }) => !stock);
   assert.equal(original.length, 25);
   const ownerEdited = { ...niqab, price: 42000, hidden: true, revision: 4, position: 7 };
   const overlay = withMaknoonPhotoBatch([...original, ownerEdited]);
   assert.equal(overlay.length, products.length);
   assert.strictEqual(overlay.find(({ id }) => id === niqab.id), ownerEdited);
   assert.equal(overlay.filter(({ id }) => id === niqab.id).length, 1);
-  assert.deepEqual(overlay.slice(-3).map(({ id }) => id), [
-    'full-drape-jilbab', 'gathered-maxi-abaya', 'two-tone-long-khimar'
+  assert.deepEqual(overlay.slice(0, 7).map(({ id }) => id), [
+    'satin-waterfall-abaya', 'full-coverage-satin-khimar', 'burgundy-satin-drape',
+    'covered-button-abaya', 'draped-collar-abaya', 'full-coverage-jilbab', 'gathered-waist-maxi'
   ]);
 });
 
 test('sitemap lists all public canonical routes and robots excludes private services', () => {
   const xml = sitemapXml(origin);
   assert.match(xml, /<urlset xmlns="http:\/\/www\.sitemaps\.org\/schemas\/sitemap\/0\.9">/);
-  assert.equal((xml.match(/<loc>/g) || []).length, 2 + 3 + 25 * 4 + 6 + 13 + 10);
-  assert.match(xml, /https:\/\/mj\.masanawa\.com\/maknoon-jamil\/products\/flow-abaya\/navy/);
-  assert.match(xml, /https:\/\/mj\.masanawa\.com\/pop-and-petals\/products\/zobo\/pictured/);
-  assert.match(xml, /https:\/\/mj\.masanawa\.com\/flawless-glow-co\/products\/laikou-mud-mask-mix\/pictured/);
-  assert.doesNotMatch(xml, /<loc>https:\/\/mj\.masanawa\.com\/(?:admin\/|manage\/|api\/|products\/flow-abaya\/)/);
+  assert.equal((xml.match(/<loc>/g) || []).length,
+    2 + 3 + products.reduce((sum, product) => sum + product.variants.length, 0)
+      + popPetalsProducts.length + flawlessGlowProducts.length);
+  assert.match(xml, /https:\/\/shop\.masanawa\.com\/maknoon-jamil\/products\/flow-abaya\/navy/);
+  assert.match(xml, /https:\/\/shop\.masanawa\.com\/pop-and-petals\/products\/zobo\/pictured/);
+  assert.match(xml, /https:\/\/shop\.masanawa\.com\/flawless-glow-co\/products\/laikou-mud-mask-mix\/pictured/);
+  assert.doesNotMatch(xml, /<loc>https:\/\/shop\.masanawa\.com\/(?:admin\/|manage\/|api\/|products\/flow-abaya\/)/);
   const robots = readFileSync(publicFile('/robots.txt'), 'utf8');
-  assert.match(robots, /Sitemap: https:\/\/mj\.masanawa\.com\/sitemap\.xml/);
+  assert.match(robots, /Sitemap: https:\/\/shop\.masanawa\.com\/sitemap\.xml/);
   assert.match(robots, /Disallow: \/manage\//);
 });

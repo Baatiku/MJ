@@ -9,8 +9,10 @@ export async function readCatalog(db) {
   return products.map((product) => {
     const edited = edits.get(product.id);
     if (!edited) return { ...product, revision: 0, hidden: false, available: true };
+    // Photographed stock has its own verified colour set; do not add a
+    // synthetic fourth colour when a seller edits its availability or price.
+    if (product.stock) return { ...edited, stock: true };
     if (edited.colourEdition === colourEdition || edited.variants.length >= 16) return edited;
-    if (!products.slice(0, 25).some(({ id }) => id === product.id)) return edited;
     const extra = fourthColour(product.id);
     if (edited.variants.some(({ id, name }) => id === extra.id || name.toLowerCase() === extra.name.toLowerCase())) return edited;
     return { ...edited, variants: [...edited.variants, extra] };
@@ -18,7 +20,7 @@ export async function readCatalog(db) {
 }
 
 const slug = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-const asset = /^\/(?:images|previews)\/(?:(?:pop-petals|flawless-glow)(?:\/curated)?\/|brand-covers\/)?[a-z0-9-]+\.(?:jpg|jpeg|png|webp)$/;
+const asset = /^\/(?:images|previews)\/(?:(?:pop-petals|flawless-glow)(?:\/curated)?\/|maknoon-stock\/|brand-covers\/)?[a-z0-9-]+\.(?:jpg|jpeg|png|webp)$/;
 function imageUrl(value, workspace) {
   if (typeof value !== 'string' || value.length > 500) return false;
   if (asset.test(value) || (workspace && /^\/shop-media\/[a-f0-9-]{36}$/.test(value))) return true;

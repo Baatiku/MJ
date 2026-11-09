@@ -21,7 +21,13 @@ export function storefront(origin, catalog = products, sharePath = '/', number =
       <span>${html(name)} <b aria-hidden="true">↗</b></span>
     </a>`;
   }).join('');
-  const heroImages = brand.heroImages?.length ? brand.heroImages : catalog.slice(0, 3).map(({ variants }) => variants[0].image);
+  const stockHeroOrder = ['satin-waterfall-abaya', 'full-coverage-jilbab', 'gathered-waist-maxi'];
+  const realStockHeroes = (!brand.name || brand.home === '/maknoon-jamil/') ? stockHeroOrder.flatMap((id) => {
+    const garment = catalog.find((item) => item.id === id && !item.hidden);
+    return garment ? [garment.variants[0].image] : [];
+  }) : [];
+  const heroImages = brand.heroImages?.length ? brand.heroImages
+    : realStockHeroes.length === 3 ? realStockHeroes : catalog.slice(0, 3).map(({ variants }) => variants[0].image);
   const hero = heroImages.slice(0, 3).map((image) =>
     `<img src="${html(image)}" alt="" width="1122" height="1402" fetchpriority="high">`
   ).join('');
