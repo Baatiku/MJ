@@ -16,9 +16,9 @@ Nine owner-supplied original photographs were compared for **garment structure**
 
 ## Image art direction
 
-- Each photo was AI-retouched using **the individual supplied image as edit target**, not generated as an ungrounded clothing design. Exposure and backdrop were improved; fabric shapes, seams, colours, and recognisable accessories were kept.
-- The old inconsistent overlaid `Maknoon_jamil` text, colour callouts and decorative lines were removed during retouching. A consistent serif-italic **Maknoon_jamil** plus fine rules and small bow is reapplied in the **bottom-right corner** to every processed JPEG.
-- The watermark's SVG is the reusable master. `node scripts/add-maknoon-watermark.mjs cleaned-image.png public/images/mj-filename.jpg` applies it with scale based on photo width, constant relative inset, and a soft shadow for readability.
+- Each photo was AI-retouched using **the individual supplied image as edit target**, not generated as an ungrounded clothing design. The images were then given a second unified art-direction pass: a warm-ivory limewash-plaster studio, a shallow rounded alcove, subtle champagne-travertine floor and delicate side lighting. The original mixed gold curtains, blank backdrops and mirror were replaced. Fabric shapes, seams, colours, details, mannequin poses and recognisable accessories remain intact.
+- The old inconsistent overlaid `Maknoon_jamil` text, colour callouts and decorative lines were removed during retouching. A more luxurious serif-italic **Maknoon_jamil** is placed in the same **bottom-right corner** with symmetrical **double hairline rules and a miniature eight-petalled geometric arabesque rosette**—a restrained reference to traditional Islamic ornamental art.
+- The watermark's SVG is the reusable master. `node scripts/add-maknoon-watermark.mjs cleaned-image.png public/images/mj-filename.jpg` applies it with scale based on photo width and a constant relative inset. The artwork uses ivory over dark fabric or muted cocoa over the light studio floor, selected from local background luminance so the signature remains legible without a heavy opaque label.
 - All nine final images are compressed JPEGs. No product is assigned an invented price, fabric specification, or assertion that separately pictured bags/abayas are included in a purchase.
 - Front/full-length views lead where available. Detail views only appear for the corresponding variant; colour-specific galleries do not accidentally mix garments.
 - New product IDs are deterministic, with no duplication of an existing product ID. Static pages, WhatsApp ordering, share JPEG metadata and the sitemap are generated from the same source catalogue.
@@ -29,7 +29,9 @@ Nine owner-supplied original photographs were compared for **garment structure**
 - [x] Nine source images mapped to four designs, six colour options, and three detail photographs.
 - [x] Preserve original catalogue products and existing edits; append in source order.
 - [x] AI clean-up of all nine references, with original watermarks removed.
-- [x] Uniform bottom-right white italic wordmark, bow and hairline rules.
+- [x] Nine portraits restaged on a cohesive ivory-and-limestone luxury backdrop.
+- [x] Uniform bottom-right elegant italic wordmark with paired lines, floral arabesque and contrast-aware colours.
+- [x] Canonical share URLs and sitemap default to the current `https://shop.masanawa.com` domain.
 - [x] Correct variant-specific detail galleries and no duplicate products.
 - [x] Integrate static pages and D1 owner-managed routes.
 - [x] Preserve WhatsApp ordering and sharing links, individual preview images and sitemap discovery.

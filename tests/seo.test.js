@@ -120,7 +120,11 @@ test('nine new Maknoon photographs become four products, six colours and matchin
     assert.ok(existsSync(publicFile(path)), `Missing owner photo: ${path}`);
     assert.equal(readFileSync(publicFile(path)).subarray(0, 3).toString('hex'), 'ffd8ff');
   }
-  assert.match(readFileSync(publicFile('/brand/maknoon-photo-watermark.svg'), 'utf8'), /Maknoon_jamil/);
+  const watermark = readFileSync(publicFile('/brand/maknoon-photo-watermark.svg'), 'utf8');
+  assert.match(watermark, /Maknoon_jamil/);
+  assert.match(watermark, /eight-petalled arabesque/);
+  assert.match(watermark, /M34 153H317 M443 153H726/);
+  assert.match(watermark, /M61 165H300 M460 165H699/);
   const niqab = maknoonPhotoBatch[1];
   const petrol = variantPage(niqab, niqab.variants[0], origin, whatsappNumber, { name: 'Maknoon Jamil', home: '/maknoon-jamil/' });
   const petrolGallery = petrol.match(/<div class="product-gallery"[^>]*>[^<]*<img[^>]*><\/div>/)?.[0];
