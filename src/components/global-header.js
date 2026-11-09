@@ -1,5 +1,6 @@
 import { escapeHtml as html } from '../lib/html.js';
-import { contactLink } from '../lib/shop.js';
+import { contactLink, whatsappNumber } from '../lib/shop.js';
+import { contactDetails, contactEmail } from '../lib/seo.js';
 import { whatsappIcon } from './whatsapp-icon.js';
 
 export const featuredShops = [
@@ -15,7 +16,7 @@ export function globalHeader(active = '/', number = '', brandName = '') {
   return `<a class="skip-link" href="#main">Skip to content</a>
   <header class="global-site-header">
     <div class="global-header-inner">
-      <a class="global-wordmark" href="/" aria-label="Shop home"><span class="global-symbol" aria-hidden="true">✳</span> shop<span class="global-wordmark-dot">.</span></a>
+      <a class="global-wordmark" href="/" aria-label="shop. home"><img class="global-symbol" src="/brand/shop-mark.svg" alt="" width="40" height="40"> shop<span class="global-wordmark-dot">.</span></a>
       <nav class="global-nav" aria-label="Main shopping navigation">
         ${links.map(({ href, label }) => `<a href="${href}"${active === href ? ' aria-current="page"' : ''}>${html(label)}</a>`).join('')}
       </nav>
@@ -24,9 +25,13 @@ export function globalHeader(active = '/', number = '', brandName = '') {
   </header>`;
 }
 
-export function globalFooter() {
+export function globalFooter(number = whatsappNumber) {
   return `<footer class="global-site-footer"><div class="global-footer-inner">
-    <a class="global-footer-mark" href="/">shop<span>.</span></a>
-    <nav aria-label="Footer shopping navigation">${featuredShops.map(({ href, label }) => `<a href="${href}">${html(label)}</a>`).join('')}</nav>
+    <a class="global-footer-mark" href="/"><img src="/brand/shop-mark.svg" alt="" width="42" height="42">shop<span>.</span></a>
+    <div class="global-footer-links">
+      <nav aria-label="Footer shopping navigation">${featuredShops.map(({ href, label }) => `<a href="${href}">${html(label)}</a>`).join('')}<a href="/contact/">Contact</a></nav>
+      <div class="global-footer-contact" aria-label="Customer contact details">${contactDetails(number)}</div>
+      <small>Questions about your order? Email <a href="mailto:${contactEmail}">${contactEmail}</a> or call us.</small>
+    </div>
   </div></footer>`;
 }

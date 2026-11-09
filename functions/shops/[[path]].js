@@ -7,6 +7,7 @@ import { page } from '../_catalog.js';
 import { popPetalsBrand, withCurrentPopPetalsPhotos } from '../../src/catalog/pop-petals.js';
 import { flawlessGlowBrand } from '../../src/catalog/flawless-glow.js';
 import { whatsappNumber } from '../../src/lib/shop.js';
+import { previewImage } from '../../src/lib/shop.js';
 
 const notFound = () => page('<!doctype html><title>Shop not found</title><h1>Shop not found</h1>', 404);
 
@@ -23,13 +24,17 @@ export async function onRequestGet({ request, env, params }) {
     const shop = await findShop(db, slug, owner, Boolean(operator));
     if (!shop) return notFound();
     const [catalog, appearance] = await Promise.all([shopCatalog(db, shop.id), shopAppearance(db, shop.id)]);
-    const curated = ['pop-and-petals', 'flawless-glow-co'].includes(shop.slug);
+    const curated = ['maknoon-jamil', 'pop-and-petals', 'flawless-glow-co'].includes(shop.slug);
+    const sisterBrand = ['pop-and-petals', 'flawless-glow-co'].includes(shop.slug);
     const home = !preview && curated ? `/${shop.slug}/` : `/shops/${shop.slug}/`;
-    const curatedBrand = shop.slug === 'pop-and-petals' ? popPetalsBrand : shop.slug === 'flawless-glow-co' ? flawlessGlowBrand : {};
+    const curatedBrand = shop.slug === 'pop-and-petals' ? popPetalsBrand : shop.slug === 'flawless-glow-co' ? flawlessGlowBrand
+      : shop.slug === 'maknoon-jamil' ? { shareImage: '/previews/brand-covers/maknoon-jamil.jpg' } : {};
     const brand = { ...curatedBrand, ...appearance, name: shop.name, description: shop.description || curatedBrand.description, home, preview, admin: `/manage/${shop.slug}/` };
+    if (curatedBrand.cover && brand.cover !== curatedBrand.cover) brand.shareImage = previewImage({ image: brand.cover || catalog[0]?.variants[0]?.image || '' });
+    if (shop.slug === 'maknoon-jamil' && brand.cover && brand.cover !== '/previews/maknoon-jamil-square.jpg') brand.shareImage = previewImage({ image: brand.cover });
     const products = (shop.slug === 'pop-and-petals' ? withCurrentPopPetalsPhotos(catalog) : catalog).filter((product) => !product.hidden);
     // All curated shops belong to one proprietor; individual numbers in D1 win.
-    const orderNumber = preview ? '' : (shop.whatsapp || (curated ? whatsappNumber : ''));
+    const orderNumber = preview ? '' : (shop.whatsapp || (sisterBrand ? whatsappNumber : ''));
     if (!variantRoute) return page(storefront(preview ? null : url.origin, products, home, orderNumber, brand));
     const product = products.find(({ id }) => id === productId);
     const variant = product?.variants.find(({ id }) => id === colourId);

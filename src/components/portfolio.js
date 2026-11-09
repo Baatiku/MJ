@@ -1,4 +1,6 @@
 import { escapeHtml as html } from '../lib/html.js';
+import { whatsappNumber } from '../lib/shop.js';
+import { brandHead, homepageSchema, socialPhoto } from '../lib/seo.js';
 import { globalHeader, globalFooter } from './global-header.js';
 
 const brands = [
@@ -39,31 +41,28 @@ export function portfolio(origin) {
   <meta property="og:title" content="Wear it. Crave it. Glow.">
   <meta property="og:description" content="Maknoon Jamil · Pop & Petals · Flawless Glow Co">
   <meta property="og:url" content="${html(new URL('/', origin).href)}">
-  <meta property="og:image" content="${html(preview)}">
-  <meta property="og:image:secure_url" content="${html(preview)}">
-  <meta property="og:image:type" content="image/jpeg">
+  ${socialPhoto(origin, '/previews/shop-all-brands-v3.jpg', 'Maknoon Jamil fashion, Pop & Petals treats, and Flawless Glow Co skincare together')}
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="Maknoon Jamil fashion, Pop & Petals treats, and Flawless Glow Co skincare together">
-  <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Wear it. Crave it. Glow.">
   <meta name="twitter:description" content="Maknoon Jamil · Pop & Petals · Flawless Glow Co">
-  <meta name="twitter:image" content="${html(preview)}">` : '';
+  <meta property="og:locale" content="en_NG">` : '';
   return `<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#faf7f1">
+  ${brandHead()}
   <title>Shop | Maknoon Jamil, Pop & Petals & Flawless Glow Co</title>
   <meta name="description" content="Shop Maknoon Jamil modestwear, Pop & Petals treats and Flawless Glow Co skincare.">
   ${canonical}
   ${social}
+  ${origin ? homepageSchema(origin, whatsappNumber) : ''}
   <link rel="stylesheet" href="/styles/portfolio.css">
   <link rel="stylesheet" href="/styles/global.css">
 </head>
 <body>
-  ${globalHeader('/')}
+  ${globalHeader('/', whatsappNumber, 'shop.')}
   <main id="main">
     <section class="portfolio-hero shell" aria-labelledby="hero-title">
       <h1 id="hero-title">Wear it. <em>Crave it.</em> Glow.</h1>
@@ -88,7 +87,7 @@ export function portfolio(origin) {
       </div>
     </section>
   </main>
-  ${globalFooter()}
+  ${globalFooter(whatsappNumber)}
 </body>
 </html>`;
 }

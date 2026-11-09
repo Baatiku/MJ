@@ -14,6 +14,9 @@ export async function originalView(db) {
   const [products, appearance] = await Promise.all([shopCatalog(db, shop.id), shopAppearance(db, shop.id)]);
   return {
     ...shop, products,
-    brand: { cover: '/previews/maknoon-jamil-square.jpg', ...appearance, name: shop.name, description: shop.description, home: '/', admin: '/manage/maknoon-jamil/', original: true }
+    brand: { cover: '/previews/maknoon-jamil-square.jpg', ...appearance,
+      shareImage: appearance.cover && appearance.cover !== '/previews/maknoon-jamil-square.jpg'
+        ? appearance.cover : '/previews/brand-covers/maknoon-jamil.jpg',
+      name: shop.name, description: shop.description, home: '/maknoon-jamil/', admin: '/manage/maknoon-jamil/', original: true }
   };
 }

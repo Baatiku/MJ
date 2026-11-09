@@ -5,3 +5,18 @@
 
 /images/*
   Cache-Control: public, max-age=86400
+
+/previews/*
+  Cache-Control: public, max-age=86400
+
+/brand/*
+  Cache-Control: public, max-age=86400
+
+/icons/*
+  Cache-Control: public, max-age=86400
+
+/robots.txt
+  Content-Type: text/plain; charset=utf-8
+
+/sitemap.xml
+  Content-Type: application/xml; charset=utf-8

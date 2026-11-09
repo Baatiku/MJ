@@ -44,10 +44,12 @@ export const flawlessGlowProducts = [
 
 export const flawlessGlowBrand = {
   name: 'Flawless Glow Co',
+  seoTitle: 'Skincare & Beauty Products',
   headline: 'A little time for you.',
   description: 'Your beauty-shelf favourites.',
   home: '/flawless-glow-co/',
   cover: '/images/brand-covers/flawless-glow-co.webp',
+  shareImage: '/previews/brand-covers/flawless-glow-co.jpg',
   heroImages: [
     '/images/flawless-glow/fruit-hand-cream-trio.webp',
     '/images/brand-covers/flawless-glow-co.webp',

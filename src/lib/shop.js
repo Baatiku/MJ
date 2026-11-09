@@ -35,7 +35,7 @@ export function orderLabel(product) {
   return product.price === null ? 'Ask on WhatsApp' : 'Buy on WhatsApp';
 }
 
-export function orderLink(product, variant, origin, number, home = '/', name = 'Maknoon Jamil') {
+export function orderLink(product, variant, origin, number, home = '/maknoon-jamil/', name = 'Maknoon Jamil') {
   const selection = variant.id === 'pictured' ? product.name : `${product.name} in ${variant.name}`;
   const price = product.price === null ? '' : ` (${formatNaira(product.price)})`;
   const question = product.price === null

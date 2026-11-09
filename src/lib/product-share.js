@@ -1,18 +1,5 @@
-import { formatNaira, previewImage, variantPath } from './shop.js';
-
-export function shareDetails(product, variant, { home = '/', name = 'Maknoon Jamil', origin = location.origin } = {}) {
-  const title = product.name + ' in ' + variant.name;
-  const url = new URL(variantPath(product, variant, home), origin).href;
-  const price = product.price === null ? '' : formatNaira(product.price) + '\n';
-  const availability = product.available === false ? 'Currently unavailable.\n' : '';
-  return {
-    title,
-    text: title + '\n' + name + '\n' + price + availability + product.description + '\n\n' + url,
-    url,
-    image: new URL(previewImage(variant), origin).href,
-    filename: product.id + '-' + variant.id
-  };
-}
+import { shareDetails } from './share-details.js';
+export { shareDetails };
 
 let dialog;
 
@@ -29,7 +16,7 @@ function showShare(details) {
   const modal = element('dialog', '', 'product-share-dialog');
   dialog = modal;
   modal.setAttribute('aria-labelledby', 'share-product-title');
-  const heading = element('h2', 'Share this style');
+  const heading = element('h2', 'Share this product');
   heading.id = 'share-product-title';
   const close = element('button', 'Close', 'share-close');
   close.type = 'button';
@@ -119,7 +106,8 @@ function showShare(details) {
 export function bindProductShare(button, selection, options) {
   if (!button) return;
   button.hidden = false;
-  button.onclick = () => {
+  button.onclick = (event) => {
+    event?.preventDefault?.();
     const { product, variant } = selection();
     showShare(shareDetails(product, variant, options));
   };

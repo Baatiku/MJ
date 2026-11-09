@@ -83,10 +83,12 @@ export function withCurrentPopPetalsPhotos(catalog) {
 
 export const popPetalsBrand = {
   name: 'Pop & Petals',
+  seoTitle: 'Doughnuts, Cupcakes & Drinks',
   headline: 'Sweeten the moment.',
   description: 'Your favourite excuse for a treat.',
   home: '/pop-and-petals/',
   cover: '/images/brand-covers/pop-and-petals.webp',
+  shareImage: '/previews/brand-covers/pop-and-petals.jpg',
   heroImages: [
     '/images/pop-petals/curated/cookie-cloud-cup.webp',
     '/images/brand-covers/pop-and-petals.webp',
