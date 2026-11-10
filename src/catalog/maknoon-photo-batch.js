@@ -1,5 +1,6 @@
 import { photographedStock } from './stock.js';
 import { refineMaknoonDescription } from './maknoon-copy.js';
+import { correctMaknoonProduct } from './maknoon-policy.js';
 
 // Uploaded 9 November 2026. Each distinct garment cut is one product; photographs
 // that differ only by colour or camera distance are variants and detail galleries.
@@ -10,7 +11,7 @@ const option = (id, name, swatch, image, gallery = []) => ({
 
 export const maknoonPhotoBatch = [
   {
-    id: 'full-drape-jilbab', name: 'Full-Drape Jilbab', category: 'layer',
+    id: 'full-drape-jilbab', name: 'Full-Drape Jilbab', category: 'jilbab',
     description: 'A full-length, softly draped prayer jilbab with an integrated head covering.',
     price: null,
     variants: [option('powder-blue', 'Powder Blue', '#c8d0ed', 'full-drape-jilbab-powder-blue')]
@@ -50,5 +51,5 @@ export function withMaknoonPhotoBatch(catalog = []) {
     ...item, revision: 0, hidden: false, available: true, position: i
   });
   return [...stocked, ...catalog.filter(({ id }) => !uploadedIds.has(id))]
-    .map(refineMaknoonDescription);
+    .map(refineMaknoonDescription).map(correctMaknoonProduct).filter(Boolean);
 }

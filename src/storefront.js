@@ -11,6 +11,14 @@ for (const product of products) {
   const image = photo.querySelector('img');
   const selected = card.querySelector('[data-selected]');
   const order = card.querySelector('.order');
+  const expand = card.querySelector('.swatches-toggle');
+  if (expand) {
+    expand.addEventListener('click', () => {
+      const collapsed = options.querySelector('.swatches').toggleAttribute('data-collapsed');
+      expand.setAttribute('aria-expanded', String(!collapsed));
+      expand.textContent = collapsed ? `+${product.variants.length - 6} more colours` : 'Show fewer colours';
+    });
+  }
   bindProductShare(card.querySelector('[data-share-product]'), () => ({
     product,
     variant: product.variants.find(({ id }) => id === options.querySelector(':checked').value)

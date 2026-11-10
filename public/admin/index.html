@@ -62,17 +62,18 @@
       <form id="editor" class="panel" hidden>
         <h2 id="product-title">Edit product</h2>
         <div class="admin-fields">
-          <label>Name <input name="name" required maxlength="100"></label>
+          <label data-maknoon-hide>Name <input name="name" required maxlength="100"></label>
           <label>Price in ₦ <input name="price" type="number" min="0" max="100000000" step="1" placeholder="Ask on WhatsApp" aria-describedby="price-help"><small id="price-help">Leave blank to show Ask on WhatsApp.</small></label>
-          <label id="legacy-category">Category <select name="category"></select></label>
-          <label class="workspace-field" hidden>Category name <input name="customCategory" maxlength="50"></label>
-          <label class="workspace-field" hidden>Display order <input name="position" type="number" min="0" max="100000" step="1"></label>
-          <label class="wide">Description <textarea name="description" required maxlength="450"></textarea></label>
-          <label class="check"><input type="checkbox" name="available"> Available to order</label>
-          <label class="check"><input type="checkbox" name="hidden"> Hide from the storefront</label>
+          <label id="legacy-category" data-maknoon-hide>Category <select name="category"></select></label>
+          <label class="workspace-field" data-maknoon-hide hidden>Category name <input name="customCategory" maxlength="50"></label>
+          <label class="workspace-field" data-maknoon-hide hidden>Display order <input name="position" type="number" min="0" max="100000" step="1"></label>
+          <label class="wide" data-maknoon-hide>Description <textarea name="description" required maxlength="450"></textarea></label>
+          <label class="check" data-maknoon-hide><input type="checkbox" name="available"> Available to order</label>
+          <label class="check" data-maknoon-hide><input type="checkbox" name="hidden"> Hide from the storefront</label>
         </div>
         <h3>Colours and photos</h3>
         <p>Set each colour’s swatch and matching photo. Changing a swatch updates the colour selector. Changing the photo updates the image shoppers see.</p>
+        <p class="maknoon-priority-help" hidden>Choose the main image shown on the product card, then use the arrows to put the most popular colours first. The selected main colour is always displayed first.</p>
         <div id="variants"></div>
         <div class="admin-actions"><button type="button" id="add-colour">Add colour</button><button type="button" id="delete-product" hidden>Delete product</button><button class="primary" type="submit">Save product</button></div>
       </form>
@@ -159,6 +160,11 @@
         <label class="wide" data-upload hidden>Upload photo <input type="file" accept="image/*"></label>
       </div>
       <button type="button" class="remove">Remove</button>
+      <div class="variant-priority" data-priority hidden>
+        <label><input type="radio" name="default-colour" data-default> Main image</label>
+        <button type="button" data-up aria-label="Move colour earlier">↑ Earlier</button>
+        <button type="button" data-down aria-label="Move colour later">↓ Later</button>
+      </div>
     </div>
   </template>
 </body>
