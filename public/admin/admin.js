@@ -5,6 +5,11 @@ import { assistantPanel } from './whatsapp-assistant.js';
 import { statusPhotos } from './status-photos.js';
 
 const shopSlug = /^\/manage\/([a-z0-9-]+)\/?$/.exec(location.pathname)?.[1];
+const maknoonAdmin = !shopSlug || shopSlug === 'maknoon-jamil';
+if (maknoonAdmin) {
+  document.body.setAttribute('data-maknoon-admin', '');
+  document.querySelector('.maknoon-priority-help').hidden = false;
+}
 const endpoint = shopSlug ? '/api/shop-catalog?shop=' + shopSlug : '/api/admin';
 const find = (selector) => document.querySelector(selector);
 const login = find('#login');
@@ -100,6 +105,16 @@ function addColour(variant) {
     if (variants.children.length > 1) row.remove();
     else notice.textContent = 'Keep at least one colour.';
   };
+  if (maknoonAdmin) {
+    const priority = row.querySelector('[data-priority]');
+    priority.hidden = false;
+    priority.querySelector('[data-up]').onclick = () => {
+      if (row.previousElementSibling) variants.insertBefore(row, row.previousElementSibling);
+    };
+    priority.querySelector('[data-down]').onclick = () => {
+      if (row.nextElementSibling) variants.insertBefore(row.nextElementSibling, row);
+    };
+  }
   variants.append(row);
 }
 
@@ -113,6 +128,7 @@ function openProduct(product) {
   for (const field of ['hidden', 'available']) editor.elements[field].checked = product[field];
   variants.replaceChildren();
   product.variants.forEach(addColour);
+  if (maknoonAdmin) variants.firstElementChild?.querySelector('[data-default]')?.setAttribute('checked', '');
   editor.hidden = false;
   renderList();
 }
@@ -206,8 +222,8 @@ find('#logout').onclick = async () => {
 };
 find('#search').oninput = renderList;
 find('#add-colour').onclick = () => {
-  if (variants.children.length >= 16) {
-    notice.textContent = 'A product can have up to 16 colours.';
+  if (variants.children.length >= 32) {
+    notice.textContent = 'A product can have up to 32 colours.';
     return;
   }
   addColour({ id: crypto.randomUUID(), name: '', swatch: '#555555', image: '' });
@@ -217,6 +233,11 @@ editor.onsubmit = (event) => {
   event.preventDefault();
   submit(editor, async () => {
     const edited = current;
+    const ordered = Array.from(variants.children);
+    if (maknoonAdmin) {
+      const chosen = ordered.find((row) => row.querySelector('[data-default]').checked);
+      if (chosen) ordered.unshift(...ordered.splice(ordered.indexOf(chosen), 1));
+    }
     const product = {
       ...edited,
       name: editor.elements.name.value,
@@ -225,7 +246,7 @@ editor.onsubmit = (event) => {
       description: editor.elements.description.value,
       available: editor.elements.available.checked,
       hidden: editor.elements.hidden.checked,
-      variants: Array.from(variants.children, (row) => ({
+      variants: ordered.map((row) => ({
         id: row.dataset.id,
         name: row.querySelector('[name=colour]').value,
         swatch: row.querySelector('[name=swatch]').value,

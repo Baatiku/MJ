@@ -21,8 +21,8 @@ const stockProduct = (id, name, category, description, options, gallery = []) =>
 
 // Order follows the owner-supplied stock batches, not a generic alphabetic sort.
 export const photographedStock = [
-  stockProduct('satin-waterfall-abaya', 'Satin Waterfall Abaya', 'abaya',
-    'A flowing round-neck abaya with a layered open-front waterfall drape in softly lustrous satin.', [
+  stockProduct('satin-waterfall-abaya', 'Waterfall Abaya', 'abaya',
+    'Quiet elegance for celebrations, graceful evenings and everything worth dressing up for.', [
       ['navy', 'Midnight Navy', '#142343'],
       ['champagne', 'Soft Champagne', '#d9c9b0'],
       ['ivory', 'Pale Ivory', '#e5e5d9'],
@@ -32,22 +32,22 @@ export const photographedStock = [
       ['blush', 'Soft Blush', '#dec0c6']
     ], ['satin-waterfall-worn', 'satin-waterfall-seven-colours']),
 
-  stockProduct('full-coverage-satin-khimar', 'Mocha Satin Khimar', 'khimar',
-    'A long, generous khimar with a smooth satin finish and graceful drape.', [
+  stockProduct('full-coverage-satin-khimar', 'Mocha Khimar', 'khimar',
+    'An elegant finishing touch when your modest look deserves a little extra polish.', [
       ['mocha', 'Chocolate Mocha', '#59454a']
     ]),
 
-  stockProduct('burgundy-satin-drape', 'Burgundy Satin Draped Look', 'layer',
-    'An elegant draped satin look. The reference shows a fabric and layering detail; ask for the full-length view and included pieces.', [
+  stockProduct('burgundy-satin-drape', 'Burgundy Waterfall Abaya', 'abaya',
+    'Rich, romantic sophistication for evenings that call for a confident statement.', [
       ['burgundy', 'Deep Burgundy', '#772d4b']
     ]),
 
-  stockProduct('covered-button-abaya', 'Covered-Button Cape Abaya', 'abaya',
-    'A sweeping, wide-sleeve abaya with a round neckline and a line of small covered buttons down the front.', [
+  stockProduct('covered-button-abaya', 'Cape Abaya', 'abaya',
+    'A beautifully fluid, buttonless cape cut for an effortless, refined finish.', [
       ['navy', 'Navy Blue', '#253475'],
       ['black', 'Jet Black', '#242326'],
       ['brown', 'Warm Camel Brown', '#936b45']
-    ], ['covered-button-abaya-three-colours']),
+    ]),
 
   stockProduct('draped-collar-abaya', 'Draped-Collar Abaya', 'abaya',
     'A softly draped neckline with slender hanging front ties. Only upper-garment views are available, so confirm the complete cut before ordering.', [
@@ -57,7 +57,7 @@ export const photographedStock = [
       ['purple', 'Rich Violet Purple', '#782a9a']
     ], ['draped-collar-abaya-four-colours']),
 
-  stockProduct('full-coverage-jilbab', 'Full-Coverage Jilbab', 'khimar',
+  stockProduct('full-coverage-jilbab', 'Full-Coverage Jilbab', 'jilbab',
     'A full-length modest covering with an integrated khimar-style drape and generous sleeves. The black look is styled with a face veil; confirm included pieces.', [
       ['purple', 'Deep Purple', '#422057'],
       ['sage', 'Sage Green', '#899083'],

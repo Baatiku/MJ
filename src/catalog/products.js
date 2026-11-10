@@ -2,6 +2,7 @@ import { fourthColour } from './fourth-colours.js';
 import { photographedStock } from './stock.js';
 import { maknoonPhotoBatch } from './maknoon-photo-batch.js';
 import { refineMaknoonDescription } from './maknoon-copy.js';
+import { correctMaknoonProduct } from './maknoon-policy.js';
 
 const product = (id, name, category, description, colours, price = null) => ({
   id, name, category, description, price,
@@ -24,11 +25,12 @@ const newStyle = (id, name, category, description) => ({
 
 export const categories = [
   { id: 'abaya', name: 'Abayas', image: '/images/maknoon-stock/satin-waterfall-abaya-navy.webp' },
-  { id: 'khimar', name: 'Khimars', image: '/images/maknoon-stock/full-coverage-jilbab-purple.webp' },
+  { id: 'khimar', name: 'Khimars', image: '/images/maknoon-stock/full-coverage-satin-khimar-mocha.webp' },
+  { id: 'jilbab', name: 'Jilbabs', image: '/images/maknoon-stock/full-coverage-jilbab-purple.webp' },
   { id: 'niqab', name: 'Niqab looks', image: '/images/blue-veil-blue.webp' },
   { id: 'dress', name: 'Maxi dresses', image: '/images/maknoon-stock/gathered-waist-maxi-teal.webp' },
   { id: 'layer', name: 'Layers & sets', image: '/images/open-kimono-abaya-olive.jpg' },
-  { id: 'headwear', name: 'Hijabs & undercaps', image: '/images/chiffon-wrap-taupe.jpg' }
+  { id: 'headwear', name: 'Veils, hijabs & undercaps', image: '/images/chiffon-wrap-taupe.jpg' }
 ];
 
 const styles = [
@@ -59,21 +61,14 @@ const styles = [
   product('short-veil', 'The Short Veil Look', 'niqab', 'A shorter drape styled with a coordinated niqab.', [
     ['slate', 'Smoky Slate', '#4b5c6c'], ['plum', 'Dusty Plum', '#795565'], ['forest', 'Forest Green', '#385344']
   ]),
-  product('jilbab-veil', 'The Layered Jilbab Look', 'niqab', 'A layered jilbab silhouette styled with a matching niqab.', [
+  product('jilbab-veil', 'The Layered Jilbab Look', 'jilbab', 'A layered jilbab silhouette styled with a matching niqab.', [
     ['black', 'Black', '#282424'], ['taupe', 'Warm Taupe', '#9a8170'], ['burgundy', 'Dark Burgundy', '#5d303a']
   ]),
-  newStyle('belted-shirt-maxi', 'Belted Shirt Maxi', 'dress', 'A collared, button-front silhouette with a waist tie.'),
-  newStyle('pleated-high-neck-maxi', 'High-Neck Pleated Maxi', 'dress', 'A high neckline and flowing pleats.'),
   newStyle('linen-a-line-maxi', 'A-Line Maxi', 'dress', 'A relaxed A-line cut with a softly textured finish.'),
   newStyle('tiered-gathered-maxi', 'Tiered Gathered Maxi', 'dress', 'Gathered tiers give this full-length dress movement.'),
-  newStyle('longline-knit-maxi', 'Longline Knit Maxi', 'dress', 'A long, simple silhouette with a knit finish.'),
   newStyle('open-kimono-abaya', 'Open Kimono Abaya', 'layer', 'An open-front layer with wide kimono sleeves.'),
-  newStyle('wide-leg-tunic-set', 'Wide-Leg Tunic Set', 'layer', 'A long tunic styled with wide-leg trousers.'),
-  newStyle('cape-sleeve-abaya', 'Cape-Sleeve Abaya', 'layer', 'A flowing cape sleeve for a more formal silhouette.'),
-  newStyle('hooded-jilbab', 'Hooded Jilbab', 'layer', 'A full-length jilbab with an integrated hood.'),
-  newStyle('waistcoat-maxi-set', 'Longline Waistcoat Set', 'layer', 'A long waistcoat styled with a matching maxi skirt.'),
-  newStyle('chiffon-wrap', 'Chiffon Wrap Hijab', 'headwear', 'A rectangular wrap with soft, overlapping folds.'),
-  newStyle('satin-square', 'Satin Square Hijab', 'headwear', 'A square scarf folded into a neat triangular drape.'),
+  newStyle('cape-sleeve-abaya', 'Cape-Sleeve Abaya', 'abaya', 'A flowing cape sleeve for a more formal silhouette.'),
+  newStyle('chiffon-wrap', 'Chiffon Wrap Veil', 'headwear', 'A rectangular wrap with soft, overlapping folds.'),
   newStyle('ribbed-instant', 'Ribbed Instant Hijab', 'headwear', 'A close-fitting pull-on shape with fine ribbing.'),
   newStyle('tie-back-undercap', 'Tie-Back Undercap', 'headwear', 'A full-coverage undercap with an adjustable tie.'),
   newStyle('pull-on-prayer-hijab', 'Pull-On Prayer Hijab', 'headwear', 'A pull-on prayer covering with a shoulder-length drape.')
@@ -87,4 +82,4 @@ export const products = [
   ...styles.map((style) => ({
     ...style, variants: [...style.variants, fourthColour(style.id)]
   }))
-].map(refineMaknoonDescription);
+].map(refineMaknoonDescription).map(correctMaknoonProduct).filter(Boolean);

@@ -8,7 +8,7 @@
 const revisions = [
   ['satin-waterfall-abaya',
     'A flowing round-neck abaya with a layered open-front waterfall drape in softly lustrous satin.',
-    'Quiet luxury for celebrations, graceful evenings and everything worth dressing up for.'],
+    'Quiet elegance for celebrations, graceful evenings and everything worth dressing up for.'],
   ['full-coverage-satin-khimar',
     'A long, generous khimar with a smooth satin finish and graceful drape.',
     'An elegant finishing touch when your modest look deserves a little extra polish.'],
@@ -17,7 +17,7 @@ const revisions = [
     'Rich, romantic sophistication for evenings that call for a confident statement.'],
   ['covered-button-abaya',
     'A sweeping, wide-sleeve abaya with a round neckline and a line of small covered buttons down the front.',
-    'Little details, lasting charm—an easy favourite for polished everyday dressing.'],
+    'A beautifully fluid, buttonless cape cut for an effortless, refined finish.'],
   ['draped-collar-abaya',
     'A softly draped neckline with slender hanging front ties. Only upper-garment views are available, so confirm the complete cut before ordering.',
     'A refined choice for women who love their everyday elegance with personality.'],

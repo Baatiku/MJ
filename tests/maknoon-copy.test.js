@@ -5,11 +5,12 @@ import { photographedStock } from '../src/catalog/stock.js';
 import { maknoonPhotoBatch, withMaknoonPhotoBatch } from '../src/catalog/maknoon-photo-batch.js';
 import { maknoonCopy, refineMaknoonDescription } from '../src/catalog/maknoon-copy.js';
 import { readCatalog } from '../src/catalog/live.js';
+import { retiredMaknoonIds } from '../src/catalog/maknoon-policy.js';
 
 test('all Maknoon products have unique boutique descriptions, not photo-observation text', () => {
-  assert.equal(products.length, 36);
-  assert.equal(Object.keys(maknoonCopy).length, products.length);
-  assert.deepEqual(new Set(Object.keys(maknoonCopy)), new Set(products.map(({ id }) => id)));
+  assert.equal(products.length, 29);
+  assert.equal(Object.keys(maknoonCopy).length, products.length + retiredMaknoonIds.size);
+  assert.ok(products.every(({ id }) => Object.hasOwn(maknoonCopy, id)));
   assert.equal(new Set(products.map(({ description }) => description)).size, products.length);
   for (const product of products) {
     const description = maknoonCopy[product.id].revised;
@@ -33,7 +34,7 @@ test('legacy seed descriptions upgrade without overwriting owner-customised desc
   assert.equal(refineMaknoonDescription(previous).description, maknoonCopy[legacy.id].revised);
 
   const overlay = withMaknoonPhotoBatch([custom, previous]);
-  assert.strictEqual(overlay.find(({ id }) => id === stock.id), custom);
+  assert.equal(overlay.find(({ id }) => id === stock.id).description, custom.description);
   assert.equal(overlay.find(({ id }) => id === legacy.id).description, maknoonCopy[legacy.id].revised);
 
   const rows = [custom, previous].map((item) => ({ id: item.id, document: JSON.stringify(item), revision: 1 }));

@@ -135,11 +135,13 @@ test('nine new Maknoon photographs become four products, six colours and matchin
   assert.match(mauveGallery, /mj-tiered-niqab-dusty-mauve-detail\.jpg/);
   assert.doesNotMatch(mauveGallery, /mj-tiered-niqab-petrol-blue-detail\.jpg/);
   const original = products.filter(({ stock }) => !stock);
-  assert.equal(original.length, 25);
+  assert.equal(original.length, 18);
   const ownerEdited = { ...niqab, price: 42000, hidden: true, revision: 4, position: 7 };
   const overlay = withMaknoonPhotoBatch([...original, ownerEdited]);
   assert.equal(overlay.length, products.length);
-  assert.strictEqual(overlay.find(({ id }) => id === niqab.id), ownerEdited);
+  assert.equal(overlay.find(({ id }) => id === niqab.id).revision, ownerEdited.revision);
+  assert.equal(overlay.find(({ id }) => id === niqab.id).hidden, true);
+  assert.equal(overlay.find(({ id }) => id === niqab.id).price, 30000);
   assert.equal(overlay.filter(({ id }) => id === niqab.id).length, 1);
   assert.deepEqual(overlay.slice(0, 7).map(({ id }) => id), [
     'satin-waterfall-abaya', 'full-coverage-satin-khimar', 'burgundy-satin-drape',

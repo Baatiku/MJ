@@ -1,6 +1,7 @@
 import { categories, products } from './products.js';
 import { fourthColour } from './fourth-colours.js';
 import { refineMaknoonDescription } from './maknoon-copy.js';
+import { correctMaknoonProduct, maknoonPolicyEdition } from './maknoon-policy.js';
 
 const colourEdition = 1;
 
@@ -13,11 +14,11 @@ export async function readCatalog(db) {
     // Photographed stock has its own verified colour set; do not add a
     // synthetic fourth colour when a seller edits its availability or price.
     if (product.stock) return { ...edited, stock: true };
-    if (edited.colourEdition === colourEdition || edited.variants.length >= 16) return edited;
+    if (edited.colourEdition === colourEdition || edited.variants.length >= 32) return edited;
     const extra = fourthColour(product.id);
     if (edited.variants.some(({ id, name }) => id === extra.id || name.toLowerCase() === extra.name.toLowerCase())) return edited;
     return { ...edited, variants: [...edited.variants, extra] };
-  }).map(refineMaknoonDescription);
+  }).map(refineMaknoonDescription).map(correctMaknoonProduct).filter(Boolean);
 }
 
 const slug = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -41,8 +42,8 @@ export function validateProduct(input, { workspace = false } = {}) {
       typeof input.hidden !== 'boolean' || typeof input.available !== 'boolean' ||
       !Number.isSafeInteger(input.revision) || input.revision < 0 ||
       !(input.price === null || Number.isSafeInteger(input.price) && input.price >= 0 && input.price <= 100000000) ||
-      !Array.isArray(input.variants) || input.variants.length < 1 || input.variants.length > 16) {
-    throw new Error('Check the product details and keep between 1 and 16 colours.');
+      !Array.isArray(input.variants) || input.variants.length < 1 || input.variants.length > 32) {
+    throw new Error('Check the product details and keep between 1 and 32 colours.');
   }
   const ids = new Set();
   const variants = input.variants.map((variant) => {
@@ -58,5 +59,7 @@ export function validateProduct(input, { workspace = false } = {}) {
   const { id, category, price, available, hidden } = input;
   const gallery = Array.isArray(input.gallery) && input.gallery.length <= 12 && input.gallery.every((url) => imageUrl(url, workspace))
     ? input.gallery : [];
-  return { id, category, price, available, hidden, colourEdition, name: input.name.trim(), description: input.description.trim(), variants, ...(gallery.length ? { gallery } : {}) };
+  return { id, category, price, available, hidden, colourEdition, name: input.name.trim(), description: input.description.trim(), variants,
+    ...(input.maknoonPolicyEdition === maknoonPolicyEdition ? { maknoonPolicyEdition } : {}),
+    ...(gallery.length ? { gallery } : {}) };
 }

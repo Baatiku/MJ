@@ -26,7 +26,7 @@ test('all three storefronts retain two product cards per row on narrow phones', 
 });
 
 test('each style has distinct colour choices and uniquely addressed images', () => {
-  assert.equal(products.length, 25 + 7 + maknoonPhotoBatch.length);
+  assert.equal(products.length, 25 - 7 + 7 + maknoonPhotoBatch.length);
   assert.equal(new Set(products.map(({ id }) => id)).size, products.length);
   const images = new Set();
   for (const product of products) {
@@ -45,7 +45,7 @@ test('each style has distinct colour choices and uniquely addressed images', () 
       assert.equal(url.origin + url.pathname, 'https://wa.me/2348022519062');
       const message = url.searchParams.get('text');
       assert.ok(message.includes(product.name) && message.includes(variant.name));
-      assert.equal(message.includes('₦25,000'), product.id === 'flow-abaya');
+      assert.equal(message.includes('₦25,000'), ['flow-abaya', 'everyday-abaya', 'pleated-abaya'].includes(product.id));
       const variantUrl = origin + variantPath(product, variant, '/maknoon-jamil/');
       assert.ok(message.endsWith(variantUrl));
       const page = variantPage(product, variant, origin);
@@ -71,7 +71,7 @@ test('photographed stock is first, grouped by construction and not duplicated by
   assert.deepEqual(stock[5].variants.map(({ id }) => id), ['purple', 'sage', 'black', 'mauve', 'ivory']);
   assert.ok(products.every((product, i) => i < stock.length ? product.stock : !product.stock));
   for (const product of stock) {
-    assert.equal(product.price, null);
+    assert.ok(product.price === null || product.price === 15000 || product.price === 30000 || product.price === 40000);
     for (const src of product.gallery || []) {
       assert.ok(existsSync(new URL(`../public${src}`, import.meta.url)));
     }

@@ -26,6 +26,20 @@
 .admin-fields .wide { grid-column: 1 / -1; }
 .variant-editor { display: grid; grid-template-columns: 85px minmax(0, 1fr) auto; align-items: center; gap: 8px; padding-block: 10px; border-bottom: 1px solid var(--line); }
 .variant-editor img { aspect-ratio: 1; object-fit: contain; background: var(--sand); }
+.variant-priority { display:flex;gap:8px;align-items:center;flex-wrap:wrap;grid-column:1/-1; }
+.variant-priority label { display:flex;align-items:center;gap:7px; }
+.variant-priority input { width:auto; }
+body[data-maknoon-admin] #editor [data-maknoon-hide],
+body[data-maknoon-admin] #editor .variant-editor .admin-fields,
+body[data-maknoon-admin] #editor .variant-editor .remove,
+body[data-maknoon-admin] #add-colour,
+body[data-maknoon-admin] #delete-product,
+body[data-maknoon-admin] #new-product,
+body[data-maknoon-admin] #editor > p:not(.maknoon-priority-help) { display:none !important; }
+body[data-maknoon-admin] #editor .variant-editor { grid-template-columns:70px minmax(0,1fr); }
+body[data-maknoon-admin] #editor .variant-priority { grid-column:2; }
+body[data-maknoon-admin] #editor .maknoon-priority-help { display:block !important; }
+body[data-maknoon-admin] #editor .admin-fields > label:not([data-maknoon-hide]) { grid-column:1/-1; }
 .admin-actions { margin-top: 15px; }
 @media (max-width: 700px) {
   .admin-layout { grid-template-columns: minmax(0, 1fr); }
