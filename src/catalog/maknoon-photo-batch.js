@@ -3,6 +3,7 @@ import { refineMaknoonDescription } from './maknoon-copy.js';
 import { correctMaknoonProduct } from './maknoon-policy.js';
 import { expandDressColours } from './dress-colours.js';
 import { expandAbayaColours } from './abaya-colours.js';
+import { expandGarmentColours } from './garment-colours.js';
 
 // Uploaded 9 November 2026. Each distinct garment cut is one product; photographs
 // that differ only by colour or camera distance are variants and detail galleries.
@@ -53,5 +54,5 @@ export function withMaknoonPhotoBatch(catalog = []) {
     ...item, revision: 0, hidden: false, available: true, position: i
   });
   return [...stocked, ...catalog.filter(({ id }) => !uploadedIds.has(id))]
-    .map(refineMaknoonDescription).map(correctMaknoonProduct).filter(Boolean).map(expandDressColours).map(expandAbayaColours);
+    .map(refineMaknoonDescription).map(correctMaknoonProduct).filter(Boolean).map(expandDressColours).map(expandAbayaColours).map(expandGarmentColours);
 }

@@ -10,6 +10,7 @@ import { validateProduct } from '../src/catalog/live.js';
 import { sitemapXml } from '../src/lib/sitemap.js';
 import { dressColours, dressColourEdition, expandDressColours } from '../src/catalog/dress-colours.js';
 import { abayaColourEdition, expandAbayaColours, twentyColourAbayas } from '../src/catalog/abaya-colours.js';
+import { garmentColourEdition, expandGarmentColours, twentyColourGarments } from '../src/catalog/garment-colours.js';
 
 const get = (id) => products.find((product) => product.id === id);
 
@@ -81,6 +82,34 @@ test('image-complete Abayas have 20 named swatches, preserve old photo links and
     assert.equal(updated.price, 42500);
     assert.ok(updated.variants.length >= 20);
     assert.equal(validateProduct(updated).abayaColourEdition, abayaColourEdition);
+  }
+});
+
+test('completed Khimar palettes offer matching colour photographs and previews without overwriting owner choices', async () => {
+  for (const id of twentyColourGarments) {
+    const garment = get(id);
+    assert.equal(garment.garmentColourEdition, garmentColourEdition);
+    assert.equal(expandGarmentColours(garment), garment);
+    assert.equal(new Set(garment.variants.map(({ id }) => id)).size, garment.variants.length);
+    const represented = new Set(garment.variants.map(({ id }) => id));
+    for (const [colourId] of dressColours) assert.ok(represented.has(colourId), `${id} lacks ${colourId}`);
+    for (const variant of garment.variants) {
+      assert.ok(existsSync(new URL(`../public${variant.image}`, import.meta.url)), variant.image);
+      const preview = variant.image.replace('/images/', '/previews/').replace(/\.(webp|png)$/, '.jpg');
+      assert.ok(existsSync(new URL(`../public${preview}`, import.meta.url)), preview);
+    }
+    const previous = { ...garment, garmentColourEdition: undefined, price: 35000, revision: 4,
+      hidden: true, available: false, variants: [garment.variants[0], garment.variants[3]] };
+    const db = { prepare: () => ({ all: async () => ({ results: [
+      { id, document: JSON.stringify(previous), revision: 4 }
+    ] }) }) };
+    const updated = (await readCatalog(db)).find((item) => item.id === id);
+    assert.equal(updated.variants[0].image, previous.variants[0].image);
+    assert.equal(updated.price, 35000);
+    assert.equal(updated.hidden, true);
+    assert.equal(updated.available, false);
+    assert.equal(updated.variants.length, 20);
+    assert.equal(validateProduct(updated).garmentColourEdition, garmentColourEdition);
   }
 });
 

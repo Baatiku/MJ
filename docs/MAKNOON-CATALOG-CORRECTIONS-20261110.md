@@ -76,6 +76,17 @@ larger-scope items **remain outstanding** and are not claimed complete:
 
 ## 11 November follow-up — all remaining Abaya palettes
 
+### Khimar colour continuation
+
+- The Mocha Khimar now has distinct studio renderings and JPEG share previews
+  for all 19 additional colours in the owner's 20-colour palette. The original
+  Mocha photograph remains first and unchanged.
+- The new garment-colour edition upgrades older D1 records while preserving
+  owner-selected default image, colour order, price, and availability.
+- Only completed, image-backed garment styles are activated. Other Khimars,
+  Jilbabs, niqab looks, layers and headwear are still awaiting their distinct
+  photo sets and are not advertised as 20-colour products yet.
+
 - Complete the outstanding seven designs: Burgundy Waterfall Abaya, Draped
   Collar Abaya, Gathered Maxi Abaya, Everyday Abaya, Pleated Cuff Abaya,
   Butterfly Abaya and Cape-Sleeve Abaya. All **ten** Abaya products now have
