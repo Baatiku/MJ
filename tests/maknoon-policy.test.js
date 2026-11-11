@@ -92,7 +92,8 @@ test('completed garment palettes offer matching colour photographs and previews 
     assert.equal(garment.garmentColourEdition, garmentColourEdition);
     assert.equal(expandGarmentColours(garment), garment);
     assert.equal(new Set(garment.variants.map(({ id }) => id)).size, garment.variants.length);
-    const represented = new Set(garment.variants.map(({ id }) => id));
+    const aliases = { navy: 'navy-blue', midnight: 'navy-blue', olive: 'olive-green', emerald: 'emerald-green', 'dusty-rose': 'dusty-pink' };
+    const represented = new Set(garment.variants.map(({ id }) => aliases[id] || id));
     for (const [colourId] of dressColours) assert.ok(represented.has(colourId), `${id} lacks ${colourId}`);
     for (const variant of garment.variants) {
       assert.ok(existsSync(new URL(`../public${variant.image}`, import.meta.url)), variant.image);
