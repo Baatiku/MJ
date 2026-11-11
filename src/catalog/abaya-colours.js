@@ -6,10 +6,17 @@ export const abayaColourEdition = 20261111;
 export const twentyColourAbayas = new Set([
   'satin-waterfall-abaya',
   'covered-button-abaya',
-  'flow-abaya'
+  'flow-abaya',
+  'burgundy-satin-drape',
+  'draped-collar-abaya',
+  'gathered-maxi-abaya',
+  'everyday-abaya',
+  'pleated-abaya',
+  'butterfly-abaya',
+  'cape-sleeve-abaya'
 ]);
 
-const aliases = { navy: 'navy-blue', midnight: 'navy-blue', olive: 'olive-green' };
+const aliases = { navy: 'navy-blue', midnight: 'navy-blue', olive: 'olive-green', emerald: 'emerald-green' };
 
 export function expandAbayaColours(product) {
   if (!twentyColourAbayas.has(product.id) || product.abayaColourEdition === abayaColourEdition) return product;

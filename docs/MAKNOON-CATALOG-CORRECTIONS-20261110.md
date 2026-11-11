@@ -74,6 +74,27 @@ larger-scope items **remain outstanding** and are not claimed complete:
 - Other Abayas and accessory categories remain a separate set of image batches;
   new colours will be activated only when their distinct product imagery exists.
 
+## 11 November follow-up — all remaining Abaya palettes
+
+- Complete the outstanding seven designs: Burgundy Waterfall Abaya, Draped
+  Collar Abaya, Gathered Maxi Abaya, Everyday Abaya, Pleated Cuff Abaya,
+  Butterfly Abaya and Cape-Sleeve Abaya. All **ten** Abaya products now have
+  the full 20 named colour choices backed by a style-specific garment image
+  and individually generated JPEG sharing preview.
+- Add **126** new colour photographs and previews in this release series:
+  43 surviving from the interrupted generation and 83 generated during the
+  final continuation. Taken together with 54 previously shipped Abaya colour
+  photos and 56 maxi-dress photos, this completes the requested palettes for
+  all 13 Abaya and Maxi-dress designs.
+- Original seller photographs, colours outside the palette, default colour,
+  manual price edits, and owner priority order are preserved. In particular,
+  original `midnight`, `navy` and `olive` IDs represent Navy Blue and Olive Green,
+  and the original Butterfly `emerald` represents Emerald Green, without
+  introducing duplicate named swatches. These synthetic previews illustrate
+  colours; they do not constitute stock or exact dye-lot verification.
+- Khimars, jilbabs, veils, niqabs and other accessories keep their own existing
+  colour choices. They were not part of the owner's 20-colour *dress* request.
+
 ## Release verification
 
 - `npm test` — 31 tests, all passing.
