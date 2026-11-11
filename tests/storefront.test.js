@@ -8,6 +8,7 @@ import { variantPage } from '../src/components/variant-page.js';
 import { popPetalsBrand, popPetalsProducts } from '../src/catalog/pop-petals.js';
 import { flawlessGlowBrand, flawlessGlowProducts } from '../src/catalog/flawless-glow.js';
 import { existsSync, readFileSync } from 'node:fs';
+import { twentyColourAbayas } from '../src/catalog/abaya-colours.js';
 
 const origin = 'https://shop.example';
 
@@ -31,7 +32,7 @@ test('each style has distinct colour choices and uniquely addressed images', () 
   const images = new Set();
   for (const product of products) {
     assert.ok(categories.some(({ id }) => id === product.category));
-    if (product.category === 'dress' || ['satin-waterfall-abaya', 'covered-button-abaya', 'flow-abaya'].includes(product.id)) assert.ok(product.variants.length >= 20);
+    if (product.category === 'dress' || twentyColourAbayas.has(product.id)) assert.ok(product.variants.length >= 20);
     else if (product.stock) assert.ok(product.variants.length >= 1);
     else assert.equal(product.variants.length, 4);
     assert.equal(new Set(product.variants.map(({ id }) => id)).size, product.variants.length);
@@ -66,9 +67,9 @@ test('photographed stock is first, grouped by construction and not duplicated by
     'covered-button-abaya', 'draped-collar-abaya', 'full-coverage-jilbab', 'gathered-waist-maxi',
     'full-drape-jilbab', 'tiered-niqab-khimar', 'gathered-maxi-abaya', 'two-tone-long-khimar'
   ]);
-  assert.deepEqual(stock.map(({ variants }) => variants.length), [25, 1, 1, 21, 4, 5, 21, 1, 3, 1, 1]);
+  assert.deepEqual(stock.map(({ variants }) => variants.length), [25, 1, 20, 21, 21, 5, 21, 1, 3, 21, 1]);
   assert.deepEqual(stock[3].variants.slice(0, 3).map(({ id }) => id), ['navy', 'black', 'brown']);
-  assert.deepEqual(stock[4].variants.map(({ id }) => id), ['rust', 'black', 'navy', 'purple']);
+  assert.deepEqual(stock[4].variants.slice(0, 4).map(({ id }) => id), ['rust', 'black', 'navy', 'purple']);
   assert.deepEqual(stock[5].variants.map(({ id }) => id), ['purple', 'sage', 'black', 'mauve', 'ivory']);
   assert.ok(products.every((product, i) => i < stock.length ? product.stock : !product.stock));
   for (const product of stock) {

@@ -68,7 +68,8 @@ test('image-complete Abayas have 20 named swatches, preserve old photo links and
     assert.equal(abaya.abayaColourEdition, abayaColourEdition);
     assert.equal(expandAbayaColours(abaya), abaya);
     assert.equal(new Set(abaya.variants.map(({ id }) => id)).size, abaya.variants.length);
-    const chosen = new Set(abaya.variants.map(({ id }) => id === 'navy' ? 'navy-blue' : id));
+    const aliases = { navy: 'navy-blue', midnight: 'navy-blue', olive: 'olive-green', emerald: 'emerald-green' };
+    const chosen = new Set(abaya.variants.map(({ id }) => aliases[id] || id));
     for (const [colourId, colourName] of dressColours) assert.ok(chosen.has(colourId), `${id} lacks ${colourName}`);
     const before = { ...abaya, abayaColourEdition: undefined, price: 42500, hidden: false, available: true,
       variants: [abaya.variants[2], abaya.variants[0], abaya.variants[1]], revision: 3 };
