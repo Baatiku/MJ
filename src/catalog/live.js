@@ -4,6 +4,7 @@ import { refineMaknoonDescription } from './maknoon-copy.js';
 import { correctMaknoonProduct, maknoonPolicyEdition } from './maknoon-policy.js';
 import { dressColourEdition, expandDressColours } from './dress-colours.js';
 import { abayaColourEdition, expandAbayaColours } from './abaya-colours.js';
+import { garmentColourEdition, expandGarmentColours } from './garment-colours.js';
 
 const colourEdition = 1;
 
@@ -20,7 +21,7 @@ export async function readCatalog(db) {
     const extra = fourthColour(product.id);
     if (edited.variants.some(({ id, name }) => id === extra.id || name.toLowerCase() === extra.name.toLowerCase())) return edited;
     return { ...edited, variants: [...edited.variants, extra] };
-  }).map(refineMaknoonDescription).map(correctMaknoonProduct).filter(Boolean).map(expandDressColours).map(expandAbayaColours);
+  }).map(refineMaknoonDescription).map(correctMaknoonProduct).filter(Boolean).map(expandDressColours).map(expandAbayaColours).map(expandGarmentColours);
 }
 
 const slug = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -65,5 +66,6 @@ export function validateProduct(input, { workspace = false } = {}) {
     ...(input.maknoonPolicyEdition === maknoonPolicyEdition ? { maknoonPolicyEdition } : {}),
     ...(input.dressColourEdition === dressColourEdition ? { dressColourEdition } : {}),
     ...(input.abayaColourEdition === abayaColourEdition ? { abayaColourEdition } : {}),
+    ...(input.garmentColourEdition === garmentColourEdition ? { garmentColourEdition } : {}),
     ...(gallery.length ? { gallery } : {}) };
 }
