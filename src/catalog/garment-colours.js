@@ -4,7 +4,8 @@ import { dressColours } from './dress-colours.js';
 // product photograph and JPEG share preview in public/maknoon-colours.
 export const garmentColourEdition = 20261111;
 export const twentyColourGarments = new Set([
-  'full-coverage-satin-khimar'
+  'full-coverage-satin-khimar',
+  'full-coverage-jilbab'
 ]);
 
 const aliases = {
