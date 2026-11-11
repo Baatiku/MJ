@@ -31,7 +31,8 @@ test('each style has distinct colour choices and uniquely addressed images', () 
   const images = new Set();
   for (const product of products) {
     assert.ok(categories.some(({ id }) => id === product.category));
-    if (product.stock) assert.ok(product.variants.length >= 1);
+    if (product.category === 'dress') assert.ok(product.variants.length >= 20);
+    else if (product.stock) assert.ok(product.variants.length >= 1);
     else assert.equal(product.variants.length, 4);
     assert.equal(new Set(product.variants.map(({ id }) => id)).size, product.variants.length);
     for (const variant of product.variants) {
@@ -65,7 +66,7 @@ test('photographed stock is first, grouped by construction and not duplicated by
     'covered-button-abaya', 'draped-collar-abaya', 'full-coverage-jilbab', 'gathered-waist-maxi',
     'full-drape-jilbab', 'tiered-niqab-khimar', 'gathered-maxi-abaya', 'two-tone-long-khimar'
   ]);
-  assert.deepEqual(stock.map(({ variants }) => variants.length), [7, 1, 1, 3, 4, 5, 1, 1, 3, 1, 1]);
+  assert.deepEqual(stock.map(({ variants }) => variants.length), [7, 1, 1, 3, 4, 5, 21, 1, 3, 1, 1]);
   assert.deepEqual(stock[3].variants.map(({ id }) => id), ['navy', 'black', 'brown']);
   assert.deepEqual(stock[4].variants.map(({ id }) => id), ['rust', 'black', 'navy', 'purple']);
   assert.deepEqual(stock[5].variants.map(({ id }) => id), ['purple', 'sage', 'black', 'mauve', 'ivory']);

@@ -8,6 +8,7 @@ import { withMaknoonPhotoBatch } from '../src/catalog/maknoon-photo-batch.js';
 import { storefront } from '../src/components/storefront.js';
 import { validateProduct } from '../src/catalog/live.js';
 import { sitemapXml } from '../src/lib/sitemap.js';
+import { dressColours, dressColourEdition, expandDressColours } from '../src/catalog/dress-colours.js';
 
 const get = (id) => products.find((product) => product.id === id);
 
@@ -92,4 +93,37 @@ test('expandable swatches preserve the circular selectors and admin supports 20+
   assert.equal(validated.variants.length, 20);
   const ordered = { ...base, variants: [base.variants[2], base.variants[0], base.variants[1]] };
   assert.match(storefront('https://shop.masanawa.com', [ordered]), new RegExp(`src="${ordered.variants[0].image}"`));
+});
+
+test('each maxi dress has the full 20-colour palette without losing original photography or duplicate colour choices', () => {
+  for (const dress of products.filter(({ category }) => category === 'dress')) {
+    assert.equal(dress.dressColourEdition, dressColourEdition);
+    assert.ok(dress.variants.length >= dressColours.length);
+    assert.equal(new Set(dress.variants.map(({ id }) => id)).size, dress.variants.length);
+    const colourIds = new Set(dress.variants.map(({ id }) =>
+      id === 'navy' ? 'navy-blue' : id === 'olive' ? 'olive-green' : id));
+    for (const [id, name] of dressColours) {
+      assert.ok(colourIds.has(id), `${dress.name} is missing ${name}`);
+    }
+    assert.deepEqual(expandDressColours(dress).variants, dress.variants);
+  }
+});
+
+test('D1 catalogue colour upgrades preserve seller main image, priority, price and availability', async () => {
+  const dress = get('linen-a-line-maxi');
+  const unexpanded = { ...dress, dressColourEdition: undefined, revision: 4, variants: [
+    { ...dress.variants[3] }, { ...dress.variants[0] }, { ...dress.variants[1] }
+  ], price: 12000, available: false, hidden: true };
+  const db = { prepare: () => ({ all: async () => ({ results: [
+    { id: dress.id, document: JSON.stringify(unexpanded), revision: 4 }
+  ] }) }) };
+  const upgraded = (await readCatalog(db)).find(({ id }) => id === dress.id);
+  assert.equal(upgraded.variants[0].id, unexpanded.variants[0].id);
+  assert.equal(upgraded.variants[0].image, unexpanded.variants[0].image);
+  assert.equal(upgraded.price, 12000);
+  assert.equal(upgraded.available, false);
+  assert.equal(upgraded.hidden, true);
+  assert.ok(upgraded.variants.length >= 20);
+  assert.equal(upgraded.dressColourEdition, dressColourEdition);
+  assert.equal(validateProduct(upgraded).dressColourEdition, dressColourEdition);
 });
