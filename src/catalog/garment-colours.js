@@ -5,7 +5,8 @@ import { dressColours } from './dress-colours.js';
 export const garmentColourEdition = 20261111;
 export const twentyColourGarments = new Set([
   'full-coverage-satin-khimar',
-  'full-coverage-jilbab'
+  'full-coverage-jilbab',
+  'full-drape-jilbab'
 ]);
 
 const aliases = {
