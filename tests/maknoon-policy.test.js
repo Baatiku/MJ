@@ -9,6 +9,7 @@ import { storefront } from '../src/components/storefront.js';
 import { validateProduct } from '../src/catalog/live.js';
 import { sitemapXml } from '../src/lib/sitemap.js';
 import { dressColours, dressColourEdition, expandDressColours } from '../src/catalog/dress-colours.js';
+import { abayaColourEdition, expandAbayaColours, twentyColourAbayas } from '../src/catalog/abaya-colours.js';
 
 const get = (id) => products.find((product) => product.id === id);
 
@@ -53,11 +54,32 @@ test('correct titles, fabric terminology and all category-wide prices apply', ()
 
 test('buttonless Cape Abaya images are used for every colour and the gallery', () => {
   const cape = get('covered-button-abaya');
-  assert.deepEqual(cape.variants.map(({ id }) => id), ['navy', 'black', 'brown']);
-  for (const image of [...cape.variants.map(({ image }) => image), ...cape.gallery]) {
+  assert.deepEqual(cape.variants.slice(0, 3).map(({ id }) => id), ['navy', 'black', 'brown']);
+  for (const image of [...cape.variants.slice(0, 3).map(({ image }) => image), ...cape.gallery]) {
     assert.match(image, /buttonless\.webp$/);
     assert.ok(existsSync(new URL(`../public${image}`, import.meta.url)));
     assert.ok(existsSync(new URL(`../public${image.replace('/images/', '/previews/').replace('.webp', '.jpg')}`, import.meta.url)));
+  }
+});
+
+test('image-complete Abayas have 20 named swatches, preserve old photo links and retain their priority', async () => {
+  for (const id of twentyColourAbayas) {
+    const abaya = get(id);
+    assert.equal(abaya.abayaColourEdition, abayaColourEdition);
+    assert.equal(expandAbayaColours(abaya), abaya);
+    assert.equal(new Set(abaya.variants.map(({ id }) => id)).size, abaya.variants.length);
+    const chosen = new Set(abaya.variants.map(({ id }) => id === 'navy' ? 'navy-blue' : id));
+    for (const [colourId, colourName] of dressColours) assert.ok(chosen.has(colourId), `${id} lacks ${colourName}`);
+    const before = { ...abaya, abayaColourEdition: undefined, price: 42500, hidden: false, available: true,
+      variants: [abaya.variants[2], abaya.variants[0], abaya.variants[1]], revision: 3 };
+    const db = { prepare: () => ({ all: async () => ({ results: [
+      { id, document: JSON.stringify(before), revision: 3 }
+    ] }) }) };
+    const updated = (await readCatalog(db)).find((product) => product.id === id);
+    assert.equal(updated.variants[0].image, before.variants[0].image);
+    assert.equal(updated.price, 42500);
+    assert.ok(updated.variants.length >= 20);
+    assert.equal(validateProduct(updated).abayaColourEdition, abayaColourEdition);
   }
 });
 
@@ -84,7 +106,7 @@ test('expandable swatches preserve the circular selectors and admin supports 20+
   const page = storefront('https://shop.masanawa.com');
   const waterfall = page.match(/<article[^>]+id="satin-waterfall-abaya"[\s\S]*?<\/article>/)?.[0];
   assert.match(waterfall, /class="swatches" data-collapsed/);
-  assert.match(waterfall, /class="swatches-toggle" aria-expanded="false">\+1 more colours/);
+  assert.match(waterfall, /class="swatches-toggle" aria-expanded="false">\+19 more colours/);
   const base = get('chiffon-wrap');
   const twenty = Array.from({ length: 20 }, (_, i) => ({
     ...base.variants[0], id: `colour-${i + 1}`, name: `Colour ${i + 1}`

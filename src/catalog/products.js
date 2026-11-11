@@ -4,6 +4,7 @@ import { maknoonPhotoBatch } from './maknoon-photo-batch.js';
 import { refineMaknoonDescription } from './maknoon-copy.js';
 import { correctMaknoonProduct } from './maknoon-policy.js';
 import { expandDressColours } from './dress-colours.js';
+import { expandAbayaColours } from './abaya-colours.js';
 
 const product = (id, name, category, description, colours, price = null) => ({
   id, name, category, description, price,
@@ -83,4 +84,4 @@ export const products = [
   ...styles.map((style) => ({
     ...style, variants: [...style.variants, fourthColour(style.id)]
   }))
-].map(refineMaknoonDescription).map(correctMaknoonProduct).filter(Boolean).map(expandDressColours);
+].map(refineMaknoonDescription).map(correctMaknoonProduct).filter(Boolean).map(expandDressColours).map(expandAbayaColours);
