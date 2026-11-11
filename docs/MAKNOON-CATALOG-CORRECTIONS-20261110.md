@@ -83,6 +83,10 @@ larger-scope items **remain outstanding** and are not claimed complete:
   Mocha photograph remains first and unchanged.
 - The new garment-colour edition upgrades older D1 records while preserving
   owner-selected default image, colour order, price, and availability.
+- Full-Coverage Jilbab now retains its five original photographs and adds
+  distinct images and previews for the other 19 palette colours. Black was
+  already covered by an original photo; Purple, Sage, Mauve and Ivory remain
+  additional seller-supplied choices.
 - Only completed, image-backed garment styles are activated. Other Khimars,
   Jilbabs, niqab looks, layers and headwear are still awaiting their distinct
   photo sets and are not advertised as 20-colour products yet.

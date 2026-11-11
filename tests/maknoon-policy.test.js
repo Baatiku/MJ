@@ -108,7 +108,7 @@ test('completed Khimar palettes offer matching colour photographs and previews w
     assert.equal(updated.price, 35000);
     assert.equal(updated.hidden, true);
     assert.equal(updated.available, false);
-    assert.equal(updated.variants.length, 20);
+    assert.ok(updated.variants.length >= 20);
     assert.equal(validateProduct(updated).garmentColourEdition, garmentColourEdition);
   }
 });

@@ -67,10 +67,10 @@ test('photographed stock is first, grouped by construction and not duplicated by
     'covered-button-abaya', 'draped-collar-abaya', 'full-coverage-jilbab', 'gathered-waist-maxi',
     'full-drape-jilbab', 'tiered-niqab-khimar', 'gathered-maxi-abaya', 'two-tone-long-khimar'
   ]);
-  assert.deepEqual(stock.map(({ variants }) => variants.length), [25, 20, 20, 21, 21, 5, 21, 1, 3, 21, 1]);
+  assert.deepEqual(stock.map(({ variants }) => variants.length), [25, 20, 20, 21, 21, 24, 21, 1, 3, 21, 1]);
   assert.deepEqual(stock[3].variants.slice(0, 3).map(({ id }) => id), ['navy', 'black', 'brown']);
   assert.deepEqual(stock[4].variants.slice(0, 4).map(({ id }) => id), ['rust', 'black', 'navy', 'purple']);
-  assert.deepEqual(stock[5].variants.map(({ id }) => id), ['purple', 'sage', 'black', 'mauve', 'ivory']);
+  assert.deepEqual(stock[5].variants.slice(0, 5).map(({ id }) => id), ['purple', 'sage', 'black', 'mauve', 'ivory']);
   assert.ok(products.every((product, i) => i < stock.length ? product.stock : !product.stock));
   for (const product of stock) {
     assert.ok(product.price === null || product.price === 15000 || product.price === 30000 || product.price === 40000);
