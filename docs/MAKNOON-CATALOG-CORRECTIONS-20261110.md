@@ -61,6 +61,19 @@ larger-scope items **remain outstanding** and are not claimed complete:
   existing verified palettes; adding the same 20 colour renderings to every
   one of those categories is a separate, larger image-generation scope.
 
+## Follow-up: Waterfall, Cape and Flow Abayas
+
+- Extend the same image-backed 20-colour palette to the Waterfall Abaya,
+  buttonless Cape Abaya and Flow Abaya. These first three Abaya designs add 54
+  generated studio colour images plus 54 JPEG product-share previews.
+- Keep real photographed stock options first, preserving seller priorities,
+  original photographs and shared colour URLs. A palette entry already covered
+  by an owner photo is not duplicated; original colours outside the 20 remain.
+- Colour images for the Cape Abaya must preserve its buttonless silhouette.
+  Photo previews do not by themselves verify inventory or precise dye shades.
+- Other Abayas and accessory categories remain a separate set of image batches;
+  new colours will be activated only when their distinct product imagery exists.
+
 ## Release verification
 
 - `npm test` — 31 tests, all passing.
