@@ -6,7 +6,8 @@ export const garmentColourEdition = 20261111;
 export const twentyColourGarments = new Set([
   'full-coverage-satin-khimar',
   'full-coverage-jilbab',
-  'full-drape-jilbab'
+  'full-drape-jilbab',
+  'jilbab-veil'
 ]);
 
 const aliases = {

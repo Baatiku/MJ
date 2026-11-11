@@ -89,6 +89,9 @@ larger-scope items **remain outstanding** and are not claimed complete:
   additional seller-supplied choices.
 - Full-Drape Jilbab retains its Powder Blue boutique photograph, handbag and
   share URL, with 19 new garment-colour studio images and matching JPEG previews.
+- Layered Jilbab Look retains its original Black, Taupe, Burgundy and Olive
+  imagery, with 17 new colour photographs and matching previews. The existing
+  Olive variant represents the Olive Green swatch without changing its URL.
 - Only completed, image-backed garment styles are activated. Other Khimars,
   Jilbabs, niqab looks, layers and headwear are still awaiting their distinct
   photo sets and are not advertised as 20-colour products yet.
