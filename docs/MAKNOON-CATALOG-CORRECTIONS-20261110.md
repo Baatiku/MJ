@@ -87,6 +87,8 @@ larger-scope items **remain outstanding** and are not claimed complete:
   distinct images and previews for the other 19 palette colours. Black was
   already covered by an original photo; Purple, Sage, Mauve and Ivory remain
   additional seller-supplied choices.
+- Full-Drape Jilbab retains its Powder Blue boutique photograph, handbag and
+  share URL, with 19 new garment-colour studio images and matching JPEG previews.
 - Only completed, image-backed garment styles are activated. Other Khimars,
   Jilbabs, niqab looks, layers and headwear are still awaiting their distinct
   photo sets and are not advertised as 20-colour products yet.

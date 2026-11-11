@@ -11,6 +11,7 @@ import { sitemapXml } from '../src/lib/sitemap.js';
 import { dressColours, dressColourEdition, expandDressColours } from '../src/catalog/dress-colours.js';
 import { abayaColourEdition, expandAbayaColours, twentyColourAbayas } from '../src/catalog/abaya-colours.js';
 import { garmentColourEdition, expandGarmentColours, twentyColourGarments } from '../src/catalog/garment-colours.js';
+import { previewImage } from '../src/lib/shop.js';
 
 const get = (id) => products.find((product) => product.id === id);
 
@@ -85,7 +86,7 @@ test('image-complete Abayas have 20 named swatches, preserve old photo links and
   }
 });
 
-test('completed Khimar palettes offer matching colour photographs and previews without overwriting owner choices', async () => {
+test('completed garment palettes offer matching colour photographs and previews without overwriting owner choices', async () => {
   for (const id of twentyColourGarments) {
     const garment = get(id);
     assert.equal(garment.garmentColourEdition, garmentColourEdition);
@@ -95,7 +96,7 @@ test('completed Khimar palettes offer matching colour photographs and previews w
     for (const [colourId] of dressColours) assert.ok(represented.has(colourId), `${id} lacks ${colourId}`);
     for (const variant of garment.variants) {
       assert.ok(existsSync(new URL(`../public${variant.image}`, import.meta.url)), variant.image);
-      const preview = variant.image.replace('/images/', '/previews/').replace(/\.(webp|png)$/, '.jpg');
+      const preview = previewImage(variant);
       assert.ok(existsSync(new URL(`../public${preview}`, import.meta.url)), preview);
     }
     const previous = { ...garment, garmentColourEdition: undefined, price: 35000, revision: 4,
