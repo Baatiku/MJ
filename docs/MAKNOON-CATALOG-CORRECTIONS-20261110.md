@@ -37,6 +37,30 @@ larger-scope items **remain outstanding** and are not claimed complete:
 - Produce all requested 20 genuinely colour-matched photographs for each
   remaining dress, without duplicate designs or falsely labelled photos.
 
+## 11 November continuation — full maxi-dress palette
+
+- The three distinct **Maxi dresses** product designs are Gathered-Waist Maxi,
+  A-Line Maxi and Tiered Gathered Maxi. Each now offers the requested 20-colour
+  palette, illustrated by garment-specific generated studio images, while
+  keeping original seller photographs and other original colours. These are
+  visual colour renderings; they do **not** independently verify inventory or
+  that the finished garment will have exactly the same shade.
+- 56 new colour options require generated product images and individually
+  generated JPEG social previews (20 for the Gathered-Waist Maxi, 18 each for
+  the A-Line and Tiered Gathered styles; their existing Navy and Olive images
+  already cover the other two palette colours). There are no duplicated dress
+  products. Generated images live in `public/images/maknoon-colours/`; their
+  previews live in `public/previews/maknoon-colours/`.
+- Keep old colour IDs and links, preserve the original top/default image and
+  seller colour order, and append the newly requested colours. Admin saves
+  retain the edition so priority and default-image changes are not undone.
+  Existing Cloudflare D1 records are upgraded on read for both legacy and
+  managed Maknoon storefront paths.
+- Colour expansion in this release is for the three **Maxi dresses** category
+  designs. Abayas, jilbabs, khimars, niqabs and headwear retain their own
+  existing verified palettes; adding the same 20 colour renderings to every
+  one of those categories is a separate, larger image-generation scope.
+
 ## Release verification
 
 - `npm test` — 31 tests, all passing.

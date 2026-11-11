@@ -2,6 +2,7 @@ import { categories, products } from './products.js';
 import { fourthColour } from './fourth-colours.js';
 import { refineMaknoonDescription } from './maknoon-copy.js';
 import { correctMaknoonProduct, maknoonPolicyEdition } from './maknoon-policy.js';
+import { dressColourEdition, expandDressColours } from './dress-colours.js';
 
 const colourEdition = 1;
 
@@ -18,11 +19,11 @@ export async function readCatalog(db) {
     const extra = fourthColour(product.id);
     if (edited.variants.some(({ id, name }) => id === extra.id || name.toLowerCase() === extra.name.toLowerCase())) return edited;
     return { ...edited, variants: [...edited.variants, extra] };
-  }).map(refineMaknoonDescription).map(correctMaknoonProduct).filter(Boolean);
+  }).map(refineMaknoonDescription).map(correctMaknoonProduct).filter(Boolean).map(expandDressColours);
 }
 
 const slug = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-const asset = /^\/(?:images|previews)\/(?:(?:pop-petals|flawless-glow)(?:\/curated)?\/|maknoon-stock\/|brand-covers\/)?[a-z0-9-]+\.(?:jpg|jpeg|png|webp)$/;
+const asset = /^\/(?:images|previews)\/(?:(?:pop-petals|flawless-glow)(?:\/curated)?\/|maknoon-stock\/|maknoon-colours\/|brand-covers\/)?[a-z0-9-]+\.(?:jpg|jpeg|png|webp)$/;
 function imageUrl(value, workspace) {
   if (typeof value !== 'string' || value.length > 500) return false;
   if (asset.test(value) || (workspace && /^\/shop-media\/[a-f0-9-]{36}$/.test(value))) return true;
@@ -61,5 +62,6 @@ export function validateProduct(input, { workspace = false } = {}) {
     ? input.gallery : [];
   return { id, category, price, available, hidden, colourEdition, name: input.name.trim(), description: input.description.trim(), variants,
     ...(input.maknoonPolicyEdition === maknoonPolicyEdition ? { maknoonPolicyEdition } : {}),
+    ...(input.dressColourEdition === dressColourEdition ? { dressColourEdition } : {}),
     ...(gallery.length ? { gallery } : {}) };
 }
